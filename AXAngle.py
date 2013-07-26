@@ -17,29 +17,30 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+import math
 from math import radians
 
 class AXAngle:
     def __init__(self, value):
-        self.value = value
+        self.angle = value
         
-    def getValue():
-        return(self.value)
+    def getValue(self):
+        return(self.angle)
     
     def setValue(self,value):
-        self.value = value
+        self.angle = value
         
-    def toDegrees():
-        return((self.value*300)/1023)
+    def toDegrees(self):
+        return((self.angle*300)/1023)
     
-    def toRadians():
-        return(math.radians(self.toDegrees))
+    def toRadians(self):
+        return(math.radians(self.toDegrees()))
         
-
 
 angle = AXAngle(1023)
 angle.setValue(1023)
-value = angle.getValue
+value = angle.getValue()
+
 print value
-print (angle.toDegrees)
-print (angle.toRadians)
+print (angle.toDegrees())
+print (angle.toRadians())
