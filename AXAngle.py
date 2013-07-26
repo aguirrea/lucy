@@ -11,7 +11,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# GNU General Public License for more details.
+# GNU General Publi c License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
@@ -19,6 +19,8 @@
 
 import math
 from math import radians
+
+ZERO_VALUE = 150
 
 class AXAngle:
     def __init__(self, value):
@@ -35,12 +37,17 @@ class AXAngle:
     
     def toRadians(self):
         return(math.radians(self.toDegrees()))
-        
+    
+    def toVrep(self):
+        if self.toDegrees()<ZERO_VALUE:
+            return -1*(math.radians(ZERO_VALUE) - self.toRadians())
+        else:
+            return (self.toRadians() - math.radians(ZERO_VALUE))
 
-angle = AXAngle(1023)
-angle.setValue(1023)
+angle = AXAngle(611)
 value = angle.getValue()
 
 print value
 print (angle.toDegrees())
 print (angle.toRadians())
+print (angle.toVrep())
