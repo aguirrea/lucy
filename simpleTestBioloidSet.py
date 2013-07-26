@@ -1,20 +1,21 @@
-# Copyright 2006-2013 Dr. Marc Andreas Freese. All rights reserved. 
-# marc@coppeliarobotics.com
-# www.coppeliarobotics.com
-# 
-# -------------------------------------------------------------------
-# This file is distributed in the hope that it will be useful,
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+# Andrés Aguirre Dorelo
+# MINA/INCO/UDELAR
+# comunication abstraction layer
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# 
-# You are free to use/modify/distribute this file for whatever purpose!
-# -------------------------------------------------------------------
-
-# This file was automatically created for V-REP release V3.0.1 on January 20th 2013
-
-# Make sure to have the server side running in V-REP!
-# Start the server from a child script with following command:
-# simExtRemoteApiStart(19999) -- starts a remote API server service on port 19999
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import vrep
 import time
@@ -24,17 +25,17 @@ print 'Program started'
 clientID = vrep.simxStart('127.0.0.1',19998,True,True,5000,5)
 if clientID !=-1:
     print 'Connected to remote API server'
-    vrep.simxLoadScene(clientID, "/home/andres/Documentos/maestria/modelos_fisicos_robots/nao_genetico.ttt", 2, vrep.simx_opmode_oneshot_wait)
+    vrep.simxLoadScene(clientID, "/home/andres/Documentos/maestria/lucy/models/genetic_bioloid.ttt", 2, vrep.simx_opmode_oneshot_wait)
     res,objs=vrep.simxGetObjects(clientID,vrep.sim_handle_all,vrep.simx_opmode_oneshot_wait)
     if res==vrep.simx_error_noerror:
         print 'Number of objects in the scene: ',len(objs)
     else:
         print 'Remote API function call returned with error code: '
-    ##x =vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot_wait)
+    x =vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot_wait)
     ##vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
     #error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"LKneePitch3#", vrep.simx_opmode_oneshot_wait)
     #error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"LShoulderPitch3#", vrep.simx_opmode_oneshot_wait)
-    error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"LHipPitch3#", vrep.simx_opmode_oneshot_wait)
+    error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"L_Shoulder_Pitch#", vrep.simx_opmode_oneshot_wait)
     #                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    error, FLOOR_Handle=vrep.simxGetObjectHandle(clientID,"DefaultFloor#", vrep.simx_opmode_oneshot_wait)
     #vrep.simxCheckDistance(clientID, LSP_Handle, FLOOR_Handle, 50,  vrep.simx_opmode_oneshot_wait)
     #colHandle = vrep.simxGetCollisionHandle(clientID, "DefaultFloor#", vrep.simx_opmode_oneshot_wait)
