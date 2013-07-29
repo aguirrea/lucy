@@ -23,7 +23,7 @@ from math import radians
 ZERO_VALUE = 150
 
 class AXAngle:
-    def __init__(self, value):
+    def __init__(self, value=0):
         self.angle = value
         
     def getValue(self):
