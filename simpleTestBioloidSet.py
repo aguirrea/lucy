@@ -19,54 +19,60 @@
 
 import vrep
 import time
+from LoadPoses import LoadPoses
 from AXAngle import AXAngle
 
+standadRemoteApiPort=19998
+localhost='127.0.0.1'
+genetic_bioloid="/home/andres/Documentos/maestria/lucy/models/genetic_bioloid.ttt"
+
+def connectVREP(ipAddr=localhost, port=standadRemoteApiPort):
+    return vrep.simxStart(ipAddr,port,True,True,5000,5)
+
+def loadscn(clientID, model=genetic_bioloid):
+    error=vrep.simxLoadScene(clientID, model, 2, vrep.simx_opmode_oneshot_wait)
+    return error
+
+def printJointPositions(clientID):
+    error, handles, intData, floatData, stringData=vrep.simxGetObjectGroupData(clientID,vrep.sim_appobj_object_type,0,vrep.simx_opmode_oneshot_wait)
+    itemHandle=0
+    print stringData
+    for name in stringData:
+        error, position = vrep.simxGetJointPosition(clientID,handles[itemHandle], vrep.simx_opmode_streaming)
+        itemHandle=itemHandle+1
+        print name + ":" + str(position)
+
+def isRobotUp(clientID):
+    error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait)
+    error, position = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_streaming)               
+    print error, position
+
+def startSim(clientID, screen=True):
+    error=vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot_wait)
+    if not screen:
+        vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
+    return error
+        
+
 print 'Program started'
-clientID = vrep.simxStart('127.0.0.1',19998,True,True,5000,5)
+angle = AXAngle()
+lp = LoadPoses()
+clientID = connectVREP()
 if clientID !=-1:
     print 'Connected to remote API server'
-    vrep.simxLoadScene(clientID, "/home/andres/Documentos/maestria/lucy/models/genetic_bioloid.ttt", 2, vrep.simx_opmode_oneshot_wait)
-    res,objs=vrep.simxGetObjects(clientID,vrep.sim_handle_all,vrep.simx_opmode_oneshot_wait)
-    if res==vrep.simx_error_noerror:
-        print 'Number of objects in the scene: ',len(objs)
-    else:
-        print 'Remote API function call returned with error code: '
-    x =vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot_wait)
-    ##vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
-    #error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"LKneePitch3#", vrep.simx_opmode_oneshot_wait)
-    #error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"LShoulderPitch3#", vrep.simx_opmode_oneshot_wait)
-    error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"L_Shoulder_Pitch#", vrep.simx_opmode_oneshot_wait)
-    #                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    error, FLOOR_Handle=vrep.simxGetObjectHandle(clientID,"DefaultFloor#", vrep.simx_opmode_oneshot_wait)
-    #vrep.simxCheckDistance(clientID, LSP_Handle, FLOOR_Handle, 50,  vrep.simx_opmode_oneshot_wait)
-    #colHandle = vrep.simxGetCollisionHandle(clientID, "DefaultFloor#", vrep.simx_opmode_oneshot_wait)
-    #error, collisionState = vrep.simxReadCollision(clientID, colHandle, vrep.simx_opmode_oneshot_wait)
-    #print error
-    #print collisionState
-    angle1 = AXAngle(1023)
-    angle2 = AXAngle(512)
-    error, position = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_streaming)
-    error, position = vrep.simxGetJointPosition(clientID,LSP_Handle, vrep.simx_opmode_streaming)
-    print "al leer posicion error " + str(error) + " posicion " + str(position)
-
-    i=0
-    while(1):
-        if (i%2 == 0):
-            #vrep.simxSetJointPosition(clientID,LSP_Handle, angle1.toVrep() , vrep.simx_opmode_streaming)
-            vrep.simxSetJointPosition(clientID,LSP_Handle, 0, vrep.simx_opmode_streaming)
-        else:
-            vrep.simxSetJointPosition(clientID,LSP_Handle, 1, vrep.simx_opmode_streaming)
-        time.sleep(3)
-        print "frame: " + str(i)
-        error, position = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_streaming)
-        error, position = vrep.simxGetJointPosition(clientID,LSP_Handle, vrep.simx_opmode_streaming)
-        print "al leer posicion error " + str(error) + " posicion " + str(position)
-
-        #error, collisionState = vrep.simxReadCollision(clientID, FLOOR_Handle, vrep.simx_opmode_oneshot_wait)
-        #print "Error: " + str(error)
-        #print "State: " + str(collisionState)
-        i=i+1
+    loadscn(clientID)
+    startSim(clientID)
+    frameQty=lp.getFrameQty()
+    for index in range(frameQty):
+        pose=lp.getFramePose(index)
+        for joint in pose.keys():
+            error, jhandle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
+            angle.setValue(pose[joint])
+            vrep.simxSetJointPosition(clientID,jhandle,angle.toVrep(),vrep.simx_opmode_oneshot)
+        printJointPositions(clientID)
+        print index
     x =vrep.simxStopSimulation(clientID,vrep.simx_opmode_oneshot_wait)
-    #vrep.simxFinish()
+    vrep.simxFinish(clientID)
 else:
     print 'Failed connecting to remote API server', clientID
 print 'Program ended'
