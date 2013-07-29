@@ -44,10 +44,10 @@ class AXAngle:
         else:
             return (self.toRadians() - math.radians(ZERO_VALUE))
 
-angle = AXAngle(611)
-value = angle.getValue()
+#angle = AXAngle(611)
+#value = angle.getValue()
 
-print value
-print (angle.toDegrees())
-print (angle.toRadians())
-print (angle.toVrep())
+#print value
+#print (angle.toDegrees())
+#print (angle.toRadians())
+#print (angle.toVrep())
