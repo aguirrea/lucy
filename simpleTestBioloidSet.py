@@ -52,6 +52,10 @@ def startSim(clientID, screen=True):
     if not screen:
         vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
     return error
+
+def setJointPosition(clientID, joint, angle):
+    error, jhandle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
+    vrep.simxSetJointPosition(clientID,jhandle,angle,vrep.simx_opmode_oneshot)
         
 
 print 'Program started'
@@ -66,9 +70,8 @@ if clientID !=-1:
     for index in range(frameQty):
         pose=lp.getFramePose(index)
         for joint in pose.keys():
-            error, jhandle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
             angle.setValue(pose[joint])
-            vrep.simxSetJointPosition(clientID,jhandle,angle.toVrep(),vrep.simx_opmode_oneshot)
+            setJointPosition(clientID,joint,angle.toVrep())
         printJointPositions(clientID)
         print index
     x =vrep.simxStopSimulation(clientID,vrep.simx_opmode_oneshot_wait)
