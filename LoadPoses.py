@@ -55,9 +55,9 @@ class LoadPoses:
     def getFrameQty(self):
         return self.framelist.length
     
-lp = LoadPoses()
-print lp.getFramePose(1)
-print lp.getJointAngles("R_Ankle_Pitch")
-print lp.getJointAngles("R_Ankle_Roll")
-frameQty=lp.getFrameQty()
-print "there is " + str(frameQty) + " frames."
+#lp = LoadPoses()
+#print lp.getFramePose(1)
+#print lp.getJointAngles("R_Ankle_Pitch")
+#print lp.getJointAngles("R_Ankle_Roll")
+#frameQty=lp.getFrameQty()
+#print "there is " + str(frameQty) + " frames."
