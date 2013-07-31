@@ -24,7 +24,12 @@ from AXAngle import AXAngle
 
 standadRemoteApiPort=19998
 localhost='127.0.0.1'
+salameIP='192.168.1.101'
+windowsSalaIP='192.168.1.106'
 genetic_bioloid="/home/andres/Documentos/maestria/lucy/models/genetic_bioloid.ttt"
+genetic_bioloid_salame="/home/romina/lucy/models/genetic_bioloid.ttt"
+genetic_bioloid_windows_sala="C:\genetic_bioloid.ttt"
+genetic_bioloid_roca="/home/rfernandez/genetic_bioloid.ttt"
 
 def connectVREP(ipAddr=localhost, port=standadRemoteApiPort):
     return vrep.simxStart(ipAddr,port,True,True,5000,5)
@@ -55,27 +60,40 @@ def startSim(clientID, screen=True):
 
 def setJointPosition(clientID, joint, angle):
     error, jhandle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
-    vrep.simxSetJointPosition(clientID,jhandle,angle,vrep.simx_opmode_oneshot)
+    vrep.simxSetJointPosition(clientID,jhandle,angle,vrep.simx_opmode_oneshot_wait)
         
+def finishSimulation(clientID):
+    errorStop=vrep.simxStopSimulation(clientID,vrep.simx_opmode_oneshot_wait)
+    errorClose=vrep.simxCloseScene(clientID,vrep.simx_opmode_oneshot_wait)
+    error=errorStop or errorClose
+    errorFinish=vrep.simxFinish(clientID)
+    error=error or errorFinish
+    return error
 
 print 'Program started'
 angle = AXAngle()
 lp = LoadPoses()
+#clientID = connectVREP(windowsSalaIP,standadRemoteApiPort)
 clientID = connectVREP()
+#clientID = connectVREP(salameIP)
 if clientID !=-1:
     print 'Connected to remote API server'
-    loadscn(clientID)
+    #loadscn(clientID,genetic_bioloid_salame)
+    #loadscn(clientID,genetic_bioloid)
+    #loadscn(clientID,genetic_bioloid_windows_sala)
+    loadscn(clientID,genetic_bioloid_windows_sala)
     startSim(clientID)
     frameQty=lp.getFrameQty()
-    for index in range(frameQty):
-        pose=lp.getFramePose(index)
-        for joint in pose.keys():
-            angle.setValue(pose[joint])
-            setJointPosition(clientID,joint,angle.toVrep())
-        printJointPositions(clientID)
-        print index
-    x =vrep.simxStopSimulation(clientID,vrep.simx_opmode_oneshot_wait)
-    vrep.simxFinish(clientID)
+    while(1):
+        for index in range(frameQty):
+            pose=lp.getFramePose(index)
+            for joint in pose.keys():
+                angle.setValue(pose[joint])
+                setJointPosition(clientID,joint,angle.toVrep())
+            #printJointPositions(clientID)
+            print index
+    error=finishSimulation(clientID)
+    print error
 else:
     print 'Failed connecting to remote API server', clientID
 print 'Program ended'
