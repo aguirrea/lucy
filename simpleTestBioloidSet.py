@@ -30,6 +30,7 @@ genetic_bioloid="/home/andres/Documentos/maestria/lucy/models/genetic_bioloid.tt
 genetic_bioloid_salame="/home/romina/lucy/models/genetic_bioloid.ttt"
 genetic_bioloid_windows_sala="C:\genetic_bioloid.ttt"
 genetic_bioloid_roca="/home/rfernandez/genetic_bioloid.ttt"
+jointHandleMapping = {}
 
 def connectVREP(ipAddr=localhost, port=standadRemoteApiPort):
     return vrep.simxStart(ipAddr,port,True,True,5000,5)
@@ -59,7 +60,11 @@ def startSim(clientID, screen=True):
     return error
 
 def setJointPosition(clientID, joint, angle):
-    error, jhandle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
+    if (jointHandleMapping[joint] > 0):
+        jhandle=jointHandleMapping[joint]
+    else:
+        error, jhandle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
+        jointHandleMapping[joint]=jhandle
     vrep.simxSetJointPosition(clientID,jhandle,angle,vrep.simx_opmode_oneshot_wait)
         
 def finishSimulation(clientID):
@@ -70,19 +75,26 @@ def finishSimulation(clientID):
     error=error or errorFinish
     return error
 
+
 print 'Program started'
 angle = AXAngle()
 lp = LoadPoses()
 #clientID = connectVREP(windowsSalaIP,standadRemoteApiPort)
 clientID = connectVREP()
+
+pose=lp.getFramePose(1)
+for joint in pose.keys():
+    jointHandleMapping[joint]=0
+    print joint
+
 #clientID = connectVREP(salameIP)
 if clientID !=-1:
     print 'Connected to remote API server'
     #loadscn(clientID,genetic_bioloid_salame)
     #loadscn(clientID,genetic_bioloid)
     #loadscn(clientID,genetic_bioloid_windows_sala)
-    loadscn(clientID,genetic_bioloid_windows_sala)
-    startSim(clientID)
+    loadscn(clientID)
+    startSim(clientID,False)
     frameQty=lp.getFrameQty()
     while(1):
         for index in range(frameQty):
