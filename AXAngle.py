@@ -11,7 +11,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# GNU General Publi c License for more details.
+# GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
@@ -20,18 +20,26 @@
 import math
 from math import radians
 
-ZERO_VALUE = 150
+MODEL_ZERO_VALUE = 150
 
 class AXAngle:
-    def __init__(self, value=0):
-        self.angle = value
+    def __init__(self, angle=0, rotation=1):
+        self.angle = angle
+        self.rotation = rotation
         
     def getValue(self):
         return(self.angle)
     
     def setValue(self,value):
         self.angle = value
+
+    # value is 1 for a clockwise rotation 0 anticlockwise
+    def setRotation(self, value):
+        self.rotation = value
         
+    def getRotation(self):
+        return (self.rotation)
+
     def toDegrees(self):
         return((self.angle*300)/1023)
     
@@ -39,13 +47,17 @@ class AXAngle:
         return(math.radians(self.toDegrees()))
     
     def toVrep(self):
-        if self.toDegrees()<ZERO_VALUE:
-            return -1*(math.radians(ZERO_VALUE) - self.toRadians())
+        if (self.getRotation() == 1):
+            return ((self.toDegrees()-MODEL_ZERO_VALUE)/float(60))    
         else:
-            return (self.toRadians() - math.radians(ZERO_VALUE))
+            return (-1*(self.toDegrees()-MODEL_ZERO_VALUE)/float(60))                
 
-#angle = AXAngle(611)
-#value = angle.getValue()
+
+#angle = AXAngle(0)
+#for i in range(1023) :
+#    angle.setValue(i)
+#    value = angle.toVrep()
+#    print value
 
 #print value
 #print (angle.toDegrees())
