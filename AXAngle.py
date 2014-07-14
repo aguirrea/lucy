@@ -45,13 +45,7 @@ class AXAngle:
         return((self.angle*300)/1023)
     
     def toRadians(self):
-        return(math.radians(self.toDegrees()))
-    
-    def toVrep(self):
-        if (self.getRotation() == 1):
-            return ((self.toDegrees()-MODEL_ZERO_VALUE)/float(60))    
-        else:
-            return (-1*(self.toDegrees()-MODEL_ZERO_VALUE)/float(60))                
+        return(math.radians(self.toDegrees()))             
 
     #asumes that the angle stored is a ax12 valid angle (between 0 and 300)
     def toVrep(self):
@@ -60,8 +54,8 @@ class AXAngle:
         vrep_angle=normalized_angle*sign/float(60)
         return vrep_angle
 
-for i in range(1024) :
-    print i , AXAngle(i).toVrep(), AXAngle(i).toDegrees()
+#for i in range(1024) :
+#    print i , AXAngle(i).toVrep(), AXAngle(i).toDegrees()
 
 #print value
 #print (angle.toDegrees())
