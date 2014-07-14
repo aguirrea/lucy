@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
-# basic ax12 actuator control
+# 
+# AX12 angle transformation
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -52,12 +53,15 @@ class AXAngle:
         else:
             return (-1*(self.toDegrees()-MODEL_ZERO_VALUE)/float(60))                
 
+    #asumes that the angle stored is a ax12 valid angle (between 0 and 300)
+    def toVrep(self):
+        sign=1
+        normalized_angle=MODEL_ZERO_VALUE-self.toDegrees()
+        vrep_angle=normalized_angle*sign/float(60)
+        return vrep_angle
 
-#angle = AXAngle(0)
-#for i in range(1023) :
-#    angle.setValue(i)
-#    value = angle.toVrep()
-#    print value
+for i in range(1024) :
+    print i , AXAngle(i).toVrep(), AXAngle(i).toDegrees()
 
 #print value
 #print (angle.toDegrees())
