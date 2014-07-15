@@ -33,6 +33,9 @@ class AXAngle:
     
     def setValue(self,value):
         self.angle = value
+        
+    def setDegreeValue(self,value):
+        self.angle = (value*1023)/300
 
     # value is 1 for a clockwise rotation 0 anticlockwise
     def setRotation(self, value):
@@ -54,8 +57,8 @@ class AXAngle:
         vrep_angle=normalized_angle*sign/float(60)
         return vrep_angle
 
-#for i in range(1024) :
-#    print i , AXAngle(i).toVrep(), AXAngle(i).toDegrees()
+for i in range(1024) :
+    print "ax: ", i ,"vrep: ", AXAngle(i).toVrep(), "grados: ", AXAngle(i).toDegrees()
 
 #print value
 #print (angle.toDegrees())
