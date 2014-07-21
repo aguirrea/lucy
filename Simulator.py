@@ -31,15 +31,14 @@ standadRemoteApiPort=19997
 class Simulator:
     def __init__(self):
         #this data structure is like a cache for the joint handles
-        self.jointHandleMapping = {}
-
-    def connectVREP(self, ipAddr=localhost, port=standadRemoteApiPort):
-        vrep.simxFinish(-1) # just in case, close all opened connections
+        self.jointHandleMapping = {}             
         lp = LoadPoses()
         pose=lp.getFramePose(1)
         for joint in pose.keys():
             self.jointHandleMapping[joint]=0
-        #print joint
+
+    def connectVREP(self, ipAddr=localhost, port=standadRemoteApiPort):
+        vrep.simxFinish(-1) # just in case, close all opened connections
         return vrep.simxStart(ipAddr,port,True,True,5000,5)
 
     def loadscn(self, clientID, model):
@@ -69,6 +68,12 @@ class Simulator:
         if not screen:
             vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
         return error
+        
+    def pauseSim(self, clientID):
+        return vrep.simxPauseCommunication(clientID,True)
+         
+    def resumePauseSim(self, clientID):
+        return vrep.simxPauseCommunication(clientID,False)
 
     def setJointPosition(self, clientID, joint, angle):
         if (self.jointHandleMapping[joint] > 0):
@@ -92,7 +97,4 @@ class Simulator:
         return bioloid_position[0], bioloid_position[1]
 
 
-
-sim = Simulator()
-sim.connectVREP()
 
