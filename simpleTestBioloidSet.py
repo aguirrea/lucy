@@ -94,10 +94,10 @@ lp = LoadPoses()
 #clientID = connectVREP(windowsSalaIP,standadRemoteApiPort)
 clientID = connectVREP()
 
-#pose=lp.getFramePose(1)
-#for joint in pose.keys():
-#    jointHandleMapping[joint]=0
-#    print joint
+pose=lp.getFramePose(1)
+for joint in pose.keys():
+    jointHandleMapping[joint]=0
+    print joint
 
 #clientID = connectVREP(salameIP)
 if clientID !=-1:
