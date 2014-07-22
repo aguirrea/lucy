@@ -31,8 +31,11 @@ Y = 1
 class SimLucy:
 
     def __init__(self, visible=False):
+        self.visible = visible
         self.sim = Simulator()
         self.clientID = self.connectVREP()
+        self.sim.loadscn(clientID, genetic_bioloid)
+        self.sim.startSim(clientID,visible)
         self.time = time()
         x,y = sim.getBioloidPlannarPosition(self.clientID)
         self.startPos = [x,y]
