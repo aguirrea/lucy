@@ -42,7 +42,9 @@ class Communication(object):
     
     def recv_msg(self):
         pass
-
+        
+        
+#for the bioloidcontrol simulator
 class CommSimulator(Communication):
 
     def __init__(self, simulator_port = SIM_PORT, simulator_address = SIM_HOST):

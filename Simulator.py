@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
+#
 # Helper functions to access simulator services
 #
 # This program is free software; you can redistribute it and/or modify

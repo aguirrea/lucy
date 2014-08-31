@@ -3,6 +3,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 # comunication abstraction layer
+# First test using vrep primitives directly
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
