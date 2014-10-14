@@ -18,26 +18,26 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-standadRemoteApiPort=19997
-localhost='127.0.0.1'
-genetic_bioloid=os.getcwd()+"/models/genetic_bioloid.ttt"
-
 import math
 from time import time
 from Simulator import Simulator
+import os
 X = 0
 Y = 1
+standadRemoteApiPort=19997
+localhost='127.0.0.1'
+genetic_bioloid=os.getcwd()+"/models/genetic_bioloid.ttt"
 
 class SimLucy:
 
     def __init__(self, visible=False):
         self.visible = visible
         self.sim = Simulator()
-        self.clientID = self.connectVREP()
-        self.sim.loadscn(clientID, genetic_bioloid)
-        self.sim.startSim(clientID,visible)
+        self.clientID = self.sim.connectVREP()
+        self.sim.loadscn(self.clientID, genetic_bioloid)
+        self.sim.startSim(self.clientID,self.visible)
         self.time = time()
-        x,y = sim.getBioloidPlannarPosition(self.clientID)
+        x,y = self.sim.getBioloidPlannarPosition(self.clientID)
         self.startPos = [x,y]
         
     def getSimTime(self):
@@ -49,16 +49,15 @@ class SimLucy:
         return distance
     
     def getFitness(self):
-        retrun self.getSimTime + self.getSimDistance() * 1000
+        return self.getSimTime() + self.getSimDistance() * 1000
         
-    def executeFrame(self):
-        #Above's 3 joints will be received and set on the V-REP side at the same time'''
-        sim.pauseSim(self.clientID)
-        #vrep.simxSetJointPosition(clientID,joint1Handle,joint1Value,vrep.simx_opmode_oneshot)
-        #vrep.simxSetJointPosition(clientID,joint2Handle,joint2Value,vrep.simx_opmode_oneshot)
-        #vrep.simxSetJointPosition(clientID,joint3Handle,joint3Value,vrep.simx_opmode_oneshot)
-        sim.resumePauseSim(self.clientID)
-        #TODO
-        pass
-    
-    
+    def executeFrame(self, pose):
+        #Above's N joints will be received and set on the V-REP side at the same time'''
+        self.sim.pauseSim(self.clientID)
+        for j in range(len(pose)):
+            joint=pose.keys()[j]
+            angle=pose[joint]
+            print joint
+            self.sim.setJointPosition(self.clientID, joint, angle)
+        self.sim.resumePauseSim(self.clientID)
+
