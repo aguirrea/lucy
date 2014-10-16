@@ -46,17 +46,17 @@ pose={}
 time_serie_lenght = len(left_ankle_mocap)
 while  True:
     for j in range(time_serie_lenght):
-        angle.setDegreeValue(int(math.floor(left_ankle_mocap[j]))-20)
+        angle.setDegreeValue(left_ankle_mocap[j]-20)
         pose["L_Knee"] = angle.toVrep()
-        angle.setDegreeValue(int(math.floor(right_ankle_mocap[j]))-20)
+        angle.setDegreeValue(right_ankle_mocap[j]-20)
         pose["R_Knee"] = angle.toVrep()
-        angle.setDegreeValue(int(math.floor(right_ankle_mocap[j]))+40)
+        angle.setDegreeValue(right_ankle_mocap[j]+40)
         pose["R_Ankle_Pitch"] = angle.toVrep()
-        angle.setDegreeValue(int(math.floor(left_ankle_mocap[j]))+40)
+        angle.setDegreeValue(left_ankle_mocap[j]+40)
         pose["L_Ankle_Pitch"] = angle.toVrep()
-        angle.setDegreeValue(int(math.floor(left_hip_mocap[j]))-20)
+        angle.setDegreeValue(left_hip_mocap[j]-20)
         pose["L_Hip_Pitch"] = angle.toVrep()
-        angle.setDegreeValue(int(math.floor(right_hip_mocap[j]))-20)
+        angle.setDegreeValue(right_hip_mocap[j]-20)
         pose["R_Hip_Pitch"] = angle.toVrep()
         print pose
         print "antes ejecutar"
