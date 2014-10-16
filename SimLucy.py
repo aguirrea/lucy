@@ -36,28 +36,46 @@ class SimLucy:
         self.clientID = self.sim.connectVREP()
         self.sim.loadscn(self.clientID, genetic_bioloid)
         self.sim.startSim(self.clientID,self.visible)
-        self.time = time()
+        self.time = 0
+        self.startTime = time()
         x,y = self.sim.getBioloidPlannarPosition(self.clientID)
         self.startPos = [x,y]
+        self.jointHandleCachePopulated = False
+        self.stop = False
         
     def getSimTime(self):
-        return time() - self.time
+        if self.stop == False:
+            time() - self.startTime
+        return self.time
         
     def getSimDistance(self):
-        x, y=sim.getBioloidPlannarPosition(self.clientID) 
-        distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
-        return distance
+        if self.stop == False:
+            x, y=self.sim.getBioloidPlannarPosition(self.clientID) 
+            distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
+            self.distance = distance
+        return self.distance        
     
     def getFitness(self):
         return self.getSimTime() + self.getSimDistance() * 1000
         
     def executeFrame(self, pose):
         #Above's N joints will be received and set on the V-REP side at the same time'''
+        if (self.jointHandleCachePopulated == False): 
+            self.sim.populateJointHandleCache(self.clientID)
+            self.jointHandleCachePopulated = True
         self.sim.pauseSim(self.clientID)
         for j in range(len(pose)):
             joint=pose.keys()[j]
             angle=pose[joint]
             print joint
-            self.sim.setJointPosition(self.clientID, joint, angle)
+            self.sim.setJointPositionNonBlock(self.clientID, joint, angle)
         self.sim.resumePauseSim(self.clientID)
+        pass
 
+    def stopLucy(self):
+        self.sim.finishSimulation(self.clientID)
+        self.stop = True
+        self.time = time() - self.startTime
+        x, y=self.sim.getBioloidPlannarPosition(self.clientID) 
+        distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
+        self.distance = distance        
