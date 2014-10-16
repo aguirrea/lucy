@@ -76,6 +76,14 @@ class Simulator:
     def resumePauseSim(self, clientID):
         return vrep.simxPauseCommunication(clientID,False)
 
+    def populateJointHandleCache(self, clientID):
+        lp = LoadPoses()
+        pose=lp.getFramePose(1)
+        for joint in pose.keys():
+            error, handle = vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
+            self.jointHandleMapping[joint]=handle        
+        pass
+                
     def setJointPosition(self, clientID, joint, angle):
         if (self.jointHandleMapping[joint] > 0):
             jhandle=self.jointHandleMapping[joint]
@@ -83,6 +91,14 @@ class Simulator:
             error, jhandle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
             self.jointHandleMapping[joint]=jhandle
         vrep.simxSetJointPosition(clientID,jhandle,angle,vrep.simx_opmode_oneshot_wait)
+    
+    def setJointPositionNonBlock(self, clientID, joint, angle):
+        if (self.jointHandleMapping[joint] > 0):
+            jhandle=self.jointHandleMapping[joint]
+        else:
+            error, jhandle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot)
+            self.jointHandleMapping[joint]=jhandle
+        vrep.simxSetJointPosition(clientID,jhandle,angle,vrep.simx_opmode_oneshot)
             
     def finishSimulation(self, clientID):
         errorStop=vrep.simxStopSimulation(clientID,vrep.simx_opmode_oneshot_wait)
