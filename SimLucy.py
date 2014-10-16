@@ -67,7 +67,6 @@ class SimLucy:
         for j in range(len(pose)):
             joint=pose.keys()[j]
             angle=pose[joint]
-            print joint
             self.sim.setJointPositionNonBlock(self.clientID, joint, angle)
         self.sim.resumePauseSim(self.clientID)
         pass
