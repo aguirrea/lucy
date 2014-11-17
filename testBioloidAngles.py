@@ -46,16 +46,16 @@ if clientID !=-1:
     while not end:
         for i in range(30):
             angle.setDegreeValue(150-i)
-            print "voy a setear ax12 value en cadera izquierda: ", 150 - i
-            sim.setJointPosition(clientID,"L_Hip_Pitch",angle.toVrep())
+            #print "voy a setear ax12 value en cadera izquierda: ", 150 - i
+            sim.setJointPosition(clientID,'L_Hip_Pitch',angle.toVrep())
             angle.setDegreeValue(i*2)
-            print "voy a setear ax12 value en rodilla derecha: ", i
-            sim.setJointPosition(clientID,"R_Knee",angle.toVrep())
+            #print "voy a setear ax12 value en rodilla derecha: ", i
+            sim.setJointPosition(clientID,'R_Knee',angle.toVrep())
             
         for i in range(30):
             angle.setDegreeValue(150-i)
-            sim.setJointPosition(clientID,"R_Hip_Pitch",angle.toVrep()) 
-            sim.setJointPosition(clientID,"L_Knee",angle.toVrep()) 
+            sim.setJointPosition(clientID,'R_Hip_Pitch',angle.toVrep()) 
+            sim.setJointPosition(clientID,'L_Knee',angle.toVrep()) 
             
         for i in range(30):
             angle.setDegreeValue(120+i)
