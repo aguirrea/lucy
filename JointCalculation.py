@@ -57,4 +57,7 @@ rElbowYaw = jc.calculate("rForeArm", "rShldr", "rHand")
 rShoulderYaw = jc.calculate("rCollar","chest", "rShldr")
 rShoulderPitch = jc.calculate("rShldr", "rForeArm", "hip")
 rHipYaw = jc.calculate("rFoot", "End Site", "rThigh")
-
+rHipRoll = jc.calculate("rThigh", "rShin", "rCollar")
+rHipPitch = jc.calculate("rThigh", "rCollar", "rShin")
+rKneePitch = jc.calculate("rShin", "rThigh", "rFoot")
+rAnkle = jc.calculate("rFoot", "rShin", "End Site")

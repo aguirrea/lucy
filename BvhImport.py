@@ -65,6 +65,7 @@ class BvhImport:
         return result_x, result_y, result_z
 
 #parser = BvhImport("Example1.bvh")
+#print dir(parser)
 #u, v, z = parser.getNodePositionsFromName("hip")
 #print v
 #u, v, z = parser.getNodePositions(0)
