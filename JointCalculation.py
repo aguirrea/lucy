@@ -39,36 +39,48 @@ class JointCalculation:
 		        v[i]=(math.pi)-angle(-v[i])
         return v
     #from joint3 to joint2 with axis in joint1 anti clockwise
-    def calculate(self, joint1, joint2, joint3):
+    def calculateSagital(self, joint1, joint2, joint3):
         x1, y1, z1 = self.parser.getNodePositionsFromName(joint1)
         x2, y2, z2 = self.parser.getNodePositionsFromName(joint2)
         x3, y3, z3 = self.parser.getNodePositionsFromName(joint3)
-        ax1 = array(x1.values())
-        ax2 = array(x2.values())
-        ax3 = array(x3.values())
+        az1 = array(z1.values())
+        az2 = array(z2.values())
+        az3 = array(z3.values())
         ay1 = array(y1.values())
         ay2 = array(y2.values())
         ay3 = array(y3.values())
-        u = ax2 - ax1 + 1j*(ay2 - ay1)
-        v = ax3 - ax1 + 1j*(ay3 - ay1)
-        conj=conjugate(v)
+        u = ay2 - ay1 + 1j*(az2 - az1)
+        v = ay3 - ay1 + 1j*(az3 - az1)
         r = self.angle(u*conjugate(v))*(180/math.pi)
         return r.real
+    #from joint3 to joint2 with axis in joint1 anti clockwise
+    def calculateFrontal(self, joint1, joint2, joint3):
+        x1, y1, z1 = self.parser.getNodePositionsFromName(joint1)
+        x2, y2, z2 = self.parser.getNodePositionsFromName(joint2)
+        x3, y3, z3 = self.parser.getNodePositionsFromName(joint3)    
+        az1 = array(z1.values())
+        az2 = array(z2.values())
+        az3 = array(z3.values())
+        ax1 = array(x1.values())
+        ax2 = array(x2.values())
+        ax3 = array(x3.values())
+        u = (ax2 - ax1) + 1j*(az2 - az1)
+        v = (ax3 - ax1) + 1j*(az3 - az1)
+        r = self.angle(u*conjugate(v))*(180/math.pi)
+        return r.real
+
         
 jc = JointCalculation("02_02.bvh")
-rElbowYaw = jc.calculate("rForeArm", "rShldr", "rHand")
-print rElbowYaw
-print rElbowYaw.min()
-print rElbowYaw.max()
+rElbowYaw = jc.calculateSagital("rForeArm", "rShldr", "rHand") #validado
 
 #print "********************************************************************************************"
 #rShoulderYaw = jc.calculate("rCollar","chest", "rShldr")
 #rShoulderPitch = jc.calculate("rShldr", "rForeArm", "hip")
 #rHipYaw = jc.calculate("rFoot", "End Site", "rThigh")
-#rHipRoll = jc.calculate("rThigh", "rShin", "rCollar")
-#rHipPitch = jc.calculate("rThigh", "rCollar", "rShin")
-rKneePitch = jc.calculate("lShin", "lThigh","lFoot")
-#rAnkle = jc.calculate("rFoot", "rShin", "End Site")
-print rKneePitch
-print rKneePitch.min()
-print rKneePitch.max()
+rHipRoll = jc.calculateFrontal("rThigh","hip" , "rShin") 
+#rHipPitch = jc.calculateSagital("rThigh", "abdomen", "rShin") #validado
+rKneePitch = jc.calculateSagital("rShin", "rThigh","rFoot") #validado
+#rAnkle = jc.calculateSagital("rFoot", "rShin", "End Site") #validado
+print rHipRoll
+print rHipRoll.min()
+print rHipRoll.max()
