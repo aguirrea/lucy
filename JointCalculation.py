@@ -34,9 +34,9 @@ class JointCalculation:
     def angle(self,v):
         for i in range(len(v)):
             if v[i].imag >=0:
-    		    v[i]=angle(v[i])
+    		    v[i]=angle(v[i], True) #angle second argument is for operate with degrees instead of radians
             else:
-		        v[i]=(math.pi)-angle(-v[i])
+		        v[i]=180-angle(-v[i], True) #angle second argument is for operate with degrees instead of radians
         return v
     #from joint3 to joint2 with axis in joint1 anti clockwise
     def calculateSagital(self, joint1, joint2, joint3):
@@ -51,7 +51,7 @@ class JointCalculation:
         ay3 = array(y3.values())
         u = ay2 - ay1 + 1j*(az2 - az1)
         v = ay3 - ay1 + 1j*(az3 - az1)
-        r = self.angle(u*conjugate(v))*(180/math.pi)
+        r = self.angle(u*conjugate(v))
         return r.real
     #from joint3 to joint2 with axis in joint1 anti clockwise
     def calculateFrontal(self, joint1, joint2, joint3):
@@ -66,7 +66,7 @@ class JointCalculation:
         ax3 = array(x3.values())
         u = (ax2 - ax1) + 1j*(az2 - az1)
         v = (ax3 - ax1) + 1j*(az3 - az1)
-        r = self.angle(u*conjugate(v))*(180/math.pi)
+        r = self.angle(u*conjugate(v))
         return r.real
 
         
