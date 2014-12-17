@@ -38,6 +38,7 @@ class JointCalculation:
             else:
 		        v[i]=180-angle(-v[i], True) #angle second argument is for operate with degrees instead of radians
         return v
+
     #from joint3 to joint2 with axis in joint1 anti clockwise
     def calculateSagital(self, joint1, joint2, joint3):
         x1, y1, z1 = self.parser.getNodePositionsFromName(joint1)
@@ -69,18 +70,31 @@ class JointCalculation:
         r = self.angle(u*conjugate(v))
         return r.real
 
+ 	#from joint3 to joint2 with axis in joint1 anti clockwise
+    def calculateTransversal(self, joint1, joint2, joint3):
+        x1, y1, z1 = self.parser.getNodePositionsFromName(joint1)
+        x2, y2, z2 = self.parser.getNodePositionsFromName(joint2)
+        x3, y3, z3 = self.parser.getNodePositionsFromName(joint3)    
+        ay1 = array(y1.values())
+        ay2 = array(y2.values())
+        ay3 = array(y3.values())
+        ax1 = array(x1.values())
+        ax2 = array(x2.values())
+        ax3 = array(x3.values())
+        u = (ax2 - ax1) + 1j*(ay2 - ay1)
+        v = (ax3 - ax1) + 1j*(ay3 - ay1)
+        r = self.angle(u*conjugate(v))
+        return r.real
+
         
 jc = JointCalculation("02_02.bvh")
-rElbowYaw = jc.calculateSagital("rForeArm", "rShldr", "rHand") #validado
+#rElbowYaw = jc.calculateSagital("rForeArm", "rShldr", "rHand") #validado
 
 #print "********************************************************************************************"
-#rShoulderYaw = jc.calculate("rCollar","chest", "rShldr")
-#rShoulderPitch = jc.calculate("rShldr", "rForeArm", "hip")
-#rHipYaw = jc.calculate("rFoot", "End Site", "rThigh")
-rHipRoll = jc.calculateFrontal("rThigh","hip" , "rShin") 
+rShoulderYaw = jc.calculateTransversal("rCollar","chest", "rShldr") #validado
+rShoulderPitch = jc.calculateSagital("rShldr", "rForeArm", "hip") #validado 
+rHipYaw = jc.calculateTransversal("rThigh", "hip", "rShin") #validado 
+#rHipRoll = jc.calculateFrontal("rThigh","hip" , "rShin")  #validado 
 #rHipPitch = jc.calculateSagital("rThigh", "abdomen", "rShin") #validado
-rKneePitch = jc.calculateSagital("rShin", "rThigh","rFoot") #validado
+#rKneePitch = jc.calculateSagital("rShin", "rThigh","rFoot") #validado
 #rAnkle = jc.calculateSagital("rFoot", "rShin", "End Site") #validado
-print rHipRoll
-print rHipRoll.min()
-print rHipRoll.max()
