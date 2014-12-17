@@ -63,7 +63,7 @@ while  True:
         angle.setDegreeValue(155-right_shoulder_mocap[j])
         pose["R_Shoulder_Pitch"] = angle.toVrep()
         lucy.executeFrame(pose)
-        time.sleep(0.05)
+        #time.sleep(0.05)
         #time.sleep(0.4)
 lucy.stopLucy()  
 print 'Program ended'
