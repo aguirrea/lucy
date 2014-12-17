@@ -64,12 +64,17 @@ class SimLucy:
             self.sim.populateJointHandleCache(self.clientID)
             self.jointHandleCachePopulated = True
         self.sim.pauseSim(self.clientID)
-        for j in range(len(pose)):
+        for j in range(len(pose)-1):
             joint=pose.keys()[j]
             angle=pose[joint]
             self.sim.setJointPositionNonBlock(self.clientID, joint, angle)
         self.sim.resumePauseSim(self.clientID)
-        pass
+        joint=pose.keys()[len(pose)-1]
+        angle=pose[joint]
+        self.sim.setJointPosition(self.clientID, joint, angle)
+        #print "pase"
+        
+        
 
     def stopLucy(self):
         self.sim.finishSimulation(self.clientID)
