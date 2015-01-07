@@ -49,7 +49,7 @@ class LoadPoses:
             #print joint
             angle = joint.getAttribute("angle")
             #print angle
-            self.frameAngleMapping[int(frameNumber)] = int(angle) 
+            self.frameAngleMapping[int(frameNumber)] = float(angle) 
         return(self.frameAngleMapping)
 
     def getFrameQty(self):
