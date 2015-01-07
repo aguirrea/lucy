@@ -22,8 +22,7 @@ import vrep
 import time
 import math
 
-from LoadPoses import LoadPoses
-
+from LoadRobotConfiguration import LoadRobotConfiguration
 FALL_THRESHOLD = 0.07
 localhost='127.0.0.1'
 standadRemoteApiPort=19997
@@ -32,10 +31,10 @@ standadRemoteApiPort=19997
 class Simulator:
     def __init__(self):
         #this data structure is like a cache for the joint handles
-        self.jointHandleMapping = {}             
-        lp = LoadPoses()
-        pose=lp.getFramePose(1)
-        for joint in pose.keys():
+        self.jointHandleMapping = {} 
+        robotConf = LoadRobotConfiguration()
+        self.LucyJoints = robotConf.getJointsName()            
+        for joint in self.LucyJoints:
             self.jointHandleMapping[joint]=0
 
     def connectVREP(self, ipAddr=localhost, port=standadRemoteApiPort):
@@ -77,9 +76,7 @@ class Simulator:
         return vrep.simxPauseCommunication(clientID,False)
 
     def populateJointHandleCache(self, clientID):
-        lp = LoadPoses()
-        pose=lp.getFramePose(1)
-        for joint in pose.keys():
+        for joint in self.LucyJoints:
             error, handle = vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
             self.jointHandleMapping[joint]=handle        
         pass
