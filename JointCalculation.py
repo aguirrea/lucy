@@ -87,13 +87,13 @@ class JointCalculation:
         return r.real
 
         
-jc = JointCalculation("02_02.bvh")
+#jc = JointCalculation("02_02.bvh")
 #rElbowYaw = jc.calculateSagital("rForeArm", "rShldr", "rHand") #validado
 
 #print "********************************************************************************************"
-rShoulderYaw = jc.calculateTransversal("rCollar","chest", "rShldr") #validado
-rShoulderPitch = jc.calculateSagital("rShldr", "rForeArm", "hip") #validado 
-rHipYaw = jc.calculateTransversal("rThigh", "hip", "rShin") #validado 
+#rShoulderYaw = jc.calculateTransversal("rCollar","chest", "rShldr") #validado
+#rShoulderPitch = jc.calculateSagital("rShldr", "rForeArm", "hip") #validado 
+#rHipYaw = jc.calculateTransversal("rThigh", "hip", "rShin") #validado 
 #rHipRoll = jc.calculateFrontal("rThigh","hip" , "rShin")  #validado 
 #rHipPitch = jc.calculateSagital("rThigh", "abdomen", "rShin") #validado
 #rKneePitch = jc.calculateSagital("rShin", "rThigh","rFoot") #validado
