@@ -20,7 +20,7 @@
 
 from xml.dom import minidom
 import os
-confFile = os.getcwd()+"/configuration/RobotConf.xml"
+confFile = os.getcwd()+"/../configuration/RobotConf.xml"
 
 class LoadRobotConfiguration:
     

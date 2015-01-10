@@ -18,9 +18,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from Simulator import Simulator
-from AXAngle import AXAngle
-from LoadPoses import LoadPoses
+from ..simulator.Simulator import Simulator
+from ..simulator.AXAngle import AXAngle
+from ..simulator.LoadPoses import LoadPoses
 
 import math
 import os
