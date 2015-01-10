@@ -18,9 +18,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from Simulator import Simulator
-from SimLucy   import SimLucy
-from AXAngle   import AXAngle
+from simulator.Simulator import Simulator
+from simulator.SimLucy   import SimLucy
+from simulator.AXAngle   import AXAngle
 
 import math
 import os
