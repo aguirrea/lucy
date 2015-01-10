@@ -18,10 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from Simulator import Simulator
-from SimLucy   import SimLucy
-from AXAngle   import AXAngle
-from parser    import LoadPoses
+from simulator.Simulator import Simulator
+from simulator.SimLucy   import SimLucy
+from simulator.AXAngle   import AXAngle
+from parser.LoadPoses    import LoadPoses
 
 import math
 import os
@@ -41,34 +41,37 @@ poseExecute={}
 poseFix={}
 
 poseFix["R_Shoulder_Yaw"] = 0
-poseFix["R_Shoulder_Pitch"] = 0
+poseFix["R_Shoulder_Pitch"] = -90
 poseFix["R_Hip_Yaw"] = 0
 poseFix["R_Hip_Roll"] = 0
-poseFix["R_Hip_Pitch"] = -10
-poseFix["R_Knee"] = 90
-poseFix["R_Ankle_Pitch"] = 0 
+poseFix["R_Hip_Pitch"] = 20
+poseFix["R_Knee"] = 10
+poseFix["R_Ankle_Pitch"] = -5
 poseFix["R_Elbow_Yaw"] = 0
 poseFix["R_Ankle_Roll"] = 0
 
 poseFix["L_Shoulder_Yaw"] = 0
-poseFix["L_Shoulder_Pitch"] = 0
+poseFix["L_Shoulder_Pitch"] = -90
 poseFix["L_Hip_Yaw"] = 0
 poseFix["L_Hip_Roll"] = 0
-poseFix["L_Hip_Pitch"] = 10
-poseFix["L_Knee"] = 0
-poseFix["L_Ankle_Pitch"] = 0
+poseFix["L_Hip_Pitch"] = 20
+poseFix["L_Knee"] = 10
+poseFix["L_Ankle_Pitch"] = -5
 poseFix["L_Elbow_Yaw"] = 0
 poseFix["L_Ankle_Roll"] = 0
 
+avoid_joints = ["R_Hip_Yaw", "R_Shoulder_Yaw", "L_Hip_Yaw", "R_Shoulder_Yaw", "L_Hip_Roll", "R_Hip_Roll", "L_Ankle_Roll", "R_Ankle_Roll", "L_Ankle_Pitch", "R_Ankle_Pitch"] 
 frameQty=lp.getFrameQty()
 while  True:
     for index in range(frameQty):
         pose=lp.getFramePose(index)
         for joint in pose.keys():
-                angleExecute.setValue(pose[joint] + poseFix[joint])
-                poseExecute[joint] = angleExecute.toVrep()
-                #print joint, poseExecute[joint], angle.toVrep()     
-        poseExecute['L_Knee']     
+                if joint not in avoid_joints:
+                    #print joint, pose[joint]
+                    angleExecute.setValue(630 - pose[joint] + poseFix[joint])
+                    poseExecute[joint] = angleExecute.toVrep() 
+                    #print joint, poseExecute[joint], angleExecute.getValue()  
+        #print poseExecute['L_Knee']     
         lucy.executeFrame(poseExecute)
 lucy.stopLucy()  
 print 'Program ended'
