@@ -3,7 +3,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 # 
-# AX12 angle transformation
+# AX12 angle representation and transformations from AX12 to others representatios
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@ from math import radians
 MODEL_ZERO_VALUE = 150
 
 class AXAngle:
-    def __init__(self, angle=0, rotation=1):
+
+    def __init__(self, angle=0):
         self.angle = angle
-        self.rotation = rotation
         
     def getValue(self):
         return(self.angle)
@@ -36,14 +36,7 @@ class AXAngle:
         
     def setDegreeValue(self,value):
         self.angle = (value*1023)/300
-
-    # value is 1 for a clockwise rotation 0 anticlockwise
-    def setRotation(self, value):
-        self.rotation = value
-        
-    def getRotation(self):
-        return (self.rotation)
-
+    
     def toDegrees(self):
         return((self.angle*300)/1023)
     
@@ -52,9 +45,8 @@ class AXAngle:
 
     #asumes that the angle stored is a ax12 valid angle (between 0 and 300)
     def toVrep(self):
-        sign=1
         normalized_angle=MODEL_ZERO_VALUE-self.toDegrees()
-        vrep_angle=normalized_angle*sign/float(60)
+        vrep_angle=normalized_angle/float(60)
         return vrep_angle
 
 #for i in range(1024) :
