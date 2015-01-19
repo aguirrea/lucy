@@ -3,7 +3,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 # 
-# Lucy interaction with the simulator
+# Lucy interaction with the simulator.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ X = 0
 Y = 1
 standadRemoteApiPort=19997
 localhost='127.0.0.1'
-genetic_bioloid=os.getcwd()+"/models/genetic_bioloid.ttt"
+genetic_bioloid=os.getcwd()+"/simulator/models/genetic_bioloid.ttt"
 
 class SimLucy:
 
