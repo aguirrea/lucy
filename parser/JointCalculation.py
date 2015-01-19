@@ -9,7 +9,7 @@
 # 
 # Regional Norte/UDELAR
 #
-# Joint value calculations for the bioloid model from mocap model
+# Helper library to calculate the angle in the sagital, frontal and transversal plane described from three points in the cartesian space.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
