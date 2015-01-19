@@ -22,6 +22,7 @@ from xml.dom import minidom
 import os
 confFile = os.getcwd()+"/../configuration/RobotConf.xml"
 
+#TODO move this to configuration folder?
 class LoadRobotConfiguration:
     
     def __init__(self):
