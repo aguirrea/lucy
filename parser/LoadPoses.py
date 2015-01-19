@@ -19,7 +19,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from xml.dom import minidom
-from LoadRobotConfiguration import LoadRobotConfiguration
+from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 class LoadPoses:
     
