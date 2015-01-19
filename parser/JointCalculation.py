@@ -57,11 +57,14 @@ class JointCalculation:
         ay1 = array(y1.values())
         ay2 = array(y2.values())
         ay3 = array(y3.values())
-        #u vector, is the projection in the sagital plane of the j2 to j1 vector, complex number is usded for the sake of simplicity
+        #u vector, is the projection in the sagital plane of the j2 to j1 vector, 
+        #complex number is usded for the sake of simplicity
         u = ay2 - ay1 + 1j*(az2 - az1)
-        #v vector, is the projection in the sagital plane of the j3 to j1 vector, complex number is usded for the sake of simplicity
+        #v vector, is the projection in the sagital plane of the j3 to j1 vector, 
+        #complex number is usded for the sake of simplicity
         v = ay3 - ay1 + 1j*(az3 - az1)
-        #the angle with respect two x axis of the product of two complex numbers correspond with the sum of the angle with x axis of each number
+        #the angle with respect two x axis of the product of two complex numbers 
+        #corresponds with the sum of the angle with x axis of each number
         r = self.angle(u*conjugate(v))
         return r.real
 
@@ -76,6 +79,7 @@ class JointCalculation:
         ax1 = array(x1.values())
         ax2 = array(x2.values())
         ax3 = array(x3.values())
+        #see comments in calculateSagital
         u = (ax2 - ax1) + 1j*(az2 - az1)
         v = (ax3 - ax1) + 1j*(az3 - az1)
         r = self.angle(u*conjugate(v))
@@ -92,20 +96,8 @@ class JointCalculation:
         ax1 = array(x1.values())
         ax2 = array(x2.values())
         ax3 = array(x3.values())
+        #see comments in calculateSagital
         u = (ax2 - ax1) + 1j*(ay2 - ay1)
         v = (ax3 - ax1) + 1j*(ay3 - ay1)
         r = self.angle(u*conjugate(v))
         return r.real
-
-        
-#jc = JointCalculation("02_02.bvh")
-#rElbowYaw = jc.calculateSagital("rForeArm", "rShldr", "rHand") #validado
-
-#print "********************************************************************************************"
-#rShoulderYaw = jc.calculateTransversal("rCollar","chest", "rShldr") #validado
-#rShoulderPitch = jc.calculateSagital("rShldr", "rForeArm", "hip") #validado 
-#rHipYaw = jc.calculateTransversal("rThigh", "hip", "rShin") #validado 
-#rHipRoll = jc.calculateFrontal("rThigh","hip" , "rShin")  #validado 
-#rHipPitch = jc.calculateSagital("rThigh", "abdomen", "rShin") #validado
-#rKneePitch = jc.calculateSagital("rShin", "rThigh","rFoot") #validado
-#rAnkle = jc.calculateSagital("rFoot", "rShin", "End Site") #validado
