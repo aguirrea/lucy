@@ -33,15 +33,15 @@ import math
 
 class JointCalculation:
     def __init__(self, file):
-    	self.parser = BvhImport(file)
+        self.parser = BvhImport(file)
 
     def angle(self,v):
         #v is a time serie, so we have to iterate in time
         for i in range(len(v)):
             if v[i].imag >=0:
-    		    v[i]=angle(v[i], True) #angle second argument is for operate with degrees instead of radians
+    	        v[i]=angle(v[i], True) #angle second argument is for operate with degrees instead of radians
             else:
-		        v[i]=180+angle(-v[i], True) #angle second argument is for operate with degrees instead of radians
+                v[i]=180+angle(-v[i], True) #angle second argument is for operate with degrees instead of radians
         return v
 
     #calculates the angle in the sagital plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise
