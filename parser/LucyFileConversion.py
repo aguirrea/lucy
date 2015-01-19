@@ -3,7 +3,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 # 
-# Transforms from bvh file to lucy mocap file format
+# Transforms from cmu bvh file to lucy mocap file format
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,14 +18,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from JointCalculation import JointCalculation
+from parser.JointCalculation import JointCalculation
 import xml.etree.cElementTree as ET
-from LoadRobotConfiguration import LoadRobotConfiguration
 
 class LucyFileConversion:
-    def __init__(self, file):
-    	self.file = 'file'
-        self.config = LoadRobotConfiguration()
+    def __init__(self, file, robotConfiguration):
+        self.file = 'file'
+        self.config = robotConfiguration
         self.jointCalc = JointCalculation(file)
         #TODO take into account that the elbowyaw can change from sagital plane to transversal
         self.rElbowYaw = self.jointCalc.calculateSagital("rForeArm", "rShldr", "rHand") #validado 
@@ -65,5 +64,3 @@ class LucyFileConversion:
         tree = ET.ElementTree(root)
         tree.write(file)
 
-fc = LucyFileConversion("02_02.bvh")
-fc.generateFile("test.xml")
