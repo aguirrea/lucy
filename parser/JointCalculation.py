@@ -1,11 +1,14 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # Andrés Aguirre Dorelo
-# Damián Ferraro
-# Patricia Polero
 #
 # MINA/INCO/UDELAR
+#
+# Damián Ferraro
+# Patricia Polero
 # 
+# Regional Norte/UDELAR
+#
 # Joint value calculations for the bioloid model from mocap model
 #
 # This program is free software; you can redistribute it and/or modify
