@@ -4,6 +4,7 @@
 # MINA/INCO/UDELAR
 #
 # Test of loading xml pose files and executing it
+# Youtube video of the test in http://youtu.be/oPO1lc5ping
 #
 # Thisc program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,7 +32,7 @@ angle = AXAngle()
 angleFix = AXAngle()
 angleExecute = AXAngle()
 
-mocapFile = os.getcwd()+"/../cmu_mocap/xml/test2.xml"
+mocapFile = os.getcwd()+"/cmu_mocap/xml/test4.xml"
 lp = LoadPoses(mocapFile)
 lucy = SimLucy(True)
 
@@ -39,27 +40,26 @@ poseExecute={}
 poseFix={}
 
 poseFix["R_Shoulder_Yaw"] = 0
-poseFix["R_Shoulder_Pitch"] = -360
+poseFix["R_Shoulder_Pitch"] = -45
 poseFix["R_Hip_Yaw"] = 0
 poseFix["R_Hip_Roll"] = 0
-poseFix["R_Hip_Pitch"] = -60
+poseFix["R_Hip_Pitch"] = -50
 poseFix["R_Knee"] = 20 
 poseFix["R_Ankle_Pitch"] = 0
 poseFix["R_Elbow_Yaw"] = 0
 poseFix["R_Ankle_Roll"] = 0
 
 poseFix["L_Shoulder_Yaw"] = 0
-poseFix["L_Shoulder_Pitch"] = -360
+poseFix["L_Shoulder_Pitch"] = -50
 poseFix["L_Hip_Yaw"] = 0
 poseFix["L_Hip_Roll"] = 0
-poseFix["L_Hip_Pitch"] = -60
+poseFix["L_Hip_Pitch"] = -50
 poseFix["L_Knee"] = 20
 poseFix["L_Ankle_Pitch"] = 0
 poseFix["L_Elbow_Yaw"] = 0
 poseFix["L_Ankle_Roll"] = 0
 
-avoid_joints = ["R_Hip_Yaw", "R_Shoulder_Yaw", "L_Hip_Yaw", "R_Shoulder_Yaw", "L_Hip_Roll", "R_Hip_Roll", "L_Ankle_Roll", "R_Ankle_Roll", "L_Ankle_Pitch", "R_Ankle_Pitch"] 
-#avoid_joints = [] 
+avoid_joints = ["R_Hip_Yaw", "R_Shoulder_Yaw", "L_Hip_Yaw", "R_Shoulder_Yaw", "L_Hip_Roll", "R_Hip_Roll", "L_Ankle_Roll", "R_Ankle_Roll"] 
 frameQty=lp.getFrameQty()
 while  True:
     for index in range(frameQty):
@@ -68,11 +68,9 @@ while  True:
                 if joint not in avoid_joints:
                     #print joint, pose[joint], pose[joint] + poseFix[joint] 
                     angleExecute.setDegreeValue(pose[joint]+ poseFix[joint])
-                    #angleExecute.setValue(630 - pose[joint] + poseFix[joint])
-                    #poseExecute[joint] = abs(angleExecute.toVrep())
                     poseExecute[joint] = angleExecute.toVrep()
                     #print joint, poseExecute[joint], angleExecute.getValue()  
-        print poseExecute['L_Shoulder_Pitch'], pose['L_Shoulder_Pitch']     
+        #print poseExecute['L_Ankle_Pitch'], pose['L_Ankle_Pitch']     
         lucy.executeFrame(poseExecute)
 lucy.stopLucy()  
 print 'Program ended'
