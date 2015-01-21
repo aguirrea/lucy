@@ -31,24 +31,24 @@ class MocapLucyMapping:
         self.framesQty = len(self.rElbowYaw)
         self.frameVectors = {}
         self.frameVectors["R_Shoulder_Yaw"] = self.jointCalc.calculateTransversal("rCollar","chest", "rShldr") #validado, por ahora no usar o tener cuidado
-        self.frameVectors["R_Shoulder_Pitch"] = self.jointCalc.calculateSagital("rShldr", "rForeArm", "hip") #validado, revisar signo
+        self.frameVectors["R_Shoulder_Pitch"] = self.jointCalc.calculateSagital("rShldr", "head", "rForeArm" ) #validado, revisar signo
         self.frameVectors["R_Hip_Yaw"] = self.jointCalc.calculateTransversal("hip", "rThigh", "rShin") #validado, por ahora no usar
         self.frameVectors["R_Hip_Roll"] = self.jointCalc.calculateFrontal("rThigh","hip" , "rShin")  #validado 
         self.frameVectors["R_Hip_Pitch"] = self.jointCalc.calculateSagital("rThigh", "abdomen", "rShin") #validado
         self.frameVectors["R_Knee"] = self.jointCalc.calculateSagital("rShin", "rThigh","rFoot") #validado
-        self.frameVectors["R_Ankle_Pitch"] = self.jointCalc.calculateSagital("rFoot", "rShin", "End Site") #validado
+        self.frameVectors["R_Ankle_Pitch"] = self.jointCalc.calculateSagital("rFoot", "rShin", "End Site12") #validado
         self.frameVectors["R_Elbow_Yaw"] = self.rElbowYaw  #validado
-        self.frameVectors["R_Ankle_Roll"] = self.frameVectors["R_Ankle_Pitch"]
+        self.frameVectors["R_Ankle_Roll"] = self.nullFrameVector(self.framesQty)
 
         self.frameVectors["L_Shoulder_Yaw"] = self.jointCalc.calculateFrontal("lCollar","chest", "lShldr") #validado 
-        self.frameVectors["L_Shoulder_Pitch"] = self.jointCalc.calculateSagital("lShldr", "rForeArm", "hip") #validado 
+        self.frameVectors["L_Shoulder_Pitch"] = self.jointCalc.calculateSagital("lShldr", "head", "lForeArm") #validado 
         self.frameVectors["L_Hip_Yaw"] = self.jointCalc.calculateTransversal("hip", "lThigh", "lShin") #validado 
         self.frameVectors["L_Hip_Roll"] = self.jointCalc.calculateFrontal("lThigh","hip" , "lShin")  #validado 
         self.frameVectors["L_Hip_Pitch"] = self.jointCalc.calculateSagital("lThigh", "abdomen", "lShin") #validado
         self.frameVectors["L_Knee"] = self.jointCalc.calculateSagital("lShin", "lThigh","lFoot") #validado
-        self.frameVectors["L_Ankle_Pitch"] = self.jointCalc.calculateSagital("lFoot", "lShin", "End Site") #validado
+        self.frameVectors["L_Ankle_Pitch"] = self.jointCalc.calculateSagital("lFoot", "lShin", "End Site13") #validado
         self.frameVectors["L_Elbow_Yaw"] = self.jointCalc.calculateSagital("lForeArm", "lShldr", "lHand") #validado
-        self.frameVectors["L_Ankle_Roll"] = self.frameVectors["L_Ankle_Pitch"]
+        self.frameVectors["L_Ankle_Roll"] =  self.nullFrameVector(self.framesQty)
         
     def generateFile(self,file):
         root = ET.Element("root")
@@ -63,4 +63,10 @@ class MocapLucyMapping:
                 xmlJointAngle = xmlJoint.set("angle" , str(pos))
         tree = ET.ElementTree(root)
         tree.write(file)
+
+    def nullFrameVector(self, length):
+        frameVector = {}
+        for i in range(length):
+            frameVector[i]=0
+        return frameVector
 
