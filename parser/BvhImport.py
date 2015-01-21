@@ -30,7 +30,16 @@ class BvhImport:
         self.nodeNameIndexMapping = {}
         pose = self.animation.get_pose(1)
         for j in range(len(pose.positions)):
-            self.nodeNameIndexMapping[pose.bone.node_list[j].name] = j
+            key = pose.bone.node_list[j].name
+            if key in self.nodeNameIndexMapping.keys():
+                counter = 1
+                newKey = key + str(counter)
+                while(newKey in self.nodeNameIndexMapping.keys()):
+                    counter = counter + 1
+                    newKey = key + str(counter)
+                self.nodeNameIndexMapping[newKey] = j
+            else:
+                self.nodeNameIndexMapping[key] = j
 
     def test(self):
         print self.nodeNameIndexMapping
