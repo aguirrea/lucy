@@ -237,7 +237,7 @@ ROOT hip
         {
           OFFSET 0.73152 -45.1104 -5.12064
           CHANNELS 3 Zrotation Xrotation Yrotation
-          End Site
+          End Site R
           {
             OFFSET -1.1221 -3.69964 12.103
           }
@@ -261,7 +261,7 @@ ROOT hip
         {
           OFFSET -0.73152 -45.1104 -5.12064
           CHANNELS 3 Zrotation Xrotation Yrotation
-          End Site
+          End Site L
           {
             OFFSET 1.1221 -3.69964 12.103
           }
