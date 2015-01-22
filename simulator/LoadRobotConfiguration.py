@@ -32,7 +32,7 @@ class LoadRobotConfiguration:
         for i in itemlist:
             name = i.getElementsByTagName("Name")[0]
             id   = i.getElementsByTagName("Id")[0]
-            #print "Nombre:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
+            #print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
             self.jointAngleMapping[(name.childNodes[0].toxml())] = int(id.childNodes[0].toxml())        
             
     def loadJointId(self, jointName):

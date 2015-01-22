@@ -72,10 +72,7 @@ class SimLucy:
         joint=pose.keys()[len(pose)-1]
         angle=pose[joint]
         self.sim.setJointPosition(self.clientID, joint, angle)
-        #print "pase"
         
-        
-
     def stopLucy(self):
         self.sim.finishSimulation(self.clientID)
         self.stop = True

@@ -50,7 +50,7 @@ class AXAngle:
         return vrep_angle
 
 #for i in range(1024) :
-#    print "ax: ", i ,"vrep: ", AXAngle(i).toVrep(), "grados: ", AXAngle(i).toDegrees()
+#    print "ax: ", i ,"vrep: ", AXAngle(i).toVrep(), "degree: ", AXAngle(i).toDegrees()
 
 #print value
 #print (angle.toDegrees())
