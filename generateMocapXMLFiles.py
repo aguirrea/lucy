@@ -24,11 +24,11 @@ from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 import os
 
-BVHDir = os.getcwd() + "/cmu_mocap/bvh/"
-XMLDir = os.getcwd() + "/cmu_mocap/xml/"
+BVHDir = os.getcwd() + "/mocap/cmu_mocap/bvh/"
+XMLDir = os.getcwd() + "/mocap/cmu_mocap/xml/"
 
 #TODO generalize this to all files in the directory
 
 robotConfiguration = LoadRobotConfiguration()
 lucyFileConversion = MocapLucyMapping(BVHDir + "02_02.bvh", robotConfiguration)
-lucyFileConversion.generateFile(XMLDir + "test3.xml")
+lucyFileConversion.generateFile(XMLDir + "test4.xml")
