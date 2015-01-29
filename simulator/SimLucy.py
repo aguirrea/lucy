@@ -80,3 +80,6 @@ class SimLucy:
         x, y=self.sim.getBioloidPlannarPosition(self.clientID) 
         distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
         self.distance = distance        
+
+    def isLucyUp(self, self.clientID):
+        self.sim.isRobotUp()
