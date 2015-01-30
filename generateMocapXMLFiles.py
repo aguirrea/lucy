@@ -21,8 +21,11 @@
 from parser.JointCalculation import JointCalculation
 from parser.MocapLucyMapping import MocapLucyMapping
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from string import rstrip
 
 import os
+import glob
+import ntpath
 
 BVHDir = os.getcwd() + "/mocap/cmu_mocap/bvh/"
 XMLDir = os.getcwd() + "/mocap/cmu_mocap/xml/"
@@ -30,5 +33,13 @@ XMLDir = os.getcwd() + "/mocap/cmu_mocap/xml/"
 #TODO generalize this to all files in the directory
 
 robotConfiguration = LoadRobotConfiguration()
-lucyFileConversion = MocapLucyMapping(BVHDir + "02_02.bvh", robotConfiguration)
-lucyFileConversion.generateFile(XMLDir + "test4.xml")
+
+
+for filename in glob.glob(os.path.join(BVHDir, '*.bvh')):
+    print "transforming: " + filename + " ..."
+    lucyFileConversion = MocapLucyMapping(filename, robotConfiguration)
+    newFile = ntpath.basename(filename)
+    newFile = rstrip(newFile[:-4]) + ".xml"
+    newFile = XMLDir + newFile
+    lucyFileConversion.generateFile(newFile)
+    print "file: " + newFile + " generated!"
