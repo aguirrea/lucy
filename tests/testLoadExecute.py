@@ -6,7 +6,7 @@
 # Test of loading xml pose files and executing it
 # Youtube video of the test in http://youtu.be/oPO1lc5ping
 #
-# Thisc program is free software; you can redistribute it and/or modify
+# This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
@@ -32,7 +32,7 @@ angle = AXAngle()
 angleFix = AXAngle()
 angleExecute = AXAngle()
 
-mocapFile = os.getcwd()+"/cmu_mocap/xml/test4.xml"
+mocapFile = os.getcwd()+"/mocap/cmu_mocap/xml/06_02.xml"
 lp = LoadPoses(mocapFile)
 lucy = SimLucy(True)
 
@@ -44,8 +44,8 @@ poseFix["R_Shoulder_Pitch"] = -45
 poseFix["R_Hip_Yaw"] = 0
 poseFix["R_Hip_Roll"] = 0
 poseFix["R_Hip_Pitch"] = -50
-poseFix["R_Knee"] = 20 
-poseFix["R_Ankle_Pitch"] = 0
+poseFix["R_Knee"] = 0 
+poseFix["R_Ankle_Pitch"] = 9
 poseFix["R_Elbow_Yaw"] = 0
 poseFix["R_Ankle_Roll"] = 0
 
@@ -54,8 +54,8 @@ poseFix["L_Shoulder_Pitch"] = -50
 poseFix["L_Hip_Yaw"] = 0
 poseFix["L_Hip_Roll"] = 0
 poseFix["L_Hip_Pitch"] = -50
-poseFix["L_Knee"] = 20
-poseFix["L_Ankle_Pitch"] = 0
+poseFix["L_Knee"] = 0
+poseFix["L_Ankle_Pitch"] = 9
 poseFix["L_Elbow_Yaw"] = 0
 poseFix["L_Ankle_Roll"] = 0
 
