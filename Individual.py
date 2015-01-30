@@ -22,6 +22,7 @@ from simulator.SimLucy    import SimLucy
 from simulator.AXAngle    import AXAngle
 from parser.LoadPoses     import LoadPoses
 from DTIndividualProperty import DTIndividualProperty
+from Pose                 import Pose
 
 
 class Individual:
@@ -37,18 +38,31 @@ class Individual:
         angleExecute = AXAngle()
         lucyIsDown = False
         while (self.lucy.isLucyUp() and i <= self.lp.getFrameQty()):
-            poses = self.lp.getPoses(i)
+            poses = self.lp.getFramePose(i)
             i = i + 1
             for joint in poses.keys():
                 if !property.avoidJoint(joint):
                     angleExecute.setDegreeValue(poses[joint] + property.getPoseFix(joint))
                     pose[joint].toVrep()
             self.lucy.executeFrame(pose)
+        self.lucy.stopLucy()  
         self.fitness = self.lucy.getFitness()        
 
     def getPoseQty(self):
         return self.lp.getFrameQty()
 
+    def getPose(self, poseNumber):
+        return self.lp.getFramePose(poseNumber) 
+
     def getMostSimilarPose(self, pose):
-        pass
+        diff = MAX_INT 
+        moreSimilarPose = self.getPose(1)
+        for i in range(self.getPoseQty()):
+            myPose = getPose(i)
+            newDiff = pose.diff(myPose)
+            if (newDiff < diff) :
+                diff = newDiff
+                moreSimilarPose = myPose
+        return moreSimilarPose
+        
 
