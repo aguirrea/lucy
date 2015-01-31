@@ -1,0 +1,6 @@
+<System>
+<Directory>
+    <Name>Transformed mocap Files</Name> 
+    <Value>/mocap/cmu_mocap/xml/</Value>
+</Directory>
+</System>
