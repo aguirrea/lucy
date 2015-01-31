@@ -32,7 +32,7 @@ angle = AXAngle()
 angleFix = AXAngle()
 angleExecute = AXAngle()
 
-mocapFile = os.getcwd()+"/mocap/cmu_mocap/xml/06_02.xml"
+mocapFile = os.getcwd()+"/mocap/cmu_mocap/xml/49_20.xml"
 lp = LoadPoses(mocapFile)
 lucy = SimLucy(True)
 
@@ -43,14 +43,14 @@ poseFix["R_Shoulder_Yaw"] = 0
 poseFix["R_Shoulder_Pitch"] = -45
 poseFix["R_Hip_Yaw"] = 0
 poseFix["R_Hip_Roll"] = 0
-poseFix["R_Hip_Pitch"] = -50
+poseFix["R_Hip_Pitch"] = -70
 poseFix["R_Knee"] = 0 
 poseFix["R_Ankle_Pitch"] = 9
 poseFix["R_Elbow_Yaw"] = 0
 poseFix["R_Ankle_Roll"] = 0
 
 poseFix["L_Shoulder_Yaw"] = 0
-poseFix["L_Shoulder_Pitch"] = -50
+poseFix["L_Shoulder_Pitch"] = -70
 poseFix["L_Hip_Yaw"] = 0
 poseFix["L_Hip_Roll"] = 0
 poseFix["L_Hip_Pitch"] = -50
@@ -59,7 +59,7 @@ poseFix["L_Ankle_Pitch"] = 9
 poseFix["L_Elbow_Yaw"] = 0
 poseFix["L_Ankle_Roll"] = 0
 
-avoid_joints = ["R_Hip_Yaw", "R_Shoulder_Yaw", "L_Hip_Yaw", "R_Shoulder_Yaw", "L_Hip_Roll", "R_Hip_Roll", "L_Ankle_Roll", "R_Ankle_Roll"] 
+avoid_joints = ["R_Hip_Yaw", "R_Shoulder_Yaw", "L_Hip_Yaw", "L_Shoulder_Yaw", "L_Hip_Roll", "R_Hip_Roll", "L_Ankle_Roll", "R_Ankle_Roll"] 
 frameQty=lp.getFrameQty()
 while  True:
     for index in range(frameQty):

@@ -81,5 +81,5 @@ class SimLucy:
         distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
         self.distance = distance        
 
-    def isLucyUp(self, self.clientID):
-        self.sim.isRobotUp()
+    def isLucyUp(self):
+        return self.sim.isRobotUp(self.clientID)

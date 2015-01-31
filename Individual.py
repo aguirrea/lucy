@@ -22,29 +22,33 @@ from simulator.SimLucy    import SimLucy
 from simulator.AXAngle    import AXAngle
 from parser.LoadPoses     import LoadPoses
 from DTIndividualProperty import DTIndividualProperty
+from DTIndividualProperty import DTIndividualPropertyCMUDaz
 from Pose                 import Pose
-
+from LoadSystemConfiguration import LoadSystemConfiguration
+import os #only for the tests
+import glob #only for the tests
 
 class Individual:
 
-    def __init__(self, file):
-        self.property = DTIndividualPropertyCMUDaz() #TODO review python herence
+    def __init__(self, file, idividualProperty):
+        self.property = idividualProperty
         self.fitness = 0
         self.mocapFile = file
         self.lp = LoadPoses(self.mocapFile)
-        self.lucy = SimLucy(False)
+        self.lucy = SimLucy(True)
 
     def execute(self):
         angleExecute = AXAngle()
-        lucyIsDown = False
-        while (self.lucy.isLucyUp() and i <= self.lp.getFrameQty()):
-            poses = self.lp.getFramePose(i)
+        poseExecute={}
+        i=0
+        while (self.lucy.isLucyUp() and i < self.lp.getFrameQty()):
+            pose = self.lp.getFramePose(i)
             i = i + 1
-            for joint in poses.keys():
-                if !property.avoidJoint(joint):
-                    angleExecute.setDegreeValue(poses[joint] + property.getPoseFix(joint))
-                    pose[joint].toVrep()
-            self.lucy.executeFrame(pose)
+            for joint in pose.keys():
+                if not(self.property.avoidJoint(joint)):
+                    angleExecute.setDegreeValue(pose[joint] + self.property.getPoseFix(joint))
+                    poseExecute[joint] = angleExecute.toVrep()
+            self.lucy.executeFrame(poseExecute)
         self.lucy.stopLucy()  
         self.fitness = self.lucy.getFitness()        
 
@@ -64,5 +68,11 @@ class Individual:
                 diff = newDiff
                 moreSimilarPose = myPose
         return moreSimilarPose
-        
 
+prop = DTIndividualPropertyCMUDaz()
+conf = LoadSystemConfiguration()
+xmlDir = os.getcwd()+conf.getDirectory("Transformed mocap Files")
+for filename in glob.glob(os.path.join(xmlDir, '*.xml')):
+    print 'executing individual: ' + filename
+    walk = Individual(filename, prop)
+    walk.execute()

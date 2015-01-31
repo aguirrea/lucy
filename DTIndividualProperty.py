@@ -26,9 +26,9 @@ class DTIndividualProperty(object):
     def avoidJoint(self, joint):
         return joint in self.avoidJoints
 
-    def getPoseFix(self, joint)
-        if joint in poseFix.keys():
-            res = poseFix[joint]
+    def getPoseFix(self, joint):
+        if joint in self.poseFix.keys():
+            res = self.poseFix[joint]
         else:
             res = 0
         return res
@@ -36,20 +36,21 @@ class DTIndividualProperty(object):
 class DTIndividualPropertyCMUDaz(DTIndividualProperty):
 
     def __init__(self):
-        self.avoidJoints = ["R_Hip_Yaw", "R_Shoulder_Yaw", "L_Hip_Yaw", "R_Shoulder_Yaw", "L_Hip_Roll", "R_Hip_Roll", "L_Ankle_Roll", "R_Ankle_Roll"] 
+        DTIndividualProperty.__init__(self)
+        self.avoidJoints = ["R_Hip_Yaw", "L_Shoulder_Yaw", "L_Hip_Yaw", "R_Shoulder_Yaw", "L_Hip_Roll", "R_Hip_Roll", "L_Ankle_Roll", "R_Ankle_Roll"] 
         
         self.poseFix["R_Shoulder_Yaw"] = 0
         self.poseFix["R_Shoulder_Pitch"] = -45
         self.poseFix["R_Hip_Yaw"] = 0
         self.poseFix["R_Hip_Roll"] = 0
-        self.poseFix["R_Hip_Pitch"] = -50
+        self.poseFix["R_Hip_Pitch"] = -70
         self.poseFix["R_Knee"] = 0 
         self.poseFix["R_Ankle_Pitch"] = 9
         self.poseFix["R_Elbow_Yaw"] = 0
         self.poseFix["R_Ankle_Roll"] = 0
 
         self.poseFix["L_Shoulder_Yaw"] = 0
-        self.poseFix["L_Shoulder_Pitch"] = -50
+        self.poseFix["L_Shoulder_Pitch"] = -70
         self.poseFix["L_Hip_Yaw"] = 0
         self.poseFix["L_Hip_Roll"] = 0
         self.poseFix["L_Hip_Pitch"] = -50

@@ -30,8 +30,6 @@ import ntpath
 BVHDir = os.getcwd() + "/mocap/cmu_mocap/bvh/"
 XMLDir = os.getcwd() + "/mocap/cmu_mocap/xml/"
 
-#TODO generalize this to all files in the directory
-
 robotConfiguration = LoadRobotConfiguration()
 
 
