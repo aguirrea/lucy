@@ -1,6 +1,17 @@
 <System>
-<Directory>
-    <Name>Transformed mocap Files</Name> 
+<Directories>
+    <Name>GAWalk Files</Name> 
+    <Value>/mocap/gawalk/xml</Value>
+    <Name>Transformed CMU mocap Files</Name> 
     <Value>/mocap/cmu_mocap/xml/</Value>
-</Directory>
+</Directories>
+<File>
+    <LucyVrepModel>/simulator/models/genetic_bioloid.ttt</LucyVrepModel>
+</File>
+<Simulator>
+    <IP>127.0.0.1</IP>
+    <Port>19997</Port>
+    <FALL_THRESHOLD>0.07</FALL_THRESHOLD>
+    <ConnectionTimeout>5000</ConnectionTimeout>
+</Simulator>
 </System>
