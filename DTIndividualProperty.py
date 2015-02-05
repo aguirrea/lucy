@@ -59,3 +59,31 @@ class DTIndividualPropertyCMUDaz(DTIndividualProperty):
         self.poseFix["L_Elbow_Yaw"] = 0
         self.poseFix["L_Ankle_Roll"] = 0
 
+class DTIndividualPropertyVanilla(DTIndividualProperty):
+
+    def __init__(self):
+        DTIndividualProperty.__init__(self)
+        self.avoidJoints = [] 
+        
+        self.poseFix["R_Shoulder_Yaw"] = 0
+        self.poseFix["R_Shoulder_Pitch"] = 0
+        self.poseFix["R_Hip_Yaw"] = 0
+        self.poseFix["R_Hip_Roll"] = 0
+        self.poseFix["R_Hip_Pitch"] = 0
+        self.poseFix["R_Knee"] = 0 
+        self.poseFix["R_Ankle_Pitch"] = 0
+        self.poseFix["R_Elbow_Yaw"] = 0
+        self.poseFix["R_Ankle_Roll"] = 0
+
+        self.poseFix["L_Shoulder_Yaw"] = 0
+        self.poseFix["L_Shoulder_Pitch"] = 0
+        self.poseFix["L_Hip_Yaw"] = 0
+        self.poseFix["L_Hip_Roll"] = 0
+        self.poseFix["L_Hip_Pitch"] = 0
+        self.poseFix["L_Knee"] = 0
+        self.poseFix["L_Ankle_Pitch"] = 0
+        self.poseFix["L_Elbow_Yaw"] = 0
+        self.poseFix["L_Ankle_Roll"] = 0
+
+
+
