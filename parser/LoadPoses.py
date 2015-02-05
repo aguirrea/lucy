@@ -20,6 +20,7 @@
 
 from xml.dom import minidom
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from Pose import Pose
 
 class LoadPoses:
     
@@ -35,10 +36,18 @@ class LoadPoses:
         for jointName in config.getJointsName():
             joint = frame.getElementsByTagName(jointName)[0]
             angle = joint.getAttribute("angle")
-            #print jointName, angle
             self.jointAngleMapping[jointName] = float(angle)
         return(self.jointAngleMapping)
-    
+    #to deprecate getFramePose
+    def getPose(self, frameNumber):
+        config = LoadRobotConfiguration()
+        frame = self.framelist[frameNumber]
+        for jointName in config.getJointsName():
+            joint = frame.getElementsByTagName(jointName)[0]
+            angle = joint.getAttribute("angle")
+            self.jointAngleMapping[jointName] = float(angle)
+        return(Pose(self.jointAngleMapping))    
+
     def getJointAngles(self, jointName):
         config = LoadRobotConfiguration()
         for frame in self.framelist:
