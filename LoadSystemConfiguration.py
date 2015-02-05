@@ -28,12 +28,13 @@ class LoadSystemConfiguration:
     def __init__(self):
         self.directoryValueMapping = {}
         xmldoc = minidom.parse(confFile)
-        itemlist = xmldoc.getElementsByTagName("Directory") 
+        itemlist = xmldoc.getElementsByTagName("Directories") 
         for i in itemlist:
-            name = i.getElementsByTagName("Name")[0]
-            id   = i.getElementsByTagName("Value")[0]
-            #print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
-            self.directoryValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml()        
+            for j in range(len(i.getElementsByTagName("Name"))):
+                name = i.getElementsByTagName("Name")[j]
+                id   = i.getElementsByTagName("Value")[j]
+                #print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
+                self.directoryValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml()        
             
     def getDirectory(self, name):
         return(self.directoryValueMapping[name])
