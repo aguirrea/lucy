@@ -21,10 +21,11 @@
 from simulator.SimLucy    import SimLucy
 from simulator.AXAngle    import AXAngle
 from parser.LoadPoses     import LoadPoses
-from DTIndividualProperty import DTIndividualProperty
-from DTIndividualProperty import DTIndividualPropertyCMUDaz
+from DTIndividualProperty import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla
 from Pose                 import Pose
 from LoadSystemConfiguration import LoadSystemConfiguration
+from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+
 import os #only for the tests
 import glob #only for the tests
 
@@ -36,19 +37,20 @@ class Individual:
         self.mocapFile = file
         self.lp = LoadPoses(self.mocapFile)
         self.lucy = SimLucy(True)
+        self.robotConfig = LoadRobotConfiguration()
 
     def execute(self):
         angleExecute = AXAngle()
         poseExecute={}
         i=0
         while (self.lucy.isLucyUp() and i < self.lp.getFrameQty()):
-            pose = self.lp.getFramePose(i)
+            pose = self.lp.getPose(i)
             i = i + 1
-            for joint in pose.keys():
+            for joint in self.robotConfig.getJointsName():
                 if not(self.property.avoidJoint(joint)):
-                    angleExecute.setDegreeValue(pose[joint] + self.property.getPoseFix(joint))
+                    angleExecute.setDegreeValue(pose.getValue(joint) + self.property.getPoseFix(joint))
                     poseExecute[joint] = angleExecute.toVrep()
-            self.lucy.executeFrame(poseExecute)
+            self.lucy.executePose(Pose(poseExecute))
         self.lucy.stopLucy()  
         self.fitness = self.lucy.getFitness()        
 
@@ -70,9 +72,18 @@ class Individual:
         return moreSimilarPose
 
 prop = DTIndividualPropertyCMUDaz()
+propVanilla = DTIndividualPropertyVanilla()
 conf = LoadSystemConfiguration()
-xmlDir = os.getcwd()+conf.getDirectory("Transformed mocap Files")
-for filename in glob.glob(os.path.join(xmlDir, '*.xml')):
+CMUxmlDir = os.getcwd()+conf.getDirectory("Transformed CMU mocap Files")
+GAwalkDir = os.getcwd()+conf.getDirectory("GAWalk Files")
+
+
+for filename in glob.glob(os.path.join(GAwalkDir, '*.xml')):
+    print 'executing individual: ' + filename
+    walk = Individual(filename, propVanilla)
+    walk.execute()
+
+for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
     print 'executing individual: ' + filename
     walk = Individual(filename, prop)
     walk.execute()
