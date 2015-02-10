@@ -26,7 +26,7 @@ from errors.VrepException import VrepException
 from Pose import Pose
 from LoadSystemConfiguration import LoadSystemConfiguration
 
-import os
+import os, threading
 
 X = 0
 Y = 1
@@ -34,20 +34,21 @@ Y = 1
 class SimLucy:
 
     def __init__(self, visible=False):
-        conf = LoadSystemConfiguration()
+        self.conf = LoadSystemConfiguration()
         self.configuration = LoadRobotConfiguration()
         self.visible = visible
         self.sim = Simulator()
         self.clientID = self.sim.connectVREP()
         if self.clientID == -1:
             raise VrepException("error connecting with Vrep", -1)
-        genetic_bioloid = os.getcwd()+conf.getFile("Lucy vrep model")
+        genetic_bioloid = os.getcwd()+self.conf.getFile("Lucy vrep model")
         self.sim.loadscn(self.clientID, genetic_bioloid)
         self.sim.startSim(self.clientID,self.visible)
         self.time = 0
         self.startTime = time()
         self.jointHandleCachePopulated = False
         self.stop = False
+        self.distance = 0
         configuration = LoadRobotConfiguration()
         self.joints = configuration.getJointsName()
         self.startPosSetted = False
@@ -55,6 +56,18 @@ class SimLucy:
         if not error:
             self.startPosSetted = True
             self.startPos = [x,y]
+        else:
+            threading.Timer(int(self.conf.getProperty("threadingTime")), self.setStartPositionAsync).start()
+
+    def setStartPositionAsync(self):
+        if not self.startPosSetted:
+            error, x, y = self.sim.getBioloidPlannarPosition(self.clientID)
+            if not error:
+                self.startPosSetted = True
+                self.startPos = [x,y]
+                print "posición de inicio seteada"
+            else:
+                threading.Timer(int(self.conf.getProperty("threadingTime")), self.setStartPositionAsync).start()
 
     def getSimTime(self):
         if self.stop == False:
@@ -132,8 +145,8 @@ class SimLucy:
         self.stop = True
         self.time = time() - self.startTime
         errorPosition, x, y = self.sim.getBioloidPlannarPosition(self.clientID) 
-        distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
-        self.distance = distance
+        if self.startPosSetted:
+            self.distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
         errorFinish = self.sim.finishSimulation(self.clientID)
         #error = errorFinish or errorPosition
         error = errorPosition
@@ -141,11 +154,6 @@ class SimLucy:
             raise VrepException("error stoping Lucy", error)        
 
     def isLucyUp(self):
-        if not self.startPosSetted:
-            error, x, y = self.sim.getBioloidPlannarPosition(self.clientID)
-            if not error:
-                self.startPosSetted = True
-                self.startPos = [x,y]
         error, up = self.sim.isRobotUp(self.clientID)
         if error:
             #raise VrepException("error consulting if lucy is up", error)
