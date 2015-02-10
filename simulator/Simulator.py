@@ -45,7 +45,6 @@ class Simulator:
             return error, ret
 
     def connectVREP(self, ipAddr=LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"Vrep IP"), port=int(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"Vrep port"))):
-        print ipAddr, port
         vrep.simxFinish(-1) # just in case, close all opened connections
         return vrep.simxStart(ipAddr,port,True,True,5000,5)
 

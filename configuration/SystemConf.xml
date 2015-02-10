@@ -7,6 +7,10 @@
     <Name>Transformed CMU mocap Files</Name> 
     <Value>/mocap/cmu_mocap/xml/</Value>
 </Directory>
+<Directory>
+    <Name>UIBLH mocap Files</Name> 
+    <Value>/mocap/uiblh_mocap/xml/</Value>
+</Directory>
 <File>
     <Name>Lucy vrep model</Name> 
     <Value>/simulator/models/genetic_bioloid.ttt</Value>
@@ -26,5 +30,9 @@
 <Property>
     <Name>ConnectionTimeout</Name>
     <Value>5000</Value>    
+</Property>
+<Property>
+    <Name>threadingTime</Name>
+    <Value>1</Value>    
 </Property>
 </System>
