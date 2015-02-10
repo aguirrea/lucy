@@ -27,17 +27,40 @@ class LoadSystemConfiguration:
     
     def __init__(self):
         self.directoryValueMapping = {}
+        self.fileValueMapping = {}
+        self.propertyValueMapping = {}
         xmldoc = minidom.parse(confFile)
-        itemlist = xmldoc.getElementsByTagName("Directories") 
+        itemlist = xmldoc.getElementsByTagName("Directory") 
         for i in itemlist:
             for j in range(len(i.getElementsByTagName("Name"))):
                 name = i.getElementsByTagName("Name")[j]
                 id   = i.getElementsByTagName("Value")[j]
                 #print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
-                self.directoryValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml()        
+                self.directoryValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml() 
+        itemlist = xmldoc.getElementsByTagName("File") 
+        for i in itemlist:
+            for j in range(len(i.getElementsByTagName("Name"))):
+                name = i.getElementsByTagName("Name")[j]
+                id   = i.getElementsByTagName("Value")[j]
+                #print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
+                self.fileValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml() 
+        
+        itemlist = xmldoc.getElementsByTagName("Property") 
+        for i in itemlist:
+            for j in range(len(i.getElementsByTagName("Name"))):
+                name = i.getElementsByTagName("Name")[j]
+                id   = i.getElementsByTagName("Value")[j]
+                #print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
+                self.propertyValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml() 
             
     def getDirectory(self, name):
         return(self.directoryValueMapping[name])
+
+    def getFile(self, name):
+        return(self.fileValueMapping[name])
+
+    def getProperty(self, name):
+        return(self.propertyValueMapping[name])
     
     
 #conf = LoadSystemConfiguration()

@@ -24,23 +24,24 @@ from Simulator import Simulator
 from LoadRobotConfiguration import LoadRobotConfiguration
 from errors.VrepException import VrepException
 from Pose import Pose
+from LoadSystemConfiguration import LoadSystemConfiguration
+
 import os
 
 X = 0
 Y = 1
 
-#genetic_bioloid=os.getcwd()+"/simulator/models/ControllerTest_Orig.ttt"
-genetic_bioloid=os.getcwd()+"/simulator/models/genetic_bioloid.ttt"
-
 class SimLucy:
 
     def __init__(self, visible=False):
+        conf = LoadSystemConfiguration()
         self.configuration = LoadRobotConfiguration()
         self.visible = visible
         self.sim = Simulator()
         self.clientID = self.sim.connectVREP()
         if self.clientID == -1:
             raise VrepException("error connecting with Vrep", -1)
+        genetic_bioloid = os.getcwd()+conf.getFile("Lucy vrep model")
         self.sim.loadscn(self.clientID, genetic_bioloid)
         self.sim.startSim(self.clientID,self.visible)
         self.time = 0

@@ -23,10 +23,7 @@ import time
 import math
 
 from LoadRobotConfiguration import LoadRobotConfiguration
-FALL_THRESHOLD = 0.07
-localhost='127.0.0.1'
-standadRemoteApiPort=19997
-
+from LoadSystemConfiguration import LoadSystemConfiguration
 
 class Simulator:
     def __init__(self):
@@ -47,7 +44,8 @@ class Simulator:
                 error, ret = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_buffer) 
             return error, ret
 
-    def connectVREP(self, ipAddr=localhost, port=standadRemoteApiPort):
+    def connectVREP(self, ipAddr=LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"Vrep IP"), port=int(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"Vrep port"))):
+        print ipAddr, port
         vrep.simxFinish(-1) # just in case, close all opened connections
         return vrep.simxStart(ipAddr,port,True,True,5000,5)
 
@@ -68,7 +66,7 @@ class Simulator:
         error = False
         error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait) or error
         error, bioloid_position = self.getObjectPositionWrapper(clientID, LSP_Handle) or error 
-        return error, bioloid_position[2]>FALL_THRESHOLD
+        return error, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD"))
 
     def startSim(self, clientID, screen=True):
         error=vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot)
