@@ -66,7 +66,7 @@ class Individual:
         for i in range(self.getPoseQty()):
             myPose = getPose(i)
             newDiff = pose.diff(myPose)
-            if (newDiff < diff) :
+            if (newDiff < diff):
                 diff = newDiff
                 moreSimilarPose = myPose
         return moreSimilarPose
@@ -76,7 +76,12 @@ propVanilla = DTIndividualPropertyVanilla()
 conf = LoadSystemConfiguration()
 CMUxmlDir = os.getcwd()+conf.getDirectory("Transformed CMU mocap Files")
 GAwalkDir = os.getcwd()+conf.getDirectory("GAWalk Files")
+UIBLHDir = os.getcwd()+conf.getDirectory("UIBLH mocap Files")
 
+for filename in glob.glob(os.path.join(UIBLHDir, '*.xml')):
+    print 'executing individual: ' + filename
+    walk = Individual(filename, propVanilla)
+    walk.execute()
 
 for filename in glob.glob(os.path.join(GAwalkDir, '*.xml')):
     print 'executing individual: ' + filename
