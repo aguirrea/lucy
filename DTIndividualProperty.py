@@ -63,7 +63,7 @@ class DTIndividualPropertyVanilla(DTIndividualProperty):
 
     def __init__(self):
         DTIndividualProperty.__init__(self)
-        self.avoidJoints = [] 
+        self.avoidJoints = ["R_Elbow_Yaw", "L_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw"]
         
         self.poseFix["R_Shoulder_Yaw"] = 0
         self.poseFix["R_Shoulder_Pitch"] = 0
@@ -84,6 +84,34 @@ class DTIndividualPropertyVanilla(DTIndividualProperty):
         self.poseFix["L_Ankle_Pitch"] = 0
         self.poseFix["L_Elbow_Yaw"] = 0
         self.poseFix["L_Ankle_Roll"] = 0
+
+class DTIndividualPropertyBaliero(DTIndividualProperty):
+
+    def __init__(self):
+        DTIndividualProperty.__init__(self)
+        self.avoidJoints = ["L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Elbow_Yaw", "L_Elbow_Yaw"] 
+        
+        self.poseFix["R_Shoulder_Yaw"] = 69
+        self.poseFix["R_Shoulder_Pitch"] = 81
+        self.poseFix["R_Hip_Yaw"] = 45
+        self.poseFix["R_Hip_Roll"] = 4
+        self.poseFix["R_Hip_Pitch"] = 54
+
+        self.poseFix["R_Knee"] = 97
+        self.poseFix["R_Ankle_Pitch"] = -14
+        self.poseFix["R_Elbow_Yaw"] = 15
+        self.poseFix["R_Ankle_Roll"] = -39
+
+        self.poseFix["L_Shoulder_Yaw"] = -68
+        self.poseFix["L_Shoulder_Pitch"] = -81
+        self.poseFix["L_Hip_Yaw"] = -45
+        self.poseFix["L_Hip_Roll"] = 1
+        self.poseFix["L_Hip_Pitch"] = -43
+        self.poseFix["L_Knee"] = -63
+        self.poseFix["L_Ankle_Pitch"] = -13
+        self.poseFix["L_Elbow_Yaw"] = -14
+        self.poseFix["L_Ankle_Roll"] = 41
+
 
 
 
