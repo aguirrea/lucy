@@ -21,13 +21,14 @@
 from simulator.SimLucy    import SimLucy
 from simulator.AXAngle    import AXAngle
 from parser.LoadPoses     import LoadPoses
-from DTIndividualProperty import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla
+from DTIndividualProperty import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero
 from Pose                 import Pose
 from LoadSystemConfiguration import LoadSystemConfiguration
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 import os #only for the tests
 import glob #only for the tests
+import time
 
 class Individual:
 
@@ -38,21 +39,28 @@ class Individual:
         self.lp = LoadPoses(self.mocapFile)
         self.lucy = SimLucy(True)
         self.robotConfig = LoadRobotConfiguration()
-
+        self.poseSize = self.lp.getFrameQty()
+        self.genomeMatrix = [[self.lp.getPose(i).getValue(j) for j in self.robotConfig.getJointsName()] for i in range(self.poseSize)] 
+        self.genomeMatrixJointNameIDMapping = {}
+        i=0
+        for jointName in self.robotConfig.getJointsName():
+            self.genomeMatrixJointNameIDMapping[jointName]=i
+            i=i+1
     def execute(self):
         angleExecute = AXAngle()
         poseExecute={}
         i=0
-        while (self.lucy.isLucyUp() and i < self.lp.getFrameQty()):
-            pose = self.lp.getPose(i)
-            i = i + 1
+        while (self.lucy.isLucyUp() and i < self.poseSize):
             for joint in self.robotConfig.getJointsName():
                 if not(self.property.avoidJoint(joint)):
-                    angleExecute.setDegreeValue(pose.getValue(joint) + self.property.getPoseFix(joint))
-                    poseExecute[joint] = angleExecute.toVrep()
+                    value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint)
+                    angleExecute.setDegreeValue(value)
+                    poseExecute[joint] = angleExecute.toVrep() 
+            i = i + 1  
             self.lucy.executePose(Pose(poseExecute))
         self.lucy.stopLucy()  
-        self.fitness = self.lucy.getFitness()        
+        self.fitness = self.lucy.getFitness()       
+        print "fitness: ", self.fitness 
 
     def getPoseQty(self):
         return self.lp.getFrameQty()
@@ -71,24 +79,53 @@ class Individual:
                 moreSimilarPose = myPose
         return moreSimilarPose
 
+    def getGenomeMatrix(self):
+        return self.genomeMatrix
+
+    def setGenomeMatrix(self, geneMatrix):
+        self.genomeMatrix = geneMatrix
+        self.poseSize = len(geneMatrix)
+
 prop = DTIndividualPropertyCMUDaz()
 propVanilla = DTIndividualPropertyVanilla()
+balieroProp = DTIndividualPropertyBaliero()
+
 conf = LoadSystemConfiguration()
+
 CMUxmlDir = os.getcwd()+conf.getDirectory("Transformed CMU mocap Files")
 GAwalkDir = os.getcwd()+conf.getDirectory("GAWalk Files")
 UIBLHDir = os.getcwd()+conf.getDirectory("UIBLH mocap Files")
+BalieroDir = os.getcwd()+conf.getDirectory("Baliero transformed walk Files")
+ADHOCDir = os.getcwd()+conf.getDirectory("ADHOC Files")
 
-for filename in glob.glob(os.path.join(UIBLHDir, '*.xml')):
-    print 'executing individual: ' + filename
-    walk = Individual(filename, propVanilla)
-    walk.execute()
+#for filename in glob.glob(os.path.join(GAwalkDir, '*.xml')):
+#    print 'executing individual: ' + filename
+#    walk = Individual(filename, propVanilla)
+#    walk.execute()
 
-for filename in glob.glob(os.path.join(GAwalkDir, '*.xml')):
-    print 'executing individual: ' + filename
-    walk = Individual(filename, propVanilla)
-    walk.execute()
+#for filename in glob.glob(os.path.join(BalieroDir, '*.xml')):
+#    print 'executing individual: ' + filename
+#    walk = Individual(filename, balieroProp)
+#    walk.execute()
+
+#for filename in glob.glob(os.path.join(UIBLHDir, '*.xml')):
+#    print 'executing individual: ' + filename
+#    walk = Individual(filename, propVanilla)
+#    walk.execute()
+
+#for filename in glob.glob(os.path.join(GAwalkDir, '*.xml')):
+#    print 'executing individual: ' + filename
+#    walk = Individual(filename, propVanilla)
+#    walk.execute()
 
 for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
     print 'executing individual: ' + filename
     walk = Individual(filename, prop)
     walk.execute()
+
+#for filename in glob.glob(os.path.join(ADHOCDir, '*.xml')):
+#    print 'executing individual: ' + filename
+#    walk = Individual(filename, propVanilla)
+#    walk.execute()
+
+    
