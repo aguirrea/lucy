@@ -39,7 +39,8 @@ class LoadRobotConfiguration:
         return(self.jointAngleMapping[jointName])
     
     def getJointsName(self):
-        return self.jointAngleMapping.keys()
+        return sorted(self.jointAngleMapping.keys())
+
     
 #conf = LoadRobotConfiguration()
 #for joint in conf.getJointsName():
