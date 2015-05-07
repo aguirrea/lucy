@@ -21,14 +21,18 @@
 from parser.JointCalculation import JointCalculation
 from parser.MocapLucyMapping import MocapLucyMapping
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from LoadSystemConfiguration import LoadSystemConfiguration
+
 from string import rstrip
 
 import os
 import glob
 import ntpath
 
-BVHDir = os.getcwd() + "/mocap/cmu_mocap/bvh/"
-XMLDir = os.getcwd() + "/mocap/cmu_mocap/xml/"
+sysConf = LoadSystemConfiguration()
+
+BVHDir = os.getcwd() + sysConf.getDirectory("CMU mocap Files")
+XMLDir = os.getcwd() + sysConf.getDirectory("Transformed CMU mocap Files")
 
 robotConfiguration = LoadRobotConfiguration()
 
