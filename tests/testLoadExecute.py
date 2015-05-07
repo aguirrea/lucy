@@ -32,7 +32,7 @@ angle = AXAngle()
 angleFix = AXAngle()
 angleExecute = AXAngle()
 
-mocapFile = os.getcwd()+"/mocap/cmu_mocap/xml/49_20.xml"
+mocapFile = os.getcwd()+"/mocap/cmu_mocap/xml/moon_walk.xml"
 lp = LoadPoses(mocapFile)
 lucy = SimLucy(True)
 
@@ -65,13 +65,15 @@ while  True:
     for index in range(frameQty):
         pose=lp.getFramePose(index)
         for joint in pose.keys():
-                if joint not in avoid_joints:
-                    #print joint, pose[joint], pose[joint] + poseFix[joint] 
-                    angleExecute.setDegreeValue(pose[joint]+ poseFix[joint])
-                    poseExecute[joint] = angleExecute.toVrep()
-                    #print joint, poseExecute[joint], angleExecute.getValue()  
-        #print poseExecute['L_Ankle_Pitch'], pose['L_Ankle_Pitch']     
+            if joint not in avoid_joints:
+                #print joint, pose[joint], pose[joint] + poseFix[joint] 
+                #angleExecute.setDegreeValue(pose[joint]+ poseFix[joint])
+                angleExecute.setDegreeValue(pose[joint]) # TODO REMOVE this is only for moonwalking
+                poseExecute[joint] = angleExecute.toVrep()
+                #print joint, poseExecute[joint], angleExecute.getValue()  
+    #print poseExecute['L_Ankle_Pitch'], pose['L_Ankle_Pitch']     
         lucy.executeFrame(poseExecute)
+        #print index
 lucy.stopLucy()  
 print 'Program ended'
 
