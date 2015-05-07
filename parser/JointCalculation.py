@@ -59,17 +59,18 @@ class JointCalculation:
         ay3 = array(y3.values())
         #u vector, is the projection in the sagital plane of the j2 to j1 vector, 
         #complex number is usded for the sake of simplicity
-        u = ay2 - ay1 + 1j*(az2 - az1)
+        u = (ay2 - ay1) + 1j*(az2 - az1)
         #v vector, is the projection in the sagital plane of the j3 to j1 vector, 
         #complex number is usded for the sake of simplicity
-        v = ay3 - ay1 + 1j*(az3 - az1)
+        v = (ay3 - ay1) + 1j*(az3 - az1)
         #the angle with respect two x axis of the product of two complex numbers 
         #corresponds with the sum of the angle with x axis of each number
         r = self.angle(u*conjugate(v))
         return r.real
 
     #calculates the angle in the frontal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise 
-    def calculateFrontal(self, joint1, joint2, joint3):
+    #WARNING Blender swaps Z and Y axis
+    def calculateTransversal(self, joint1, joint2, joint3):
         x1, y1, z1 = self.parser.getNodePositionsFromName(joint1)
         x2, y2, z2 = self.parser.getNodePositionsFromName(joint2)
         x3, y3, z3 = self.parser.getNodePositionsFromName(joint3)    
@@ -86,7 +87,8 @@ class JointCalculation:
         return r.real
 
     #calculates the angle in the transversal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise
-    def calculateTransversal(self, joint1, joint2, joint3):
+    #WARNING Blender swaps Z and Y axis
+    def calculateFrontal(self, joint1, joint2, joint3):
         x1, y1, z1 = self.parser.getNodePositionsFromName(joint1)
         x2, y2, z2 = self.parser.getNodePositionsFromName(joint2)
         x3, y3, z3 = self.parser.getNodePositionsFromName(joint3)    
