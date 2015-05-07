@@ -52,6 +52,7 @@ class SimLucy:
         configuration = LoadRobotConfiguration()
         self.joints = configuration.getJointsName()
         self.startPosSetted = False
+        self.firstCallGetFrame = True
         error, x, y = self.sim.getBioloidPlannarPosition(self.clientID)
         if not error:
             self.startPosSetted = True
@@ -65,7 +66,6 @@ class SimLucy:
             if not error:
                 self.startPosSetted = True
                 self.startPos = [x,y]
-                print "posición de inicio seteada"
             else:
                 threading.Timer(int(self.conf.getProperty("threadingTime")), self.setStartPositionAsync).start()
 
@@ -106,17 +106,22 @@ class SimLucy:
 
     def executePose(self, pose):
         error = False
+        dontSupportedJoints = self.conf.getVrepNotImplementedBioloidJoints()
+        RobotImplementedJoints = []
         #Above's N joints will be received and set on the V-REP side at the same time'''
         if (self.jointHandleCachePopulated == False): 
             self.sim.populateJointHandleCache(self.clientID)
             self.jointHandleCachePopulated = True
         error = self.sim.pauseSim(self.clientID) or error
-        joints = self.configuration.getJointsName()
-        jointsQty = len(joints)
-        jointExecutedCounter=1
-        for joint in joints:
-            angle = pose.getValue(joint)
-            if jointExecutedCounter < jointsQty:
+        robotJoints = self.configuration.getJointsName()
+        for joint in robotJoints:
+            if joint not in dontSupportedJoints:
+                RobotImplementedJoints.append(joint)
+        jointsQty = len(RobotImplementedJoints)
+        jointExecutedCounter=0
+        for joint in RobotImplementedJoints:
+            angle = pose.getValue(joint)    
+            if jointExecutedCounter < jointsQty - 1:
                 error = self.sim.setJointPositionNonBlock(self.clientID, joint, angle) or error
             else:
                 error = self.sim.resumePauseSim(self.clientID) or error
@@ -125,21 +130,27 @@ class SimLucy:
         if error:
             raise VrepException("error excecuting a pose", error)
 
-    def getFrame(self):
+    def getFrame(self): #TODO return a Pose object
         error = False
         pose = {}
+        dontSupportedJoints = self.conf.getVrepNotImplementedBioloidJoints()
         if (self.jointHandleCachePopulated == False): 
             self.sim.populateJointHandleCache(self.clientID)
             self.jointHandleCachePopulated = True
         error = self.sim.pauseSim(self.clientID) or error
         for joint in self.joints:
-            errorGetJoint, value = self.sim.getJointPositionNonBlock(self.clientID, joint)
-            error = error or errorGetJoint 
-            pose[joint] = value
+            if joint not in dontSupportedJoints: #actual model of vrep bioloid don't support this joints
+                errorGetJoint, value = self.sim.getJointPositionNonBlock(self.clientID, joint, self.firstCallGetFrame)
+                error = error or errorGetJoint 
+                print errorGetJoint
+                pose[joint] = value
+            else:
+                pose[joint] = 0
+        self.firstCallGetFrame = False
         error = self.sim.resumePauseSim(self.clientID) or error
-        if error:
-            raise VrepException("error geting a frame", error)
-        return pose
+        #if error:
+        #    raise VrepException("error geting a frame", error)
+        return error, pose
         
     def stopLucy(self):
         self.stop = True
