@@ -7,7 +7,6 @@
     <Name>R_Shoulder_Pitch</Name>
     <Id>2</Id>
 </Joint>
-<!-- Not supported by the bioloid vrep model
 <Joint>
     <Name>L_Shoulder_Yaw</Name>
     <Id>3</Id>
@@ -23,7 +22,7 @@
 <Joint>
     <Name>R_Elbow_Yaw</Name>
     <Id>6</Id>
-</Joint>-->
+</Joint>
 <Joint>
     <Name>L_Hip_Yaw</Name>
     <Id>7</Id>

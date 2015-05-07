@@ -33,7 +33,7 @@ class AXAngle:
     
     def setValue(self,value):
         self.angle = value
-        
+
     def setDegreeValue(self,value):
         self.angle = (value*1023)/300
     
