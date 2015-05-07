@@ -29,7 +29,8 @@ class LoadPoses:
         self.framelist = xmldoc.getElementsByTagName("frame") 
         self.jointAngleMapping = {}
         self.frameAngleMapping = {}   
-        
+    
+    #warning this method is deprecated by getPose    
     def getFramePose(self, frameNumber):
         config = LoadRobotConfiguration()
         frame = self.framelist[frameNumber]
@@ -38,6 +39,7 @@ class LoadPoses:
             angle = joint.getAttribute("angle")
             self.jointAngleMapping[jointName] = float(angle)
         return(self.jointAngleMapping)
+    
     #to deprecate getFramePose
     def getPose(self, frameNumber):
         config = LoadRobotConfiguration()
@@ -51,13 +53,9 @@ class LoadPoses:
     def getJointAngles(self, jointName):
         config = LoadRobotConfiguration()
         for frame in self.framelist:
-            #frameNumber = frame.getElementsByTagName("number")[0]
             frameNumber = frame.getAttribute("number")
-            #print frameNumber
             joint = frame.getElementsByTagName(jointName)[0]
-            #print joint
             angle = joint.getAttribute("angle")
-            #print angle
             self.frameAngleMapping[int(frameNumber)] = float(angle) 
         return(self.frameAngleMapping)
 
