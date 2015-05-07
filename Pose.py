@@ -21,16 +21,38 @@
 import math
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
-jointNullValue = 0
+#TODO find a better place for this chunk of code :P
+jointNullValue ={}
+jointNullValue["R_Ankle_Pitch"]=0
+jointNullValue["R_Shoulder_Pitch"]=0
+jointNullValue["L_Ankle_Pitch"]=0
+jointNullValue["R_Hip_Pitch"]=0
+jointNullValue["Hip_Pitch"]=0
+jointNullValue["L_Knee angle"]=166.119092703
+jointNullValue["L_Hip_Roll"]=0
+jointNullValue["R_Ankle_Roll"]=0
+jointNullValue["L_Ankle_Roll"]=0
+jointNullValue["L_Shoulder_Pitch"]=0
+jointNullValue["R_Hip_Yaw"]=0
+jointNullValue["R_Hip_Roll"]=0
+jointNullValue["R_Knee"]=166.534881592
+jointNullValue["L_Hip_Yaw"]=0
+jointNullValue["L_Elbow_Yaw"]=0
+jointNullValue["R_Elbow_Yaw"]=0
+jointNullValue["L_Shoulder_Yaw"]=0
+jointNullValue["R_Shoulder_Yaw"]=0
 
 class Pose:
 
-    def __init__(self, poseValues):
+    def __init__(self, poseValues={}):
         self.value = poseValues
         configuration = LoadRobotConfiguration()
         for joint in configuration.getJointsName():
             if joint not in self.value.keys():
-                self.value[joint]=jointNullValue
+                self.value[joint]=jointNullValue[joint]
+
+    def setValue(self, key, value):
+        self.value[key] = value
 
     def getValue(self, key):
         if key in self.value.keys():
