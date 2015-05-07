@@ -61,6 +61,9 @@ class LoadSystemConfiguration:
 
     def getProperty(self, name):
         return(self.propertyValueMapping[name])
+
+    def getVrepNotImplementedBioloidJoints(self):
+        return(self.propertyValueMapping["Vrep not implemented joints"].split())
     
     
 #conf = LoadSystemConfiguration()
