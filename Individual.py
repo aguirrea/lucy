@@ -32,20 +32,30 @@ import time
 
 class Individual:
 
-    def __init__(self, file, idividualProperty):
+    def __init__(self, idividualProperty, file = None, geneMatrix = None):
         self.property = idividualProperty
         self.fitness = 0
         self.mocapFile = file
-        self.lp = LoadPoses(self.mocapFile)
-        self.lucy = SimLucy(True)
         self.robotConfig = LoadRobotConfiguration()
-        self.poseSize = self.lp.getFrameQty()
-        self.genomeMatrix = [[self.lp.getPose(i).getValue(j) for j in self.robotConfig.getJointsName()] for i in range(self.poseSize)] 
+        
+        #if the constructor receive a genetic matrix instead a file to create the individual
+        if self.mocapFile == None and not(geneMatrix == None):
+            self.genomeMatrix = geneMatrix
+            self.poseSize = len(geneMatrix)
+        #if the constructor receive a file intead a genetic matrix to create the individual
+        elif not self.mocapFile == None:
+            self.lp = LoadPoses(self.mocapFile)
+            self.poseSize = self.lp.getFrameQty()
+            self.genomeMatrix = [[self.lp.getPose(i).getValue(j) for j in self.robotConfig.getJointsName()] for i in range(self.poseSize)] 
+
+        self.lucy = SimLucy(True)
+
         self.genomeMatrixJointNameIDMapping = {}
         i=0
         for jointName in self.robotConfig.getJointsName():
             self.genomeMatrixJointNameIDMapping[jointName]=i
             i=i+1
+
     def execute(self):
         angleExecute = AXAngle()
         poseExecute={}
@@ -59,9 +69,10 @@ class Individual:
             i = i + 1  
             self.lucy.executePose(Pose(poseExecute))
         self.lucy.stopLucy()  
-        self.fitness = self.lucy.getFitness()       
-        print "fitness: ", self.fitness 
-
+        self.fitness = self.lucy.getFitness()
+        print "fitness: ", self.fitness
+        return self.fitness       
+         
     def getPoseQty(self):
         return self.lp.getFrameQty()
 
@@ -120,7 +131,7 @@ ADHOCDir = os.getcwd()+conf.getDirectory("ADHOC Files")
 
 for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
     print 'executing individual: ' + filename
-    walk = Individual(filename, prop)
+    walk = Individual(prop, filename)
     walk.execute()
 
 #for filename in glob.glob(os.path.join(ADHOCDir, '*.xml')):
