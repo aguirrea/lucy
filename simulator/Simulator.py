@@ -27,7 +27,6 @@ from LoadSystemConfiguration import LoadSystemConfiguration
 
 class Simulator:
     def __init__(self):
-        self.firstCallsimxGetJointPosition = True
         self.getObjectPositionFirstTime = True
         #this data structure is like a cache for the joint handles
         self.jointHandleMapping = {} 
@@ -79,42 +78,43 @@ class Simulator:
     def resumePauseSim(self, clientID):
         return vrep.simxPauseCommunication(clientID,False)
 
+    #when the simulator is paused the call to simxGetObjectHandle returns error    
     def populateJointHandleCache(self, clientID):
         for joint in self.LucyJoints:
             error, handle = vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
-            self.jointHandleMapping[joint]=handle        
+            self.jointHandleMapping[joint]=handle 
         pass
                 
     def setJointPosition(self, clientID, joint, angle):
-        if (self.jointHandleMapping[joint] > 0):
-            jhandle=self.jointHandleMapping[joint]
-        else:
-            error, jhandle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
-            self.jointHandleMapping[joint]=jhandle
-        vrep.simxSetJointPosition(clientID,jhandle,angle,vrep.simx_opmode_oneshot_wait)
+        error = False
+        handle = self.jointHandleMapping[joint]
+        if (handle == 0):
+            errorGetObjetHandle, handle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
+            error = errorGetObjetHandle or error
+            self.jointHandleMapping[joint]=handle
+        error = error or vrep.simxSetJointPosition(clientID,handle,angle,vrep.simx_opmode_oneshot_wait)
+        return error
     
     def setJointPositionNonBlock(self, clientID, joint, angle):
-        if (self.jointHandleMapping[joint] > 0):
-            jhandle=self.jointHandleMapping[joint]
-        else:
-            error, jhandle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot)
-            self.jointHandleMapping[joint]=jhandle
-        vrep.simxSetJointPosition(clientID,jhandle,angle,vrep.simx_opmode_oneshot)
-
-    def getJointPositionNonBlock(self, clientID, joint):
-
-        if (self.jointHandleMapping[joint] > 0):
-            jhandle=self.jointHandleMapping[joint]
-        else:
-            error, jhandle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot)
-            self.jointHandleMapping[joint]=jhandle
-        if self.firstCallsimxGetJointPosition:
-            self.firstCallsimxGetJointPosition = False
-            error, value = vrep.simxGetJointPosition(clientID,jhandle,vrep.simx_opmode_streaming)
-        else:
-            error, value = vrep.simxGetJointPosition(clientID,jhandle,vrep.simx_opmode_buffer)
-        if error:
-            print "error: ", error
+        handle = self.jointHandleMapping[joint]
+        error = False
+        if (handle == 0):
+            error, handle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot)
+            self.jointHandleMapping[joint]=handle
+        vrep.simxSetJointPosition(clientID,handle,angle,vrep.simx_opmode_streaming)
+        
+    def getJointPositionNonBlock(self, clientID, joint, firstTime):
+        error = False
+        value = 0
+        handle = self.jointHandleMapping[joint]
+        if (handle == 0):
+            error, handle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot)
+            self.jointHandleMapping[joint]=handle
+        if not error:
+            if firstTime:
+                error, value = vrep.simxGetJointPosition(clientID,handle,vrep.simx_opmode_streaming)
+            else:
+                error, value = vrep.simxGetJointPosition(clientID,handle,vrep.simx_opmode_buffer)
         return error, value
 
     def finishSimulation(self, clientID):
