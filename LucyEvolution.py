@@ -28,8 +28,59 @@ from pyevolve import Mutators
 from DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero
 from DTIndividualGeneticMaterial      import DTIndividualGeneticMaterial, DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
 from Individual                       import Individual
+from LoadSystemConfiguration          import LoadSystemConfiguration
+#from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 import time
+import os
+import glob
+
+initialPopulationSetted = False
+def createOwnGen(ga_engine):
+    gen = ga_engine.getCurrentGeneration()
+    if gen == 0:
+        prop = DTIndividualPropertyCMUDaz()    
+        propVanilla = DTIndividualPropertyVanilla()
+        balieroProp = DTIndividualPropertyBaliero()
+
+        conf = LoadSystemConfiguration()
+
+        CMUxmlDir = os.getcwd()+conf.getDirectory("Transformed CMU mocap Files")
+        GAwalkDir = os.getcwd()+conf.getDirectory("GAWalk Files")
+        UIBLHDir = os.getcwd()+conf.getDirectory("UIBLH mocap Files")
+        BalieroDir = os.getcwd()+conf.getDirectory("Baliero transformed walk Files")
+        ADHOCDir = os.getcwd()+conf.getDirectory("ADHOC Files")
+
+        print "pase"
+        population = ga_engine.getPopulation()
+        popSize = len(population)
+        print popSize
+        individualCounter = 0
+        for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
+            print individualCounter, " individuals processed!"
+            print 'inserting individual: ' + filename + " into the initial population"
+            walk = Individual(prop, DTIndividualGeneticTimeSerieFile(filename))
+            geneticMatrix = walk.getGenomeMatrix()
+            if individualCounter < popSize:
+                adan = population[individualCounter]
+                for i in xrange(adan.getHeight()):
+                    for j in xrange(adan.getWidth()):
+                        adan.setItem(i,j,geneticMatrix[i][j])
+                population[individualCounter]=adan
+                individualCounter = individualCounter + 1
+            else:
+                break
+        global initialPopulationSetted
+        initialPopulationSetted = True
+    elif gen % 10 == 0:
+        # persist moment best individual
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        filename = timestr + ".xml"
+        prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
+        bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(ga_engine.bestIndividual())))
+        bestIndividual.persist(filename)
+
+    return False
 
 def chromosomeToLucyGeneticMatrix(chromosome):
     geneticMatrix = [[chromosome[i][j] for j in xrange(chromosome.getWidth())] for i in xrange(chromosome.getHeight())] #debería pedir solo los joints implementados
@@ -37,9 +88,14 @@ def chromosomeToLucyGeneticMatrix(chromosome):
 
 # This function is the evaluation function
 def eval_func(chromosome):
-    prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
-    individual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome)))
-    return individual.execute() #return the fitness resulting from the simulator execution
+    fitness = 0
+    if initialPopulationSetted == True:
+        print "***********************---------------------------------------------------"
+        #prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
+        prop = DTIndividualPropertyCMUDaz()
+        individual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome)))
+        fitness = individual.execute() #return the fitness resulting from the simulator execution
+    return fitness
 
 def run_main():
     # Genome instance
@@ -54,6 +110,10 @@ def run_main():
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
     ga.setGenerations(20)
+    ga.setPopulationSize(40)
+
+    #the first call sets the initial population
+    ga.stepCallback.set(createOwnGen)
 
     # Do the evolution, with stats dump
     # frequency of 10 generations
