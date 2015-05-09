@@ -31,12 +31,14 @@ from Individual                       import Individual
 
 import time
 
-# This function is the evaluation function, we want
-# to give high score to more zero'ed chromosomes
-def eval_func(chromosome):
-    prop = DTIndividualPropertyCMUDaz()
+def chromosomeToLucyGeneticMatrix(chromosome):
     geneticMatrix = [[chromosome[i][j] for j in xrange(chromosome.getWidth())] for i in xrange(chromosome.getHeight())] #debería pedir solo los joints implementados
-    individual = Individual(prop, DTIndividualGeneticMatrix(geneticMatrix))
+    return geneticMatrix
+
+# This function is the evaluation function
+def eval_func(chromosome):
+    prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
+    individual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome)))
     return individual.execute() #return the fitness resulting from the simulator execution
 
 def run_main():
@@ -51,16 +53,18 @@ def run_main():
 
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
-    ga.setGenerations(800)
+    ga.setGenerations(20)
 
     # Do the evolution, with stats dump
     # frequency of 10 generations
-    ga.evolve(freq_stats=100)
+    ga.evolve(freq_stats=2)
 
     # Best individual
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    Individual(prop,DTIndividualGeneticMaterial(ga.bestIndividual())).persist(timestr)
-
+    filename = timestr + ".xml"
+    prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
+    bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(ga.bestIndividual())))
+    bestIndividual.persist(filename)
 
 if __name__ == "__main__":
    run_main()
