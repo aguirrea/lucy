@@ -84,7 +84,7 @@ class SimLucy:
         return self.distance        
     
     def getFitness(self):
-        return self.getSimTime() + self.getSimDistance() * 1000
+        return self.getSimTime() * self.getSimDistance()
         
     def executeFrame(self, pose):
         error = False
