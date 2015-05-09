@@ -37,7 +37,7 @@
 </Property>
 <Property>
     <Name>FALL_THRESHOLD</Name>
-    <Value>0.07</Value>    
+    <Value>0.17</Value>    
 </Property>
 <Property>
     <Name>ConnectionTimeout</Name>
