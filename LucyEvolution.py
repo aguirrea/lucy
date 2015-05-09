@@ -25,8 +25,9 @@ from pyevolve import Selectors
 from pyevolve import Crossovers
 from pyevolve import Mutators
 
-from DTIndividualProperty import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero
-from Individual import Individual
+from DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero
+from DTIndividualGeneticMaterial      import DTIndividualGeneticMaterial, DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
+from Individual                       import Individual
 
 import time
 
@@ -34,12 +35,13 @@ import time
 # to give high score to more zero'ed chromosomes
 def eval_func(chromosome):
     prop = DTIndividualPropertyCMUDaz()
-    individual = Individual(prop, chromosome)
-    return individual.execute()
+    geneticMatrix = [[chromosome[i][j] for j in xrange(chromosome.getWidth())] for i in xrange(chromosome.getHeight())] #debería pedir solo los joints implementados
+    individual = Individual(prop, DTIndividualGeneticMatrix(geneticMatrix))
+    return individual.execute() #return the fitness resulting from the simulator execution
 
 def run_main():
     # Genome instance
-    genome = G2DList.G2DList(164, 14)
+    genome = G2DList.G2DList(164, 18)
     genome.setParams(rangemin=0, rangemax=360)
 
     # The evaluator function (objective function)
@@ -56,11 +58,8 @@ def run_main():
     ga.evolve(freq_stats=100)
 
     # Best individual
-    #print ga.bestIndividual()
-
-    #crear individuo con material genético ga.bestIndividual() y persistirlo
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    print timestr
+    Individual(prop,DTIndividualGeneticMaterial(ga.bestIndividual())).persist(timestr)
 
 
 if __name__ == "__main__":
