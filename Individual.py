@@ -21,10 +21,10 @@
 from simulator.SimLucy                import SimLucy
 from simulator.AXAngle                import AXAngle
 from parser.LoadPoses                 import LoadPoses
-from DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero
-from DTIndividualGeneticMaterial      import DTIndividualGeneticMaterial, DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
+from datatypes.DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero
+from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticMaterial, DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
 from Pose                             import Pose
-from LoadSystemConfiguration          import LoadSystemConfiguration
+from configuration.LoadSystemConfiguration          import LoadSystemConfiguration
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 import os #only for the tests
@@ -61,6 +61,7 @@ class Individual:
 
         for i in range(self.poseSize):
             for joint in self.robotImplementedJoints:
+                #print "i: ", i, "j: ", joint
                 value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint)
                 self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]=value
 
