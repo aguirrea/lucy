@@ -19,8 +19,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from xml.dom import minidom
-from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 from Pose import Pose
+from configuration.LoadSystemConfiguration import LoadSystemConfiguration
+from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 class LoadPoses:
     
@@ -42,9 +43,18 @@ class LoadPoses:
     
     #to deprecate getFramePose
     def getPose(self, frameNumber):
-        config = LoadRobotConfiguration()
+        sysconf = LoadSystemConfiguration()
+        robotConf = LoadRobotConfiguration()
+        dontSupportedJoints = sysconf.getVrepNotImplementedBioloidJoints()
+        robotImplementedJoints = []
+        robotJoints = robotConf.getJointsName()
+
+        for joint in robotJoints:
+            if joint not in dontSupportedJoints:
+                robotImplementedJoints.append(joint)
+
         frame = self.framelist[frameNumber]
-        for jointName in config.getJointsName():
+        for jointName in robotImplementedJoints:
             joint = frame.getElementsByTagName(jointName)[0]
             angle = joint.getAttribute("angle")
             self.jointAngleMapping[jointName] = float(angle)
