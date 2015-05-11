@@ -23,6 +23,10 @@
     <Name>Baliero transformed walk Files</Name> 
     <Value>/mocap/baliero/xml/</Value>
 </Directory>
+<Directory>
+    <Name>Genetic Pool</Name> 
+    <Value>/gene_pool/</Value>
+</Directory>
 <File>
     <Name>Lucy vrep model</Name> 
     <Value>/simulator/models/genetic_bioloid.ttt</Value>
