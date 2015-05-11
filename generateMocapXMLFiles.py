@@ -21,7 +21,7 @@
 from parser.JointCalculation import JointCalculation
 from parser.MocapLucyMapping import MocapLucyMapping
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
-from LoadSystemConfiguration import LoadSystemConfiguration
+from configuration.LoadSystemConfiguration import LoadSystemConfiguration
 
 from string import rstrip
 
