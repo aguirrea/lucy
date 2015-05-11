@@ -100,6 +100,8 @@ def eval_func(chromosome):
     return fitness
 
 def run_main():
+
+    conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
     genome = G2DList.G2DList(164, 18)
     genome.setParams(rangemin=0, rangemax=360)
