@@ -78,8 +78,9 @@ def setInitialPopulation (ga_engine):
     initialPopulationSetted = True
 
 def createOwnGen(ga_engine):
-
-    # persist moment best individual
+    # persist best individual at the moment
+    conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
+    geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
     gen = ga_engine.getCurrentGeneration()
     timestr = time.strftime("%Y%m%d-%H%M%S")
     filename = timestr + "-" + str(gen) + ".xml"
@@ -117,8 +118,8 @@ def run_main():
 
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
-    ga.setGenerations(30)
-    ga.setPopulationSize(51)
+    ga.setGenerations(30)    #TODO class atribute
+    ga.setPopulationSize(51) #TODO class atribute
 
     #the first call sets the initial population
     ga.stepCallback.set(createOwnGen)
@@ -135,7 +136,7 @@ def run_main():
     filename = timestr + ".xml"
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(ga.bestIndividual())))
-    geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
+    geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool") #TODO encapsulate into an object
     bestIndividual.persist(geneticPoolDir + filename)
 
 if __name__ == "__main__":
