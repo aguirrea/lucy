@@ -30,7 +30,7 @@ import os, threading
 
 X = 0
 Y = 1
-MAX_FITNESS = 50
+MAX_FITNESS_BONUS = 5
 
 class SimLucy:
 
@@ -87,10 +87,8 @@ class SimLucy:
     def getFitness(self, endFrameExecuted=False):
         fitness = self.getSimTime() * self.getSimDistance()
         if endFrameExecuted:
-            fitness = MAX_FITNESS + fitness
+            fitness = MAX_FITNESS_BONUS + fitness
         return fitness
-
-    def getMaxFitness(self):
         
     def executeFrame(self, pose):
         error = False
