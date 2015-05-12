@@ -87,7 +87,7 @@ def createOwnGen(ga_engine):
     best = ga_engine.bestIndividual()
     score = best.getRawScore()
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    filename = score + "-" + timestr + "-" + str(gen) + ".xml"
+    filename = str(score) + "-" + timestr + "-" + str(gen) + ".xml"
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
     bestIndividual.persist(geneticPoolDir + filename)
@@ -141,12 +141,13 @@ def run_main():
     ga.evolve(freq_stats=2)
 
     # Best individual
+    best = ga_engine.bestIndividual()
+    score = best.getRawScore()
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    filename = timestr + ".xml"
+    filename = str(score) + "-" + timestr + "-" + str(gen) + ".xml"
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
-    bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(ga.bestIndividual())))
-    geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool") #TODO encapsulate into an object
+    bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
     bestIndividual.persist(geneticPoolDir + filename)
-
+    
 if __name__ == "__main__":
    run_main()
