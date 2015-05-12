@@ -36,8 +36,9 @@ import os
 import glob
 
 initialPopulationSetted = False
-def createOwnGen(ga_engine):
-    gen = ga_engine.getCurrentGeneration()
+gaEngine = None
+
+def setInitialPopulation (ga_engine):
 
     prop = DTIndividualPropertyCMUDaz()    
     propVanilla = DTIndividualPropertyVanilla()
@@ -51,36 +52,40 @@ def createOwnGen(ga_engine):
     BalieroDir = os.getcwd()+conf.getDirectory("Baliero transformed walk Files")
     ADHOCDir = os.getcwd()+conf.getDirectory("ADHOC Files")
     geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
-    if gen == 0:
-        population = ga_engine.getPopulation()
-        popSize = len(population)
-        print popSize
-        individualCounter = 0
-        for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
-            print individualCounter, " individuals processed!"
-            print 'inserting individual: ' + filename + " into the initial population"
-            walk = Individual(prop, DTIndividualGeneticTimeSerieFile(filename))
-            geneticMatrix = walk.getGenomeMatrix()
-            if individualCounter < popSize:
-                adan = population[individualCounter]
-                for i in xrange(adan.getHeight()):
-                    if i == len(geneticMatrix):
-                            break
-                    for j in xrange(adan.getWidth()):
-                        adan.setItem(i,j,geneticMatrix[i][j])
-                population[individualCounter]=adan
-                individualCounter = individualCounter + 1
-            else:
-                break
-        global initialPopulationSetted
-        initialPopulationSetted = True
-    else:
-        # persist moment best individual
-        timestr = time.strftime("%Y%m%d-%H%M%S")
-        filename = timestr + "-" + str(gen) + ".xml"
-        prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
-        bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(ga_engine.bestIndividual())))
-        bestIndividual.persist(geneticPoolDir + filename)
+    
+    population = ga_engine.getPopulation()
+    popSize = len(population)
+    print popSize
+
+    individualCounter = 0
+    for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
+        print individualCounter, " individuals processed!"
+        print 'inserting individual: ' + filename + " into the initial population"
+        walk = Individual(prop, DTIndividualGeneticTimeSerieFile(filename))
+        geneticMatrix = walk.getGenomeMatrix()
+        if individualCounter < popSize:
+            adan = population[individualCounter]
+            for i in xrange(adan.getHeight()):
+                if i == len(geneticMatrix):
+                        break
+                for j in xrange(adan.getWidth()):
+                    adan.setItem(i,j,geneticMatrix[i][j])
+            population[individualCounter]=adan
+            individualCounter = individualCounter + 1
+        else:
+            break
+    global initialPopulationSetted
+    initialPopulationSetted = True
+
+def createOwnGen(ga_engine):
+
+    # persist moment best individual
+    gen = ga_engine.getCurrentGeneration()
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    filename = timestr + "-" + str(gen) + ".xml"
+    prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
+    bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(ga_engine.bestIndividual())))
+    bestIndividual.persist(geneticPoolDir + filename)
 
     return False
 
@@ -90,13 +95,12 @@ def chromosomeToLucyGeneticMatrix(chromosome):
 
 # This function is the evaluation function
 def eval_func(chromosome):
-    fitness = 0
-    if initialPopulationSetted == True:
-        print "***********************---------------------------------------------------"
-        #prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
-        prop = DTIndividualPropertyVanillaEvolutive()
-        individual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome)))
-        fitness = individual.execute() #return the fitness resulting from the simulator execution
+    if not initialPopulationSetted:
+        setInitialPopulation(gaEngine)    
+    #prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
+    prop = DTIndividualPropertyVanillaEvolutive()
+    individual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome)))
+    fitness = individual.execute() #return the fitness resulting from the simulator execution
     return fitness
 
 def run_main():
@@ -118,6 +122,9 @@ def run_main():
 
     #the first call sets the initial population
     ga.stepCallback.set(createOwnGen)
+
+    global gaEngine
+    gaEngine = ga
 
     # Do the evolution, with stats dump
     # frequency of 10 generations
