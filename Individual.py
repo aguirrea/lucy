@@ -78,7 +78,11 @@ class Individual:
             i = i + 1  
             self.lucy.executePose(Pose(poseExecute))
         self.lucy.stopLucy()  
-        self.fitness = self.lucy.getFitness()
+        if i < self.poseSize:
+            self.fitness = self.lucy.getFitness()
+        else:
+            endFrameExecuted = True
+            self.fitness = self.lucy.getFitness(endFrameExecuted)
         print "fitness: ", self.fitness
         return self.fitness       
          
