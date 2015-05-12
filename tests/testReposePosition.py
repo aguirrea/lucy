@@ -46,7 +46,7 @@ lucyPersistence = ET.SubElement(root, "Lucy")
 configuration = LoadRobotConfiguration()
 
 
-for i in range(80):
+for i in xrange(80):
     print "capture: ", i
     frame = ET.SubElement(lucyPersistence, "frame")
     frame.set("number" , str(i))

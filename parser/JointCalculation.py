@@ -37,7 +37,7 @@ class JointCalculation:
 
     def angle(self,v):
         #v is a time serie, so we have to iterate in time
-        for i in range(len(v)):
+        for i in xrange(len(v)):
             if v[i].imag >=0:
     	        v[i]=angle(v[i], True) #angle second argument is for operate with degrees instead of radians
             else:

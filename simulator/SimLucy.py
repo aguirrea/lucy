@@ -97,7 +97,7 @@ class SimLucy:
             self.sim.populateJointHandleCache(self.clientID)
             self.jointHandleCachePopulated = True
         error = self.sim.pauseSim(self.clientID) or error
-        for j in range(len(pose)-1):
+        for j in xrange(len(pose)-1):
             joint=pose.keys()[j]
             angle=pose[joint]
             error=self.sim.setJointPositionNonBlock(self.clientID, joint, angle) or error

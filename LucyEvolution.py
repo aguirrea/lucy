@@ -57,7 +57,6 @@ def setInitialPopulation (ga_engine):
     
     population = ga_engine.getPopulation()
     popSize = len(population)
-    print popSize
 
     individualCounter = 0
     for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
@@ -118,12 +117,13 @@ def run_main():
     # The evaluator function (objective function)
     genome.evaluator.set(eval_func)
     genome.crossover.set(Crossovers.G2DListCrossoverSingleHPoint)
-    genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
+    #genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
+    genome.mutator.set(Mutators.G2DListMutatorIntegerGaussian)
 
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
     ga.setGenerations(30)    #TODO class atribute
-    ga.setPopulationSize(51) #TODO class atribute
+    ga.setPopulationSize(10) #TODO class atribute
 
     # Create DB Adapter and set as adapter
     sqlite_adapter = DBAdapters.DBSQLite(identify="Lucy walk", resetDB=True)
@@ -141,13 +141,13 @@ def run_main():
     ga.evolve(freq_stats=2)
 
     # Best individual
-    best = ga_engine.bestIndividual()
+    best = ga.bestIndividual()
     score = best.getRawScore()
     timestr = time.strftime("%Y%m%d-%H%M%S")
     filename = str(score) + "-" + timestr + "-" + str(gen) + ".xml"
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
     bestIndividual.persist(geneticPoolDir + filename)
-    
+
 if __name__ == "__main__":
    run_main()

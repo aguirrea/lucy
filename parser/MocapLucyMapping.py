@@ -53,7 +53,7 @@ class MocapLucyMapping:
     def generateFile(self,file):
         root = ET.Element("root")
         lucy = ET.SubElement(root, "Lucy")
-        for frameIt in range(self.framesQty):
+        for frameIt in xrange(self.framesQty):
             frame = ET.SubElement(lucy, "frame")
             frame.set("number" , str(frameIt))
             for joint in self.config.getJointsName():
@@ -66,7 +66,7 @@ class MocapLucyMapping:
 
     def nullFrameVector(self, length):
         frameVector = {}
-        for i in range(length):
+        for i in xrange(length):
             frameVector[i]=0
         return frameVector
 

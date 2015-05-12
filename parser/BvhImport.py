@@ -29,7 +29,7 @@ class BvhImport:
         self.animation = Animation.from_bvh(bvh_serial_path)
         self.nodeNameIndexMapping = {}
         pose = self.animation.get_pose(1)
-        for j in range(len(pose.positions)):
+        for j in xrange(len(pose.positions)):
             key = pose.bone.node_list[j].name
             if key in self.nodeNameIndexMapping.keys():
                 counter = 1
@@ -45,16 +45,16 @@ class BvhImport:
         print self.nodeNameIndexMapping
 
     def listAll(self):
-        for i in range(len(self.animation.frames)):
+        for i in xrange(len(self.animation.frames)):
             pose = self.animation.get_pose(i)
-            for j in range(len(pose.positions)):
+            for j in xrange(len(pose.positions)):
                 print str(pose.bone.node_list[j].name) + ": " + str(pose.get_position(j))
 
     def getNodePositions(self,nodeIndex):
         result_x={}
         result_y={}
         result_z={}
-        for i in range(len(self.animation.frames)):
+        for i in xrange(len(self.animation.frames)):
             pose = self.animation.get_pose(i)
             result_x[i]=pose.get_position(nodeIndex)[0]
             result_y[i]=pose.get_position(nodeIndex)[1]
@@ -66,7 +66,7 @@ class BvhImport:
         result_y={}
         result_z={}
         nodeIndex=self.nodeNameIndexMapping[nodeName]
-        for i in range(len(self.animation.frames)):
+        for i in xrange(len(self.animation.frames)):
             pose = self.animation.get_pose(i)
             result_x[i]=pose.get_position(nodeIndex)[0]
             result_y[i]=pose.get_position(nodeIndex)[1]

@@ -36,7 +36,7 @@ class DTIndividualGeneticTimeSerieFile(DTIndividualGeneticMaterial):
         lp = LoadPoses(geneticMaterial)
         robotConfig = LoadRobotConfiguration()
         poseSize = lp.getFrameQty()
-        self.geneticMatrix = [[lp.getPose(i).getValue(j) for j in robotConfig.getJointsName()] for i in range(poseSize)] #debería pedir solo los joints implementados
+        self.geneticMatrix = [[lp.getPose(i).getValue(j) for j in robotConfig.getJointsName()] for i in xrange(poseSize)] #debería pedir solo los joints implementados
 
 class DTIndividualGeneticMatrix(DTIndividualGeneticMaterial):
 

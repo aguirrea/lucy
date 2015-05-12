@@ -44,7 +44,7 @@ if clientID !=-1:
     pos1x, pos1y=sim.getBioloidPlannarPosition(clientID)
     end=False
     while not end:
-        for i in range(30):
+        for i in xrange(30):
             angle.setDegreeValue(150-i)
             #print "voy a setear ax12 value en cadera izquierda: ", 150 - i
             sim.setJointPosition(clientID,'L_Hip_Pitch',angle.toVrep())
@@ -52,12 +52,12 @@ if clientID !=-1:
             #print "voy a setear ax12 value en rodilla derecha: ", i
             sim.setJointPosition(clientID,'R_Knee',angle.toVrep())
             
-        for i in range(30):
+        for i in xrange(30):
             angle.setDegreeValue(150-i)
             sim.setJointPosition(clientID,'R_Hip_Pitch',angle.toVrep()) 
             sim.setJointPosition(clientID,'L_Knee',angle.toVrep()) 
             
-        for i in range(30):
+        for i in xrange(30):
             angle.setDegreeValue(120+i)
             sim.setJointPosition(clientID,"R_Hip_Pitch",angle.toVrep())
             sim.setJointPosition(clientID,"L_Hip_Pitch",angle.toVrep())

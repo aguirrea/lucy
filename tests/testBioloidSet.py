@@ -44,7 +44,7 @@ if clientID !=-1:
     pos1x, pos1y=sim.getBioloidPlannarPosition(clientID)
     end=False
     while not end:
-        for index in range(frameQty):
+        for index in xrange(frameQty):
             pose=lp.getFramePose(index)
             #sim.pauseSim(clientID)
             for joint in pose.keys():

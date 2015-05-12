@@ -59,7 +59,7 @@ class Individual:
             if joint not in dontSupportedJoints:
                 self.robotImplementedJoints.append(joint)
 
-        for i in range(self.poseSize):
+        for i in xrange(self.poseSize):
             for joint in self.robotImplementedJoints:
                 #print "i: ", i, "j: ", joint
                 value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint)
@@ -95,7 +95,7 @@ class Individual:
     def getMostSimilarPose(self, pose):
         diff = MAX_INT 
         moreSimilarPose = self.getPose(1)
-        for i in range(self.getPoseQty()):
+        for i in xrange(self.getPoseQty()):
             myPose = getPose(i)
             newDiff = pose.diff(myPose)
             if (newDiff < diff):
@@ -113,7 +113,7 @@ class Individual:
     def persist(self,file):
         root = ET.Element("root")
         lucy = ET.SubElement(root, "Lucy")
-        for frameIt in range(self.poseSize):
+        for frameIt in xrange(self.poseSize):
             frame = ET.SubElement(lucy, "frame")
             frame.set("number" , str(frameIt))
             for joint in self.robotImplementedJoints:

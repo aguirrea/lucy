@@ -53,7 +53,7 @@ root = ET.Element("root")
 lucyPersistence = ET.SubElement(root, "Lucy")
 configuration = LoadRobotConfiguration()
 
-for j in range(time_serie_lenght):
+for j in xrange(time_serie_lenght):
     frame = ET.SubElement(lucyPersistence, "frame")
     frame.set("number" , str(j))
     lucy.isLucyUp()

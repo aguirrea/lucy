@@ -49,7 +49,7 @@ class AXAngle:
         vrep_angle=normalized_angle/float(60)
         return vrep_angle
 
-#for i in range(1024) :
+#for i in xrange(1024) :
 #    print "ax: ", i ,"vrep: ", AXAngle(i).toVrep(), "degree: ", AXAngle(i).toDegrees()
 
 #print value

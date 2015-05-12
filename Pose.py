@@ -62,7 +62,7 @@ class Pose:
 
     def diff(self, pose):
         diff = 0
-        for key in range(self.keys()):
+        for key in xrange(self.keys()):
             diff = diff + math.fabs(pose.getValue(key) - self.value[key])
         return diff
 

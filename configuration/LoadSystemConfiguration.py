@@ -31,14 +31,14 @@ class LoadSystemConfiguration:
         xmldoc = minidom.parse(confFile)
         itemlist = xmldoc.getElementsByTagName("Directory") 
         for i in itemlist:
-            for j in range(len(i.getElementsByTagName("Name"))):
+            for j in xrange(len(i.getElementsByTagName("Name"))):
                 name = i.getElementsByTagName("Name")[j]
                 id   = i.getElementsByTagName("Value")[j]
                 #print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
                 self.directoryValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml() 
         itemlist = xmldoc.getElementsByTagName("File") 
         for i in itemlist:
-            for j in range(len(i.getElementsByTagName("Name"))):
+            for j in xrange(len(i.getElementsByTagName("Name"))):
                 name = i.getElementsByTagName("Name")[j]
                 id   = i.getElementsByTagName("Value")[j]
                 #print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
@@ -46,7 +46,7 @@ class LoadSystemConfiguration:
         
         itemlist = xmldoc.getElementsByTagName("Property") 
         for i in itemlist:
-            for j in range(len(i.getElementsByTagName("Name"))):
+            for j in xrange(len(i.getElementsByTagName("Name"))):
                 name = i.getElementsByTagName("Name")[j]
                 id   = i.getElementsByTagName("Value")[j]
                 #print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
