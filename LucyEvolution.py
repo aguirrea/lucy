@@ -24,6 +24,8 @@ from pyevolve import GSimpleGA
 from pyevolve import Selectors
 from pyevolve import Crossovers
 from pyevolve import Mutators
+from pyevolve import DBAdapters
+from pyevolve import Statistics
 
 from datatypes.DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive
 from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticMaterial, DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
@@ -82,10 +84,12 @@ def createOwnGen(ga_engine):
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
     gen = ga_engine.getCurrentGeneration()
+    best = ga_engine.bestIndividual()
+    score = best.getRawScore()
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    filename = timestr + "-" + str(gen) + ".xml"
+    filename = score + "-" + timestr + "-" + str(gen) + ".xml"
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
-    bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(ga_engine.bestIndividual())))
+    bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
     bestIndividual.persist(geneticPoolDir + filename)
 
     return False
@@ -121,9 +125,14 @@ def run_main():
     ga.setGenerations(30)    #TODO class atribute
     ga.setPopulationSize(51) #TODO class atribute
 
-    #the first call sets the initial population
+    # Create DB Adapter and set as adapter
+    sqlite_adapter = DBAdapters.DBSQLite(identify="Lucy walk", resetDB=True)
+    ga.setDBAdapter(sqlite_adapter)
+
+    #callback to persist best individual of each generation
     ga.stepCallback.set(createOwnGen)
 
+    #keep a reference to the genetic algorithm engine
     global gaEngine
     gaEngine = ga
 
