@@ -25,7 +25,9 @@ import math
 from LoadRobotConfiguration import LoadRobotConfiguration
 from LoadSystemConfiguration import LoadSystemConfiguration
 
+_instance = None
 class Simulator:
+
     def __init__(self):
         self.getObjectPositionFirstTime = True
         #this data structure is like a cache for the joint handles
@@ -35,6 +37,12 @@ class Simulator:
         for joint in self.LucyJoints:
             self.jointHandleMapping[joint]=0
 
+    def getInstance(self):
+        global _instance
+        if _instance is None:
+            _instance = Simulator()
+        return _instance
+    
     def getObjectPositionWrapper(self, clientID, LSP_Handle):
             if self.getObjectPositionFirstTime:
                 error, ret = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_streaming)
@@ -65,7 +73,6 @@ class Simulator:
         error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait) or error
         error, bioloid_position = self.getObjectPositionWrapper(clientID, LSP_Handle) or error 
         return error, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD"))
-
     def startSim(self, clientID, screen=True):
         error=vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot)
         if not screen:

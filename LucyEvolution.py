@@ -129,7 +129,7 @@ def run_main():
     # Create DB Adapter and set as adapter
     sqlite_adapter = DBAdapters.DBSQLite(identify="Lucy walk", resetDB=True)
     ga.setDBAdapter(sqlite_adapter)
-
+                    
     #callback to persist best individual of each generation
     ga.stepCallback.set(createOwnGen)
 

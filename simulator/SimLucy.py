@@ -38,7 +38,7 @@ class SimLucy:
         self.conf = LoadSystemConfiguration()
         self.configuration = LoadRobotConfiguration()
         self.visible = visible
-        self.sim = Simulator()
+        self.sim = Simulator().getInstance()
         self.clientID = self.sim.connectVREP()
         if self.clientID == -1:
             raise VrepException("error connecting with Vrep", -1)
@@ -167,7 +167,7 @@ class SimLucy:
         error = errorPosition
         if error:
             raise VrepException("error stoping Lucy", error)        
-
+            
     def isLucyUp(self):
         error, up = self.sim.isRobotUp(self.clientID)
         if error:
