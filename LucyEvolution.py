@@ -124,6 +124,7 @@ def run_main():
     ga = GSimpleGA.GSimpleGA(genome)
     ga.setGenerations(30)    #TODO class atribute
     ga.setPopulationSize(10) #TODO class atribute
+    ga.setMutationRate(0.2)
 
     # Create DB Adapter and set as adapter
     sqlite_adapter = DBAdapters.DBSQLite(identify="Lucy walk", resetDB=True)
