@@ -107,6 +107,11 @@ def eval_func(chromosome):
     fitness = individual.execute() #return the fitness resulting from the simulator execution
     return fitness
 
+# This function is the termination criteria for the algorithm
+def ConvergenceCriteria(ga_engine):
+   pop = ga_engine.getPopulation()
+   return pop[0] == pop[len(pop)-1]
+
 def run_main():
     initialPopulationSize = 51
     generations = 70   
@@ -126,7 +131,8 @@ def run_main():
     ga.setGenerations(generations)    #TODO class atribute
     ga.setPopulationSize(initialPopulationSize) #TODO class atribute
     ga.setMutationRate(0.2)
-    ga.terminationCriteria.set(GSimpleGA.ConvergenceCriteria)
+    ga.selector.set(Selectors.GRouletteWheel) 
+    #ga.terminationCriteria.set(ConvergenceCriteria)
 
     # Create DB Adapter and set as adapter
     sqlite_adapter = DBAdapters.DBSQLite(identify="Lucy walk", resetDB=True)
