@@ -124,6 +124,9 @@ class Individual:
         tree = ET.ElementTree(root)
         tree.write(file)
 
+    def getJointMatrixIDFromName(self, jointName):
+        return self.genomeMatrixJointNameIDMapping[jointName]
+
 #prop = DTIndividualPropertyCMUDaz()
 #propVanilla = DTIndividualPropertyVanilla()
 #balieroProp = DTIndividualPropertyBaliero()
