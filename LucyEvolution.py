@@ -108,7 +108,8 @@ def eval_func(chromosome):
     return fitness
 
 def run_main():
-
+    initialPopulationSize = 51
+    generations = 70   
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
     genome = G2DList.G2DList(164, 18)
@@ -122,14 +123,15 @@ def run_main():
 
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
-    ga.setGenerations(30)    #TODO class atribute
-    ga.setPopulationSize(10) #TODO class atribute
+    ga.setGenerations(generations)    #TODO class atribute
+    ga.setPopulationSize(initialPopulationSize) #TODO class atribute
     ga.setMutationRate(0.2)
+    ga.terminationCriteria.set(GSimpleGA.ConvergenceCriteria)
 
     # Create DB Adapter and set as adapter
     sqlite_adapter = DBAdapters.DBSQLite(identify="Lucy walk", resetDB=True)
     ga.setDBAdapter(sqlite_adapter)
-                    
+                        
     #callback to persist best individual of each generation
     ga.stepCallback.set(createOwnGen)
 
@@ -145,9 +147,10 @@ def run_main():
     best = ga.bestIndividual()
     score = best.getRawScore()
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    filename = str(score) + "-" + timestr + "-" + str(gen) + ".xml"
+    filename = str(score) + "-" + timestr + "-" + str(generations) + ".xml"
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
+    geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
     bestIndividual.persist(geneticPoolDir + filename)
 
 if __name__ == "__main__":
