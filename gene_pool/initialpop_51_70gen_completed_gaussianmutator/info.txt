@@ -1,0 +1,4 @@
+initial pop 51
+70 generations
+rank selection
+gausian mutator with 0,2 rate
