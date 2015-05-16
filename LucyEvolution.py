@@ -113,7 +113,7 @@ def ConvergenceCriteria(ga_engine):
    return pop[0] == pop[len(pop)-1]
 
 def run_main():
-    initialPopulationSize = 51
+    initialPopulationSize = 50
     generations = 70   
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
@@ -131,7 +131,7 @@ def run_main():
     ga.setGenerations(generations)    #TODO class atribute
     ga.setPopulationSize(initialPopulationSize) #TODO class atribute
     ga.setMutationRate(0.2)
-    ga.selector.set(Selectors.GRouletteWheel) 
+    #ga.selector.set(Selectors.GRouletteWheel) 
     #ga.terminationCriteria.set(ConvergenceCriteria)
 
     # Create DB Adapter and set as adapter

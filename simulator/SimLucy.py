@@ -85,11 +85,15 @@ class SimLucy:
         return self.distance        
     
     def getFitness(self, endFrameExecuted=False):
-        fitness = self.getSimTime() * self.getSimDistance()
+        #print "time ", self.getSimTime(), "distance ", self.getSimDistance()
+        time = self.getSimTime()
+        distance = self.getSimDistance()
+        fitness = time + distance * time
         if endFrameExecuted:
-            fitness = MAX_FITNESS_BONUS + fitness
+            fitness = fitness * 2
         return fitness
-        
+    
+    #this function ins deprecated
     def executeFrame(self, pose):
         error = False
         #Above's N joints will be received and set on the V-REP side at the same time'''
