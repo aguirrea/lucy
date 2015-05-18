@@ -59,6 +59,7 @@ class Individual:
             if joint not in dontSupportedJoints:
                 self.robotImplementedJoints.append(joint)
 
+        #is important to use only supported joints to avoid errors obtaining the handler of a joint that doesn't exists
         for i in xrange(self.poseSize):
             for joint in self.robotImplementedJoints:
                 #print "i: ", i, "j: ", joint
@@ -77,7 +78,7 @@ class Individual:
                     poseExecute[joint] = angleExecute.toVrep() 
             i = i + 1  
             self.lucy.executePose(Pose(poseExecute))
-        self.lucy.stopLucy()  
+        self.lucy.stopLucy()  #this function also updates time and distance
         if i < self.poseSize:
             self.fitness = self.lucy.getFitness()
         else:

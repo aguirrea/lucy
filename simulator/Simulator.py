@@ -73,8 +73,10 @@ class Simulator:
         error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait) or error
         error, bioloid_position = self.getObjectPositionWrapper(clientID, LSP_Handle) or error 
         return error, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD"))
+
     def startSim(self, clientID, screen=True):
         error=vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot)
+        vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_visible_layers,2,vrep.simx_opmode_oneshot_wait)
         if not screen:
             vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
         return error
