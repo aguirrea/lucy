@@ -44,7 +44,7 @@ class Individual:
         self.genomeMatrix = individualGeneticMaterial.getGeneticMatrix()
         self.poseSize = len(self.genomeMatrix)
 
-        self.lucy = SimLucy(True)
+        self.lucy = SimLucy(False)
 
         self.genomeMatrixJointNameIDMapping = {}
         i=0

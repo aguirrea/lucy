@@ -76,9 +76,9 @@ class Simulator:
 
     def startSim(self, clientID, screen=True):
         error=vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot)
-        vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_visible_layers,2,vrep.simx_opmode_oneshot_wait)
         if not screen:
-            vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
+            vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_visible_layers,2,vrep.simx_opmode_oneshot_wait)
+            #vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
         return error
         
     def pauseSim(self, clientID):
