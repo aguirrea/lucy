@@ -27,7 +27,7 @@ from Pose                             import Pose
 from configuration.LoadSystemConfiguration          import LoadSystemConfiguration
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
-import os #only for the tests
+import os   #only for the tests
 import glob #only for the tests
 import time
 import xml.etree.cElementTree as ET
@@ -37,16 +37,12 @@ class Individual:
     def __init__(self, idividualProperty, individualGeneticMaterial):
         self.property = idividualProperty
         self.fitness = 0
-
         self.robotConfig = LoadRobotConfiguration()
         self.configuration = LoadSystemConfiguration()
-        
         self.genomeMatrix = individualGeneticMaterial.getGeneticMatrix()
-        self.poseSize = len(self.genomeMatrix)
-
-        self.lucy = SimLucy(False)
-
+        self.poseSize = len(self.genomeMatrix) 
         self.genomeMatrixJointNameIDMapping = {}
+
         i=0
         for jointName in self.robotConfig.getJointsName():
             self.genomeMatrixJointNameIDMapping[jointName]=i
@@ -65,8 +61,12 @@ class Individual:
                 #print "i: ", i, "j: ", joint
                 value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint)
                 self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]=value
+    
+    def stopLucy(self):
+        self.lucy.stopLucy()
 
     def execute(self):
+        self.lucy = SimLucy(int(self.configuration.getProperty("Lucy render enable"))) 
         angleExecute = AXAngle()
         poseExecute={}
         i=0
