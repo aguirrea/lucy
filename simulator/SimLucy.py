@@ -26,7 +26,7 @@ from errors.VrepException import VrepException
 from Pose import Pose
 from LoadSystemConfiguration import LoadSystemConfiguration
 
-import os, threading
+import os, threading, time
 
 X = 0
 Y = 1
@@ -38,15 +38,15 @@ class SimLucy:
         self.conf = LoadSystemConfiguration()
         self.configuration = LoadRobotConfiguration()
         self.visible = visible
-        self.sim = Simulator().getInstance()
-        self.clientID = self.sim.connectVREP()
+        genetic_bioloid = os.getcwd()+self.conf.getFile("Lucy vrep model")
+        self.sim = Simulator().getInstance(genetic_bioloid)
+        self.clientID = self.sim.getClientId() #self.sim.connectVREP()
         if self.clientID == -1:
             raise VrepException("error connecting with Vrep", -1)
-        genetic_bioloid = os.getcwd()+self.conf.getFile("Lucy vrep model")
-        self.sim.loadscn(self.clientID, genetic_bioloid)
+        #self.sim.loadscn(self.clientID, genetic_bioloid)
         self.sim.startSim(self.clientID,self.visible)
         self.time = 0
-        self.startTime = time()
+        self.startTime = time.time()
         self.jointHandleCachePopulated = False
         self.stop = False
         self.distance = 0
@@ -59,7 +59,7 @@ class SimLucy:
             self.startPosSetted = True
             self.startPos = [x,y]
         else:
-            threading.Timer(int(self.conf.getProperty("threadingTime")), self.setStartPositionAsync).start()
+            threading.Timer(float(self.conf.getProperty("threadingTime")), self.setStartPositionAsync).start()
 
     def setStartPositionAsync(self):
         if not self.startPosSetted:
@@ -68,27 +68,22 @@ class SimLucy:
                 self.startPosSetted = True
                 self.startPos = [x,y]
             else:
-                threading.Timer(int(self.conf.getProperty("threadingTime")), self.setStartPositionAsync).start()
+                threading.Timer(float(self.conf.getProperty("threadingTime")), self.setStartPositionAsync).start()
 
     def getSimTime(self):
         if self.stop == False:
-            self.time = time() - self.startTime
+            self.time = time.time() - self.startTime
         return self.time
         
     def getSimDistance(self):
-        if self.stop == False:
-            error, x, y=self.sim.getBioloidPlannarPosition(self.clientID) 
-            if error:
-                raise VrepException("error calculating bioloid plannar position", error)
-            distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
-            self.distance = distance
         return self.distance        
     
     def getFitness(self, endFrameExecuted=False):
         #print "time ", self.getSimTime(), "distance ", self.getSimDistance()
         time = self.getSimTime()
         distance = self.getSimDistance()
-        fitness = time + distance * time
+        #fitness = time + distance * time
+        fitness = distance * time
         if endFrameExecuted:
             fitness = fitness * 2
         return fitness
@@ -135,8 +130,9 @@ class SimLucy:
                 error = self.sim.resumePauseSim(self.clientID) or error
                 error = self.sim.setJointPosition(self.clientID, joint, angle) or error
             jointExecutedCounter = jointExecutedCounter + 1
-        if error:
-            raise VrepException("error excecuting a pose", error)
+        self.updateLucyPosition()
+        #if error:
+        #    raise VrepException("error excecuting a pose", error)
 
     def getFrame(self): #TODO return a Pose object
         error = False
@@ -150,7 +146,6 @@ class SimLucy:
             if joint not in dontSupportedJoints: #actual model of vrep bioloid don't support this joints
                 errorGetJoint, value = self.sim.getJointPositionNonBlock(self.clientID, joint, self.firstCallGetFrame)
                 error = error or errorGetJoint 
-                print errorGetJoint
                 pose[joint] = value
             else:
                 pose[joint] = 0
@@ -159,18 +154,18 @@ class SimLucy:
         #if error:
         #    raise VrepException("error geting a frame", error)
         return error, pose
-        
+
+    def updateLucyPosition(self):
+        if self.stop == False: 
+            self.time = time.time() - self.startTime
+            errorPosition, x, y = self.sim.getBioloidPlannarPosition(self.clientID) 
+            if self.startPosSetted and not errorPosition:
+                self.distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
+            
     def stopLucy(self):
         self.stop = True
-        self.time = time() - self.startTime
-        errorPosition, x, y = self.sim.getBioloidPlannarPosition(self.clientID) 
-        if self.startPosSetted:
-            self.distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
-        errorFinish = self.sim.finishSimulation(self.clientID)
-        #error = errorFinish or errorPosition
-        error = errorPosition
-        if error:
-            raise VrepException("error stoping Lucy", error)        
+        self.updateLucyPosition()
+        self.sim.finishSimulation(self.clientID)
             
     def isLucyUp(self):
         error, up = self.sim.isRobotUp(self.clientID)
