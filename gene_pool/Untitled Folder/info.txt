@@ -1,0 +1,7 @@
+initial pop 18
+600 generations
+rank selection
+gausian mutator with 0,2 rate
+fitness = time * distance
+time serie window 400
+

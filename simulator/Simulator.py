@@ -25,33 +25,48 @@ import math
 from LoadRobotConfiguration import LoadRobotConfiguration
 from LoadSystemConfiguration import LoadSystemConfiguration
 
-_instance = None
+bulletEngine = 0
+odeEngine    = 1
+simulatioTimeStepDT = 0.200
+_instance    = None
 class Simulator:
 
-    def __init__(self):
+    def __init__(self, simulatorModel=None):
         self.getObjectPositionFirstTime = True
         #this data structure is like a cache for the joint handles
         self.jointHandleMapping = {} 
         robotConf = LoadRobotConfiguration()
+        self.model = simulatorModel
         self.LucyJoints = robotConf.getJointsName()            
         for joint in self.LucyJoints:
             self.jointHandleMapping[joint]=0
+        self.clientId = self.connectVREP()
+        if simulatorModel:
+            self.loadscn(self.clientId, simulatorModel)
 
-    def getInstance(self):
+    def getInstance(self, simulatorModel):
         global _instance
         if _instance is None:
-            _instance = Simulator()
+            _instance = Simulator(simulatorModel)
         return _instance
     
+    def getClientId(self):
+        return self.clientId
+
+    def setClientId(self, idClient):
+        self.clientId = idClient 
+
     def getObjectPositionWrapper(self, clientID, LSP_Handle):
-            if self.getObjectPositionFirstTime:
-                error, ret = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_streaming)
-            else:
-                self.getObjectPositionFirstTime = False
-                error, ret = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_buffer) 
-            return error, ret
+        error = False
+        if self.getObjectPositionFirstTime:
+            error, ret = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_streaming)
+            self.getObjectPositionFirstTime = False
+        else:
+            error, ret = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_buffer) 
+        return error, ret
 
     def connectVREP(self, ipAddr=LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"Vrep IP"), port=int(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"Vrep port"))):
+        self.getObjectPositionFirstTime = True
         vrep.simxFinish(-1) # just in case, close all opened connections
         return vrep.simxStart(ipAddr,port,True,True,5000,5)
 
@@ -73,10 +88,14 @@ class Simulator:
         error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait) or error
         error, bioloid_position = self.getObjectPositionWrapper(clientID, LSP_Handle) or error 
         return error, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD"))
+
     def startSim(self, clientID, screen=True):
+        vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_dynamic_engine,bulletEngine ,vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetFloatingParameter(clientID,vrep.sim_floatparam_simulation_time_step, simulatioTimeStepDT, vrep.simx_opmode_oneshot_wait)
         error=vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot)
         if not screen:
-            vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
+            vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_visible_layers,2,vrep.simx_opmode_oneshot_wait)
+            #vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
         return error
         
     def pauseSim(self, clientID):
@@ -125,6 +144,7 @@ class Simulator:
         return error, value
 
     def finishSimulation(self, clientID):
+        self.getObjectPositionFirstTime = True
         errorStop=vrep.simxStopSimulation(clientID,vrep.simx_opmode_oneshot_wait)
         errorClose=vrep.simxCloseScene(clientID,vrep.simx_opmode_oneshot_wait)
         error=errorStop or errorClose
@@ -134,8 +154,13 @@ class Simulator:
         
     def getBioloidPlannarPosition(self, clientID):
         errorHandler, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait)
-        errorObjectPosition, bioloid_position = self.getObjectPositionWrapper(clientID, LSP_Handle) 
-        return errorHandler or errorObjectPosition, bioloid_position[0], bioloid_position[1]
+        errorObjectPosition = True
+        if not errorHandler:
+            errorObjectPosition, bioloid_position = self.getObjectPositionWrapper(clientID, LSP_Handle)
+            #print "error handler: ", errorHandler, " error object position: ", errorObjectPosition 
+            if not errorHandler or errorObjectPosition:
+                return False, bioloid_position[0], bioloid_position[1]
+        return True, None, None
 
 
 

@@ -18,16 +18,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from simulator.SimLucy                import SimLucy
-from simulator.AXAngle                import AXAngle
-from parser.LoadPoses                 import LoadPoses
+from simulator.Lucy                             import Lucy, SimulatedLucy, PhysicalLucy
+from simulator.AXAngle                          import AXAngle
+from parser.LoadPoses                           import LoadPoses
 from datatypes.DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero
 from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticMaterial, DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
-from Pose                             import Pose
-from configuration.LoadSystemConfiguration          import LoadSystemConfiguration
-from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from Pose                                       import Pose
+from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
+from simulator.LoadRobotConfiguration           import LoadRobotConfiguration
 
-import os #only for the tests
+import os   #only for the tests
 import glob #only for the tests
 import time
 import xml.etree.cElementTree as ET
@@ -37,16 +37,13 @@ class Individual:
     def __init__(self, idividualProperty, individualGeneticMaterial):
         self.property = idividualProperty
         self.fitness = 0
-
         self.robotConfig = LoadRobotConfiguration()
         self.configuration = LoadSystemConfiguration()
-        
         self.genomeMatrix = individualGeneticMaterial.getGeneticMatrix()
-        self.poseSize = len(self.genomeMatrix)
-
-        self.lucy = SimLucy(True)
-
+        self.poseSize = len(self.genomeMatrix) 
         self.genomeMatrixJointNameIDMapping = {}
+        self.sysConf = LoadSystemConfiguration()
+
         i=0
         for jointName in self.robotConfig.getJointsName():
             self.genomeMatrixJointNameIDMapping[jointName]=i
@@ -59,13 +56,26 @@ class Individual:
             if joint not in dontSupportedJoints:
                 self.robotImplementedJoints.append(joint)
 
+        #is important to use only supported joints to avoid errors obtaining the handler of a joint that doesn't exists
         for i in xrange(self.poseSize):
             for joint in self.robotImplementedJoints:
                 #print "i: ", i, "j: ", joint
                 value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint)
                 self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]=value
+    
+    def stopLucy(self):
+        self.lucy.stopLucy()
 
     def execute(self):
+        #TODO create a instance of the Lucy class depending if its simulated or physical
+        print "property: ", self.sysConf.getProperty("Lucy simulated?")
+        if int(self.sysConf.getProperty("Lucy simulated?"))==1:
+            self.lucy = SimulatedLucy(int(self.configuration.getProperty("Lucy render enable")))
+            print "simulated Lucy"
+        else:
+            self.lucy = PhysicalLucy()
+            print "physical Lucy"
+   
         angleExecute = AXAngle()
         poseExecute={}
         i=0
@@ -77,7 +87,7 @@ class Individual:
                     poseExecute[joint] = angleExecute.toVrep() 
             i = i + 1  
             self.lucy.executePose(Pose(poseExecute))
-        self.lucy.stopLucy()  
+        self.lucy.stopLucy()  #this function also updates time and distance
         if i < self.poseSize:
             self.fitness = self.lucy.getFitness()
         else:

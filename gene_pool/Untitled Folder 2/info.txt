@@ -1,0 +1,18 @@
+initial pop 18
+600 generations
+rank selection (explicit)
+gausian mutator with 0,2 rate
+fitness = time * distance
+time serie window 400
+
+Total time elapsed: 38540.570 seconds.
+- Statistics
+        Minimum raw score                             = 0.31
+        Fitness average                               = 0.71
+        Minimum fitness                               = 0.69
+        Raw scores variance                           = 0.43
+        Standard deviation of raw scores              = 0.66
+        Average of raw scores                         = 0.71
+        Maximum fitness                               = 0.86
+        Maximum raw score                             = 3.26
+

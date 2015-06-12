@@ -73,7 +73,9 @@ try:
     poseNumber = 0
     configuration = LoadRobotConfiguration()
     simTimeMark = lucy.getSimTime()
-    while  lucy.isLucyUp():
+    counter = 0
+    while  lucy.isLucyUp() and counter <= 400:
+        print "executin pose number: ", counter
         frame = ET.SubElement(lucyPersistence, "frame")
         frame.set("number" , str(poseNumber))
 
@@ -108,6 +110,7 @@ try:
             degreeAngle = 150-(pos*float(60))
             xmlJointAngle = xmlJoint.set("angle" , str(degreeAngle))
 
+        counter = counter + 1
     lucy.stopLucy()
     tree = ET.ElementTree(root)
     tree.write("moon_walk1.xml")

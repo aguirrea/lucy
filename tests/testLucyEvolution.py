@@ -56,9 +56,7 @@ if arguments > 1:
         walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
         #walk = Individual(propCMUDaz, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
         walk.execute()
-
 else:
-
     for filename in glob.glob(os.path.join(geneticPoolDir, '*.xml')):
         print 'executing individual: ' + filename
         walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(filename))

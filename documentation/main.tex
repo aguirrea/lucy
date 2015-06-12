@@ -1,0 +1,147 @@
+% book example for classicthesis.sty
+\documentclass[
+  % Replace twoside with oneside if you are printing your thesis on a single side
+  % of the paper, or for viewing on screen.
+  %oneside,
+  twoside,
+  11pt, a4paper,
+  footinclude=true,
+  headinclude=true,
+  cleardoublepage=empty
+]{scrbook}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\selectlanguage{spanish}
+
+\usepackage{lipsum}
+\usepackage[linedheaders,parts,pdfspacing]{classicthesis}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{acronym}
+\usepackage{siunitx}
+%\usepackage[spanish,onelanguage]{algorithm2e} %for psuedo code
+\usepackage[spanish]{algorithm2e} %for psuedo code
+
+
+%\textsc{\LARGE PEDECIBA Informática, Instituto de Computación – Facultad de Ingeniería, Universidad de la República}\\[1.5cm]
+%\textsc{\Large Tesis de maestría }\\[0.5cm]
+
+\title{Aprendizaje motor por imitación, un enfoque multi instructor aplicado a  robots humanoides}
+\author{Andrés Aguirre Dorelo\\ PEDECIBA Informática \\Facultad de Ingeniería - Instituto de Computación \\ Universidad de la República}
+
+
+\begin{document}
+%\tutor{Gonzalo Tejera}{Javier Baliosian} no se como se formatea ...
+\maketitle
+
+
+
+
+\include{FrontBackMatter/abstract}
+\include{FrontBackMatter/dedication}
+\include{FrontBackMatter/acknowledgements}
+\include{FrontBackMatter/declaration}
+\include{FrontBackMatter/contents}
+
+
+\part{First Part of My Thesis}
+
+\chapter{Algoritmo de aprendizaje por imitación, basado en algoritmos genéticos y técnicas de reducción dimensional}
+
+Al trabajar con aprendizaje por imitación, se presentan problemas a la hora de transferir de forma genérica habilidades entre varios agentes y situaciones. En la bibliografía éstos problemas se ha formulado con un conjunto de preguntas genéricas: ¿Qué imitar? ¿Cómo imitar? ¿Cuando imitar? y ¿A quién imitar?\cite{Billard08chapter}.
+
+En el presente trabajo nos centraremos en las dos primeras preguntas. La respuesta a la pregunta de ¿Qué imitar? está en la búsqueda de los aspectos relevantes en la demostración para lograr realizar una determinada tarea. Por otro lado la respuesta a la pregunta de ¿Cómo imitar? también referida como el problema de la correspondencia\cite{1158965}, es el problema de transferir un movimiento observado a las capacidades del agente que realiza la observación \cite{Calinon05goal-directedimitation}.
+
+El algoritmo se implementa mediante la utilización de algoritmos genéticos, introduciendo un proceso de hibridación\cite{700115}\cite{Sumathi:2008:EII:1628817} mediante una variante del algoritmo genético simple, para el cual se define un nuevo operador de cruzamiento y mutación con el anhelo de lograr obtener una convergencia más temprana.
+
+Para un movimiento determinado, como ser una caminata, se va a disponer de diferentes demostraciones, ejecutadas potencialmente por varios instructores. Situándonos en un caso de aprendizaje con múltiples instructores.
+
+A partir del registro de los movimientos realizado por la Unidad de Investigación en Biomecánica de la Locomoción Humana (UIBLH) de la Facultad de Medicina, mediante el uso de 18 marcadores en las articulaciones principales del cuerpo humano. Se obtiene una serie temporal de ángulos tomados a una frecuencia de \SI{50}{\hertz}, para cada instante de tiempo se dispone de un vector de $R^{18}$ al cual llamaremos pose. 
+Se disponen también de bases de movimientos públicas, como ser la de la universidad de Carnegie Mellon, CMU MoCap database\footnote{http://mocap.cs.cmu.edu/}, donde se utilizaron 40 marcadores para registrar 2500 movimientos variados ejecutados por 140 instructores. Como también la HDM05 database\cite{cg-2007-2}. Con el objetivo de reducir la cantidad de datos a manejar y por ende disminuir la complejidad computacional del problema, se propone segmentar dicha serie temporal en un conjunto de poses que caracteriza el movimiento a imitar por el robot. 
+
+\section{Análisis de componentes principales del movimiento}
+
+Explicar de que trata el método y dar pie a que se usa en el trabajo para la segmentación y para la reducción dimensional
+\section{Segmentación}
+
+A partir de la serie temporal de poses, se determina el subespacio de ángulos más significativos de dicho movimiento mediante técnicas de reducción dimensional como ser Principal Components Analysis (PCA). Mediante ésta técnica, los ángulos seleccionados como componentes principales del movimiento, son los que tienen asociados valores propios mayores, cuanto mayor sea el valor propio, más características del movimiento, el ángulo seleccionado describe. 
+
+Una vez identificados los ángulos significativos, debemos identificar cuales son las poses más significativas para un movimiento. Para ello se propone el siguiente algoritmo greedy de segmentación:
+
+\begin{algorithm}[H]
+\KwData{Serie temporal de poses}
+\KwResult{Lista de poses representativas}
+$i=0$\;
+$p_0=timeSeriePoses[i]$\;
+$poses\_min.add(p_0$)\;
+\Repeat{i==timeSeriePoses.length()}{
+    $i=i+1$\;
+    $pi=timeSeriePoses[i$]\;
+    \For{$j\in Principal\_Joints$}{
+        \If{$|p_1[j]-p_0[j]|>\mbox ANGLE\_THREASHOLD\_J$} {
+            $poses\_min.add(p_i$)\;
+            $p_0=p_i$\;
+            $break()$\;
+        }
+    }
+  }{}{}
+ 
+ \caption{Algoritmo de segmentación de una serie temporal de poses en un conjunto de poses representativas}
+\end{algorithm}
+
+\section{Implementación mediante un algoritmo genético}
+
+Esta sección presenta los detalles de codificación e implementación del algoritmo genético utilizando para la resolución del aprendizaje por imitación. 
+
+\subsection{Codificación}
+
+El algoritmo genético implementado se basa en una codificación entera de genes. Cada cromosoma representa cierto movimiento a imitar y está implementado mediante una lista ordenada de poses significativas. Cada pose se implementa como un arreglo de enteros, donde cada posición codifica los ángulos (genes), para las articulaciones seleccionadas por PCA.
+
+La segmentación de movimiento en poses significativas es inspirado en las técnicas de animación, por lo que no se van a codificar las repeticiones de una misma secuencia, como ser en el caso de las caminatas, la repetición de pasos. En la siguiente figura podemos ver un ejemplo de codificación de diferentes caminatas mediante ésta técnica.
+
+\subsection{Operador de Cruzamiento}
+
+\subsection{Función de Fitness}
+
+\subsection{Población Inicial}
+
+\subsection{Mutación}
+
+La mutación en el contexto del algoritmo presentado es el operador que busca dar respuesta al problema de correspondencia. A diferencia de los operadores clásicos de mutación, los valores a ser tomados por el gen no pueden ser equiprobables, debiéndose ponderar los valores cercanos a la posición actual con el objetivo de adaptar las poses ejecutadas por un humano a las capacidades motrices del robot. 
+
+Tomemos como ejemplo el caso de la marcha humana, el centro de masa (CM) se desplaza sobre el punto de contacto con el piso comportándose como un péndulo invertido: la energía cinética generada durante el movimiento hacia adelante (Ek,h) es en parte, transformada en energía potencial gravitatoria (Ep) cuando el CM alcanza la mayor altura (cuando está alineado verticalmente con el punto de apoyo). Luego, esta Ep vuelve a ser transformada en Ek,h ya que cuando el CM disminuye la altura es a la vez reacelerado hacia delante. Los valores de energía vertical (Ev) y Ek,h cambian en oposición de fase (Cavagna, Saibene et al. 1963). 
+
+Para la marcha en robots, las características técnicas de los actuadores imponen restricciones sobre el tipo de marcha que el robot puede ejecutar. Esto es debido, principalmente a la velocidad máxima de los motores disponibles en los kits estándar de robótica, dado que dicha velocidad no permite lograr implementar en el robot un modelo como el del péndulo invertido. Por el contrario las caminatas típicas en robots presentan la característica de mantener el CM dentro del polígono de sustentación, cuadrilátero limitado por los bordes externos de ambos pies. Realizando pasos más cortos para lograr presentar esta característica.
+
+Se propone escalar el movimiento como mecanismo de mutación, realizando movimientos similares al original pero de diferente magnitud\cite{5354391}, con el objetivo de adaptar el movimiento a las características motoras del robot. Luego de varias aplicaciones de éste operador el movimiento se parecerá cada vez menos al del humano, pero se irá adaptando a las características del robot. Si multiplicamos el conjunto de ángulos que forman una pose por un factor mayor que 1, la pose será amplificada, de forma análoga si lo hacemos por un valor menor a 1 la pose será reducida. Llamaremos en el contexto de éste algoritmo escalamiento positivo cuando se trate de multiplicar por un valor mayor a 1 y escalamiento negativo cuando se realice la multiplicación por un factor menor a 1. 
+Es importante tener en cuenta que existe una relación entre los ángulos que debe ser preservada para lograr una buena adaptación, y lograr atacar el problema de la correspondencia, por lo que el mecanismo de escalamiento parece ser adecuado. 
+
+Además, la escalabilidad se mantiene luego de ser aplicado PCA[3], permitiendo realizar el escalamiento directamente sobre la representación elegida.
+
+Para cada pose se aplicará con cierta probabilidad de mutación un escalamiento. Dependiendo de la pose será más adecuado un escalamiento positivo o uno negativo, por lo que será sorteado el tipo de escalamiento a realizar y el valor de magnitud del coeficiente de escalamiento será determinado en la etapa de ajuste del algoritmo. Intuitivamente el valor de escalamiento debe ser pequeño, para permitir mediante múltiples aplicaciones del operador de mutación explorar un dominio mayor.
+
+Es importante notar que la mutación, se aplica sobre los ángulos significativos, debido a la codificación elegida, pero indirectamente afecta en la misma proporción a todos los ángulos que caracterizan el movimiento del robot, dada la dependencia lineal existente entre los ángulos no significativos respecto a los significativos. 
+
+\chapter{Ambiente de simulación}
+\lipsum[1] % This is just some filler text. Remove before you start writing
+
+\section{Yet Another Section}
+\lipsum[1] % This is just some filler text. Remove before you start writing
+
+\part{Another Part}
+
+\chapter{Yet Another Chapter}
+\lipsum[1] % This is just some filler text. Remove before you start writing
+
+
+  
+\
+\part{}
+\chapter{ Chapter}
+\lipsum[1]
+
+\bibliographystyle{unsrt}%Used BibTeX style is unsrt
+\bibliography{bibliography}
+
+\end{document}
