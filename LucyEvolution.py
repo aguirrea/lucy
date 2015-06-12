@@ -40,6 +40,14 @@ import glob
 initialPopulationSetted = False
 gaEngine = None
 
+def getPopulationAverage(population):
+    average = 0
+    for p in population:
+        score = p.getRawScore()
+        average = average + score
+    return average/len(population)
+
+
 def setInitialPopulation (ga_engine):
 
     prop = DTIndividualPropertyCMUDaz()    
@@ -59,26 +67,47 @@ def setInitialPopulation (ga_engine):
     popSize = len(population)
 
     individualCounter = 0
-    for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
-        print individualCounter, " individuals processed!"
-        print 'inserting individual: ' + filename + " into the initial population"
-        walk = Individual(prop, DTIndividualGeneticTimeSerieFile(filename))
-        geneticMatrix = walk.getGenomeMatrix()
-        if individualCounter < popSize:
-            adan = population[individualCounter]
-            for i in xrange(adan.getHeight()):
-                if i == len(geneticMatrix):
-                        break
-                for j in xrange(adan.getWidth()):
-                    adan.setItem(i,j,geneticMatrix[i][j])
-            population[individualCounter]=adan
-            individualCounter = individualCounter + 1
-        else:
-            break
+    
+#    if individualCounter < popSize:
+#        for filename in glob.glob(os.path.join(GAwalkDir, '*.xml')):
+#            print individualCounter, " individuals processed!"
+#            print 'inserting individual: ' + filename + " into the initial population"
+#            walk = Individual(propVanilla, DTIndividualGeneticTimeSerieFile(filename))
+#            geneticMatrix = walk.getGenomeMatrix()
+#            if individualCounter < popSize:
+#                adan = population[individualCounter]
+#                for i in xrange(adan.getHeight()):
+#                    if i == len(geneticMatrix):
+#                            break
+#                    for j in xrange(adan.getWidth()):
+#                        adan.setItem(i,j,geneticMatrix[i][j])
+#                population[individualCounter]=adan
+#                individualCounter = individualCounter + 1
+#            else:
+#                break
+        
+    if individualCounter < popSize:
+        for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
+            print individualCounter, " individuals processed!"
+            print 'inserting individual: ' + filename + " into the initial population"
+            walk = Individual(prop, DTIndividualGeneticTimeSerieFile(filename))
+            geneticMatrix = walk.getGenomeMatrix()
+            if individualCounter < popSize:
+                adan = population[individualCounter]
+                for i in xrange(adan.getHeight()):
+                    if i == len(geneticMatrix):
+                            break
+                    for j in xrange(adan.getWidth()):
+                        adan.setItem(i,j,geneticMatrix[i][j])
+                population[individualCounter]=adan
+                individualCounter = individualCounter + 1
+            else:
+                break
+
     global initialPopulationSetted
     initialPopulationSetted = True
 
-def createOwnGen(ga_engine):
+def generationCallback(ga_engine):
     # persist best individual at the moment
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
@@ -90,7 +119,12 @@ def createOwnGen(ga_engine):
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
     bestIndividual.persist(geneticPoolDir + filename)
-
+    ga_engine.getDBAdapter().commit()
+    ##population = ga_engine.getPopulation()
+    ##averagePopulation = getPopulationAverage(population)
+    #averageGeneration = getPopulationAverage(gen)
+    ##print "current population raw score average: ", averagePopulation
+    #print "current generation raw score average: ", averageGeneration
     return False
 
 def chromosomeToLucyGeneticMatrix(chromosome):
@@ -113,11 +147,11 @@ def ConvergenceCriteria(ga_engine):
    return pop[0] == pop[len(pop)-1]
 
 def run_main():
-    initialPopulationSize = 50
-    generations = 70   
+    initialPopulationSize = 19
+    generations = 1500
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
-    genome = G2DList.G2DList(164, 18)
+    genome = G2DList.G2DList(400, 18)
     genome.setParams(rangemin=0, rangemax=360)
 
     # The evaluator function (objective function)
@@ -131,7 +165,11 @@ def run_main():
     ga.setGenerations(generations)    #TODO class atribute
     ga.setPopulationSize(initialPopulationSize) #TODO class atribute
     ga.setMutationRate(0.2)
-    #ga.selector.set(Selectors.GRouletteWheel) 
+    ga.selector.set(Selectors.GRankSelector)
+    #ga.selector.set(Selectors.GTournamentSelector)
+    #ga.selector.set(Selectors.GRouletteWheel)
+    ga.setElitism(True)
+    ga.setElitismReplacement(initialPopulationSize/3)
     #ga.terminationCriteria.set(ConvergenceCriteria)
 
     # Create DB Adapter and set as adapter
@@ -139,15 +177,15 @@ def run_main():
     ga.setDBAdapter(sqlite_adapter)
                         
     #callback to persist best individual of each generation
-    ga.stepCallback.set(createOwnGen)
+    ga.stepCallback.set(generationCallback)
 
     #keep a reference to the genetic algorithm engine
     global gaEngine
     gaEngine = ga
 
     # Do the evolution, with stats dump
-    # frequency of 10 generations
-    ga.evolve(freq_stats=2)
+    # frequency of 2 generations
+    ga.evolve(freq_stats=1)
 
     # Best individual
     best = ga.bestIndividual()
@@ -158,6 +196,10 @@ def run_main():
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
     geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
     bestIndividual.persist(geneticPoolDir + filename)
+    
+    #TODO store all the population, not only the fitest
+
+    print ga.getStatistics()
 
 if __name__ == "__main__":
    run_main()
