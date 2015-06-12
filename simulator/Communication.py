@@ -24,8 +24,6 @@ import time
 import serial         
 import sys
 
-from pybot import pybot_client
-
 SIM_HOST = 'localhost'
 SIM_PORT = 7777
 
@@ -39,9 +37,8 @@ class Communication(object):
 
     def send_msg(self, msg):
         pass
-    
-    def recv_msg(self):
-        pass
+
+
 
 class CommSimulator(Communication):
 
@@ -93,6 +90,22 @@ class CommSerial(Communication):
         except:
             print "problems sending package"
             
+    '''
+    def read_msg(self,N_param):
+        print "leo serial"
+        aux = self.client.read(5+N_param)
+        for val in aux:
+            print (hex(ord(val)))
+        #aux= self.client.read(N_param)
+        #print "leo los demas "
+        #for val in aux:
+        #    print (hex(ord(val)))
+        self.client.read(1) #CHECK SUM
+        return aux
+
+    def flushInput (self):
+        self.client.flushInput() '''
+
     def recv_msg(self):
         checksum = 0;
         dato = chr(0)
@@ -100,11 +113,12 @@ class CommSerial(Communication):
 
         while (dato != chr(0xFF) and dato != ""):        
             dato = self.client.read(1)       
-            print "primer read"
+            print "primer read", hex(ord(dato))
 
         if (dato == ""):
             return 0
 
+        print "antes del segundo read"
         dato = self.client.read(1)
         print "segundo read"
         if (dato == chr(0xFF)):
@@ -131,25 +145,3 @@ class CommSerial(Communication):
 
         packet.append(checksum)
         return packet
-    
-            
-
-class CommButia(Communication):
-    
-    def __init__(self):
-        Communication.__init__(self)
-       
-    def connect(self):
-        try:
-            self.client = pybot_client.robot()
-        except:
-            print "problems connecting butiá"
-    
-    def send_msg(self, msg):
-        try:
-            #self.client.callModule('butia', str(0), '0', 'getVolt', msg)
-            msg2 = [str(i) for i in msg]
-            res = self.client.callModule('ax', str('0'), '0', 'sendPacket', msg2)
-            print res
-        except:
-            print "problems sending ax message"

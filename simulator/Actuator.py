@@ -27,6 +27,9 @@ MOVING_SPEED_CMD  = 0x20
 TURN_LED_CMD      = 0x19
 RESET_CMD         = 0x06
 PING_CMD          = 0x01
+READ_DATA = 0x02
+READ_PRESENT_POSITION_CMD = 0x24
+
 
 BROADCAST_ID      = 254
 
@@ -68,8 +71,8 @@ class Actuator:
         self.communication.send_msg(msg)  
 
     def led_state_change(self, id, led_state):
-        msg = self.make_msg(id, Instruction.WRITE_DATA, [Register.TURN_LED, led_state])
-        print msg
+        msg = self.make_msg(id, Instruction.WRITE_DATA, [Register.LED, led_state])
+        #print msg
         self.communication.send_msg(msg)
         
     def factory_reset(self, id=BROADCAST_ID):
@@ -79,7 +82,19 @@ class Actuator:
     def ping(self, id=BROADCAST_ID):
         msg = self.make_msg(id, Instruction.PING, [])
         self.communication.send_msg(msg)
-     
+
+    '''def get_position(self, idMotor):
+        #Consulta la posicion del motor en un momento dado.
+        self.communication.flushInput()  # vacia el buffer de datos de entrada
+        msg = self.make_msg(idMotor, READ_DATA, [READ_PRESENT_POSITION_CMD, 0x02])  # parametros =[dir de memoria inicial, bytes a leer]
+        self.communication.send_msg(msg)  # efectua el pedido de lectura de la ID
+        aux = self.communication.read_msg(2)  # cuantos parametros espero, devuelve array
+        bit_Alto=ord(aux[0])
+        bit_Bajo=ord(aux[1])
+        bit_Alto= bit_Alto << 8
+        final = bit_Bajo + bit_Alto
+        return final    '''
+
     def get_position(self, id):
         msg = self.make_msg(id, Instruction.READ_DATA, [Register.CURRENT_POSITION, 0x1])
         self.communication.send_msg(msg)
