@@ -49,10 +49,22 @@
 </Property>
 <Property>
     <Name>threadingTime</Name>
-    <Value>1</Value>    
+    <Value>0.5</Value>    
 </Property>
 <Property>
     <Name>Vrep not implemented joints</Name>
     <Value>R_Elbow_Yaw L_Elbow_Yaw L_Shoulder_Yaw R_Shoulder_Yaw</Value>
+</Property>
+<Property>
+    <Name>Lucy render enable</Name>
+    <Value>1</Value>    
+</Property>
+<Property>
+    <Name>Lucy render disable</Name>
+    <Value>1</Value>    
+</Property>
+<Property>
+    <Name>Lucy simulated?</Name>
+    <Value>0</Value>    
 </Property>
 </System>
