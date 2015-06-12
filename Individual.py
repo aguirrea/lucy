@@ -18,14 +18,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from simulator.SimLucy                import SimLucy
-from simulator.AXAngle                import AXAngle
-from parser.LoadPoses                 import LoadPoses
+from simulator.Lucy                             import Lucy, SimulatedLucy, PhysicalLucy
+from simulator.AXAngle                          import AXAngle
+from parser.LoadPoses                           import LoadPoses
 from datatypes.DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero
 from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticMaterial, DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
-from Pose                             import Pose
-from configuration.LoadSystemConfiguration          import LoadSystemConfiguration
-from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from Pose                                       import Pose
+from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
+from simulator.LoadRobotConfiguration           import LoadRobotConfiguration
 
 import os   #only for the tests
 import glob #only for the tests
@@ -42,6 +42,7 @@ class Individual:
         self.genomeMatrix = individualGeneticMaterial.getGeneticMatrix()
         self.poseSize = len(self.genomeMatrix) 
         self.genomeMatrixJointNameIDMapping = {}
+        self.sysConf = LoadSystemConfiguration()
 
         i=0
         for jointName in self.robotConfig.getJointsName():
@@ -66,7 +67,15 @@ class Individual:
         self.lucy.stopLucy()
 
     def execute(self):
-        self.lucy = SimLucy(int(self.configuration.getProperty("Lucy render enable"))) 
+        #TODO create a instance of the Lucy class depending if its simulated or physical
+        print "property: ", self.sysConf.getProperty("Lucy simulated?")
+        if int(self.sysConf.getProperty("Lucy simulated?"))==1:
+            self.lucy = SimulatedLucy(int(self.configuration.getProperty("Lucy render enable")))
+            print "simulated Lucy"
+        else:
+            self.lucy = PhysicalLucy()
+            print "physical Lucy"
+   
         angleExecute = AXAngle()
         poseExecute={}
         i=0

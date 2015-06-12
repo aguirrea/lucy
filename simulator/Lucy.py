@@ -19,14 +19,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import math
-from time import time
-from Simulator import Simulator
-from LoadRobotConfiguration import LoadRobotConfiguration
-from errors.VrepException import VrepException
-from Pose import Pose
-from LoadSystemConfiguration import LoadSystemConfiguration
-from dataypes.DTIndividualProperty import DTIndividualPropertyPhysicalBioloid
-from Communication import CommSerial
+from time                           import time
+from Simulator                      import Simulator
+from LoadRobotConfiguration         import LoadRobotConfiguration
+from errors.VrepException           import VrepException
+from Pose                           import Pose
+from LoadSystemConfiguration        import LoadSystemConfiguration
+from datatypes.DTIndividualProperty import DTIndividualProperty, DTIndividualPropertyPhysicalBioloid
+from Communication                  import CommSerial
 import Actuator
 
 import os, threading, time
@@ -38,13 +38,13 @@ MAX_FITNESS_BONUS = 5
 #abstract class representing lucy abstraction base class
 class Lucy(object):
     def __init__(self):
-        self.sysConf = LoadSystemConfiguration
+        self.sysConf = LoadSystemConfiguration()
         self.robotConfiguration = LoadRobotConfiguration()
         self.joints = self.robotConfiguration.getJointsName()
         self.time = 0
-        self.startTime = time()
+        self.startTime = time.time()
         self.distance = 0
-        self.stoped = False
+        self.stop = False
 
     def getFitness(self, endFrameExecuted=False):
         pass
@@ -68,34 +68,43 @@ class PhysicalLucy(Lucy):
         Lucy.__init__(self)
         self.comm_tty = CommSerial() 
         self.comm_tty.connect()
-        self.actuator = Actuator.Actuator(comm_tty)
+        self.actuator = Actuator.Actuator(self.comm_tty)
         self.defaultSpeed = 600 #TODO change this, use configuration files
         self.bioloidProperty = DTIndividualPropertyPhysicalBioloid()
 
         #checking communication with motors
         for joint in self.joints:
-            self.actuator.led_state_change(loadJointId(joint), 1)
-        time.sleep(1)
+            self.actuator.led_state_change(self.robotConfiguration.loadJointId(joint), 1)
+            print joint, self.actuator.get_position(self.robotConfiguration.loadJointId(joint))
+            time.sleep(1)
+        print "led on"
+        time.sleep(14)
         for joint in self.joints:
-            self.actuator.led_state_change(loadJointId(joint), 0)
+            self.actuator.led_state_change(self.robotConfiguration.loadJointId(joint), 0)
         
     def executePose(self, pose):
         #set positions and wait that the actuator reaching that position
-        for j in xrange(len(pose)-1):
-            joint=pose.keys()[j]
-            angle=pose[joint]
+        dontSupportedJoints = self.sysConf.getVrepNotImplementedBioloidJoints()
+        RobotImplementedJoints = []
+        for joint in self.joints:
+            if joint not in dontSupportedJoints:
+                RobotImplementedJoints.append(joint)
+        jointsQty = len(RobotImplementedJoints)
+        for joint in RobotImplementedJoints:
+            angle = pose.getValue(joint)   
             #TODO implement method for setting position of all actuators at the same time
-            self.actuator.move_actuator(loadJointId(joint), angle, self.defaultSpeed)
+            self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), int(angle), self.defaultSpeed)
+        time.sleep(1)
 
     def stopLucy(self):
         for joint in self.joints:
-            self.actuator.move_actuator(loadJointId(joint), self.bioloidProperty().getPoseFix(joint), self.defaultSpeed)
+            self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), self.bioloidProperty.getPoseFix(joint), self.defaultSpeed)
 
     def getFrame(self):
         error = False
         pose = {}
         for joint in self.joints:
-            value = self.actuator.get_position(loadJointId(joint))
+            value = self.actuator.get_position(self.robotConfiguration.loadJointId(joint))
             pose[joint] = value
         return error, pose            
 
@@ -111,20 +120,14 @@ class SimulatedLucy(Lucy):
 
     def __init__(self, visible=False):
         Lucy.__init__(self)
-        self.conf = LoadSystemConfiguration()
-        self.configuration = LoadRobotConfiguration()
         self.visible = visible
-        genetic_bioloid = os.getcwd()+self.conf.getFile("Lucy vrep model")
+        genetic_bioloid = os.getcwd() + self.sysConf.getFile("Lucy vrep model")
         self.sim = Simulator().getInstance(genetic_bioloid)
         self.clientID = self.sim.getClientId() 
         if self.clientID == -1:
             raise VrepException("error connecting with Vrep", -1)
         self.sim.startSim(self.clientID,self.visible)
-        self.time = 0
-        self.startTime = time.time()
         self.jointHandleCachePopulated = False
-        self.stop = False
-        self.distance = 0
         configuration = LoadRobotConfiguration()
         self.joints = configuration.getJointsName()
         self.startPosSetted = False
@@ -134,7 +137,7 @@ class SimulatedLucy(Lucy):
             self.startPosSetted = True
             self.startPos = [x,y]
         else:
-            threading.Timer(float(self.conf.getProperty("threadingTime")), self.setStartPositionAsync).start()
+            threading.Timer(float(self.sysConf.getProperty("threadingTime")), self.setStartPositionAsync).start()
 
     def setStartPositionAsync(self):
         if not self.startPosSetted:
@@ -143,7 +146,7 @@ class SimulatedLucy(Lucy):
                 self.startPosSetted = True
                 self.startPos = [x,y]
             else:
-                threading.Timer(float(self.conf.getProperty("threadingTime")), self.setStartPositionAsync).start()
+                threading.Timer(float(self.sysConf.getProperty("threadingTime")), self.setStartPositionAsync).start()
 
     def getSimTime(self):
         if self.stop == False:
@@ -165,15 +168,14 @@ class SimulatedLucy(Lucy):
 
     def executePose(self, pose):
         error = False
-        dontSupportedJoints = self.conf.getVrepNotImplementedBioloidJoints()
+        dontSupportedJoints = self.sysConf.getVrepNotImplementedBioloidJoints()
         RobotImplementedJoints = []
         #Above's N joints will be received and set on the V-REP side at the same time'''
         if (self.jointHandleCachePopulated == False): 
             self.sim.populateJointHandleCache(self.clientID)
             self.jointHandleCachePopulated = True
         error = self.sim.pauseSim(self.clientID) or error
-        robotJoints = self.configuration.getJointsName()
-        for joint in robotJoints:
+        for joint in self.joints:
             if joint not in dontSupportedJoints:
                 RobotImplementedJoints.append(joint)
         jointsQty = len(RobotImplementedJoints)
@@ -193,7 +195,7 @@ class SimulatedLucy(Lucy):
     def getFrame(self): #TODO return a Pose object
         error = False
         pose = {}
-        dontSupportedJoints = self.conf.getVrepNotImplementedBioloidJoints()
+        dontSupportedJoints = self.sysConf.getVrepNotImplementedBioloidJoints()
         if (self.jointHandleCachePopulated == False): 
             self.sim.populateJointHandleCache(self.clientID)
             self.jointHandleCachePopulated = True
