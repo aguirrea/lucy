@@ -57,11 +57,7 @@
 </Property>
 <Property>
     <Name>Lucy render enable</Name>
-    <Value>1</Value>    
-</Property>
-<Property>
-    <Name>Lucy render disable</Name>
-    <Value>1</Value>    
+    <Value>0</Value>    
 </Property>
 <Property>
     <Name>Lucy simulated?</Name>
