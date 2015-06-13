@@ -19,18 +19,6 @@
 
 import Communication
 
-SIM_HOST = 'localhost'
-SIM_PORT = 7777
-WRITE_DATA        = 0x03
-GOAL_POSITION_CMD = 0X1e
-MOVING_SPEED_CMD  = 0x20
-TURN_LED_CMD      = 0x19
-RESET_CMD         = 0x06
-PING_CMD          = 0x01
-READ_DATA = 0x02
-READ_PRESENT_POSITION_CMD = 0x24
-
-
 BROADCAST_ID      = 254
 
 from defs       import Instruction
@@ -85,7 +73,7 @@ class Actuator:
         self.communication.send_msg(msg)
 
     def setear_id(self, newID):
-        msg = self.make_msg(0xFE, Instruction.WRITE_DATA, [Register.ID, newID])
+        msg = self.make_msg(BROADCAST_ID, Instruction.WRITE_DATA, [Register.ID, newID])
         self.communication.send_msg(msg) 
 
     def get_position(self, id):
