@@ -147,7 +147,7 @@ def ConvergenceCriteria(ga_engine):
    return pop[0] == pop[len(pop)-1]
 
 def run_main():
-    initialPopulationSize = 19
+    initialPopulationSize = 51
     generations = 1500
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
