@@ -73,16 +73,21 @@ class PhysicalLucy(Lucy):
         self.defaultSpeed = 600 #TODO change this, use configuration files
         self.bioloidProperty = DTIndividualPropertyPhysicalBioloid()
 
+        poses = {}
         #checking communication with motors
         for joint in self.joints:
-            self.actuator.led_state_change(self.robotConfiguration.loadJointId(joint), 1)
-            self.actuator.factory_reset(self.robotConfiguration.loadJointId(joint))
-            print joint, self.actuator.get_position(self.robotConfiguration.loadJointId(joint))
-            time.sleep(1)
-        print "led on"
+            jointID = self.robotConfiguration.loadJointId(joint)
+            print jointID
+            poses[joint] = self.actuator.get_position(jointID).toDegrees()
+            self.actuator.led_state_change(jointID, 1)
+        
         time.sleep(1)
+        
         for joint in self.joints:
             self.actuator.led_state_change(self.robotConfiguration.loadJointId(joint), 0)
+
+        self.bioloidProperty.setPoseFix(poses)
+
         
     def executePose(self, pose):
         #set positions and wait that the actuator reaching that position
