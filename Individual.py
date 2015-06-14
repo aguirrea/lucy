@@ -67,14 +67,11 @@ class Individual:
         self.lucy.stopLucy()
 
     def execute(self):
-        #TODO create a instance of the Lucy class depending if its simulated or physical
-        print "property: ", self.sysConf.getProperty("Lucy simulated?")
+        #create the corresponding instance of Lucy, depending if it's real or simulated.
         if int(self.sysConf.getProperty("Lucy simulated?"))==1:
             self.lucy = SimulatedLucy(int(self.configuration.getProperty("Lucy render enable")))
-            print "simulated Lucy"
         else:
             self.lucy = PhysicalLucy()
-            print "physical Lucy"
    
         angleExecute = AXAngle()
         poseExecute={}
