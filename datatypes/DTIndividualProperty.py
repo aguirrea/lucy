@@ -18,10 +18,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+
 class DTIndividualProperty(object):
     def __init__(self):
         self.poseFix={}
         self.avoidJoints=[]
+        self.robotConfiguration = LoadRobotConfiguration()
+        self.joints = self.robotConfiguration.getJointsName()
 
     def avoidJoint(self, joint):
         return joint in self.avoidJoints
@@ -32,6 +36,11 @@ class DTIndividualProperty(object):
         else:
             res = 0
         return res
+
+    def setPoseFix(self, poses):
+        for joint in joints:
+            self.poseFix[joint] = poses[joint]
+
 
 class DTIndividualPropertyPhysicalBioloid(DTIndividualProperty):
     
@@ -57,6 +66,7 @@ class DTIndividualPropertyPhysicalBioloid(DTIndividualProperty):
         self.poseFix["L_Ankle_Pitch"] = 0
         self.poseFix["L_Elbow_Yaw"] = 0
         self.poseFix["L_Ankle_Roll"] = 0
+    
 
 class DTIndividualPropertyCMUDaz(DTIndividualProperty):
     

@@ -19,22 +19,11 @@
 
 import Communication
 
-SIM_HOST = 'localhost'
-SIM_PORT = 7777
-WRITE_DATA        = 0x03
-GOAL_POSITION_CMD = 0X1e
-MOVING_SPEED_CMD  = 0x20
-TURN_LED_CMD      = 0x19
-RESET_CMD         = 0x06
-PING_CMD          = 0x01
-READ_DATA = 0x02
-READ_PRESENT_POSITION_CMD = 0x24
-
-
 BROADCAST_ID      = 254
 
-from defs import Instruction
-from defs import Register
+from defs       import Instruction
+from defs       import Register
+from AXAngle    import AXAngle
 
 class Actuator:
 
@@ -83,20 +72,20 @@ class Actuator:
         msg = self.make_msg(id, Instruction.PING, [])
         self.communication.send_msg(msg)
 
-    '''def get_position(self, idMotor):
-        #Consulta la posicion del motor en un momento dado.
-        self.communication.flushInput()  # vacia el buffer de datos de entrada
-        msg = self.make_msg(idMotor, READ_DATA, [READ_PRESENT_POSITION_CMD, 0x02])  # parametros =[dir de memoria inicial, bytes a leer]
-        self.communication.send_msg(msg)  # efectua el pedido de lectura de la ID
-        aux = self.communication.read_msg(2)  # cuantos parametros espero, devuelve array
-        bit_Alto=ord(aux[0])
-        bit_Bajo=ord(aux[1])
-        bit_Alto= bit_Alto << 8
-        final = bit_Bajo + bit_Alto
-        return final    '''
+    def setear_id(self, newID):
+        msg = self.make_msg(BROADCAST_ID, Instruction.WRITE_DATA, [Register.ID, newID])
+        self.communication.send_msg(msg) 
 
     def get_position(self, id):
-        msg = self.make_msg(id, Instruction.READ_DATA, [Register.CURRENT_POSITION, 0x1])
-        self.communication.send_msg(msg)
+        AXposition = AXAngle()
+        self.communication.flushInput()  # to empty the data buffer
+        bytesToRead = 0x02
+        positionRequestMsg = self.make_msg(id, Instruction.READ_DATA, [Register.CURRENT_POSITION, bytesToRead])
+        self.communication.send_msg(positionRequestMsg)
         ret = self.communication.recv_msg()
-        return ret[3]
+        positionHighByte = ret[4]
+        positionHighByte = positionHighByte << 8
+        positionLowByte  = ret[3]
+        position = positionHighByte | positionLowByte
+        AXposition.setValue(position)
+        return AXposition

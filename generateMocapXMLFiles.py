@@ -28,14 +28,10 @@ from string import rstrip
 import os
 import glob
 import ntpath
-
 sysConf = LoadSystemConfiguration()
-
 BVHDir = os.getcwd() + sysConf.getDirectory("CMU mocap Files")
 XMLDir = os.getcwd() + sysConf.getDirectory("Transformed CMU mocap Files")
-
 robotConfiguration = LoadRobotConfiguration()
-
 
 for filename in glob.glob(os.path.join(BVHDir, '*.bvh')):
     print "transforming: " + filename + " ..."

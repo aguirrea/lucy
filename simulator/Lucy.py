@@ -28,6 +28,7 @@ from LoadSystemConfiguration        import LoadSystemConfiguration
 from datatypes.DTIndividualProperty import DTIndividualProperty, DTIndividualPropertyPhysicalBioloid
 from Communication                  import CommSerial
 import Actuator
+from AXAngle                        import AXAngle
 
 import os, threading, time
 
@@ -72,15 +73,21 @@ class PhysicalLucy(Lucy):
         self.defaultSpeed = 600 #TODO change this, use configuration files
         self.bioloidProperty = DTIndividualPropertyPhysicalBioloid()
 
+        poses = {}
         #checking communication with motors
         for joint in self.joints:
-            self.actuator.led_state_change(self.robotConfiguration.loadJointId(joint), 1)
-            print joint, self.actuator.get_position(self.robotConfiguration.loadJointId(joint))
-            time.sleep(1)
-        print "led on"
-        time.sleep(14)
+            jointID = self.robotConfiguration.loadJointId(joint)
+            print jointID
+            poses[joint] = self.actuator.get_position(jointID).toDegrees()
+            self.actuator.led_state_change(jointID, 1)
+        
+        time.sleep(1)
+        
         for joint in self.joints:
             self.actuator.led_state_change(self.robotConfiguration.loadJointId(joint), 0)
+
+        self.bioloidProperty.setPoseFix(poses)
+
         
     def executePose(self, pose):
         #set positions and wait that the actuator reaching that position
@@ -91,9 +98,11 @@ class PhysicalLucy(Lucy):
                 RobotImplementedJoints.append(joint)
         jointsQty = len(RobotImplementedJoints)
         for joint in RobotImplementedJoints:
-            angle = pose.getValue(joint)   
+            angle = pose.getValue(joint)
+            angleAX = AXAngle()   
+            angleAX.setDegreeValue(angle)
             #TODO implement method for setting position of all actuators at the same time
-            self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), int(angle), self.defaultSpeed)
+            self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), int(angleAX.toDegrees()), self.defaultSpeed)
         time.sleep(1)
 
     def stopLucy(self):
@@ -161,7 +170,7 @@ class SimulatedLucy(Lucy):
         time = self.getSimTime()
         distance = self.getSimDistance()
         #fitness = time + distance * time
-        fitness = distance * time
+        fitness = distance**2 * time
         if endFrameExecuted:
             fitness = fitness * 2
         return fitness
