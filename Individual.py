@@ -60,7 +60,7 @@ class Individual:
         for i in xrange(self.poseSize):
             for joint in self.robotImplementedJoints:
                 #print "i: ", i, "j: ", joint
-                value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint)
+                value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint) #TODO this can be a problem for the physical robot
                 self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]=value
     
     def stopLucy(self):
@@ -80,16 +80,23 @@ class Individual:
             for joint in self.robotConfig.getJointsName():
                 if not(self.property.avoidJoint(joint)):
                     value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]
-                    angleExecute.setDegreeValue(value)
-                    poseExecute[joint] = angleExecute.toVrep() 
+                    #angleExecute.setDegreeValue(value)
+                #else: # we need a zero value for the joint
+                #    value =  self.property.getPoseFix(joint)
+                #    angleExecute.setDegreeValue(value)
+                #poseExecute[joint] = angleExecute.toVrep() TODO think about it with physical robot
+                    #poseExecute[joint] = angleExecute.getValue()
+                    poseExecute[joint] = value
             i = i + 1  
             self.lucy.executePose(Pose(poseExecute))
         self.lucy.stopLucy()  #this function also updates time and distance
+        
         if i < self.poseSize:
             self.fitness = self.lucy.getFitness()
         else:
             endFrameExecuted = True
             self.fitness = self.lucy.getFitness(endFrameExecuted)
+
         print "fitness: ", self.fitness
         return self.fitness       
          

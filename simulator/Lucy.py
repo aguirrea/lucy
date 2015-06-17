@@ -46,6 +46,7 @@ class Lucy(object):
         self.startTime = time.time()
         self.distance = 0
         self.stop = False
+        self.poseExecuted = 0
 
     def getFitness(self, endFrameExecuted=False):
         pass
@@ -79,7 +80,10 @@ class PhysicalLucy(Lucy):
             jointID = self.robotConfiguration.loadJointId(joint)
             print jointID
             poses[joint] = self.actuator.get_position(jointID).toDegrees()
+            print jointID, joint, poses[joint]
+            time.sleep(0.1)
             self.actuator.led_state_change(jointID, 1)
+            time.sleep(0.1)
         
         time.sleep(1)
         
@@ -96,14 +100,14 @@ class PhysicalLucy(Lucy):
         for joint in self.joints:
             if joint not in dontSupportedJoints:
                 RobotImplementedJoints.append(joint)
-        jointsQty = len(RobotImplementedJoints)
         for joint in RobotImplementedJoints:
             angle = pose.getValue(joint)
             angleAX = AXAngle()   
             angleAX.setDegreeValue(angle)
             #TODO implement method for setting position of all actuators at the same time
-            self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), int(angleAX.toDegrees()), self.defaultSpeed)
-        time.sleep(1)
+            self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), int(angleAX.getValue()), self.defaultSpeed)
+            self.poseExecuted = self.poseExecuted + 1
+        time.sleep(3)
 
     def stopLucy(self):
         for joint in self.joints:
@@ -170,7 +174,8 @@ class SimulatedLucy(Lucy):
         time = self.getSimTime()
         distance = self.getSimDistance()
         #fitness = time + distance * time
-        fitness = distance**2 * time
+        #fitness = distance**2 * time
+        fitness = distance * self.poseExecuted
         if endFrameExecuted:
             fitness = fitness * 2
         return fitness
@@ -179,25 +184,35 @@ class SimulatedLucy(Lucy):
         error = False
         dontSupportedJoints = self.sysConf.getVrepNotImplementedBioloidJoints()
         RobotImplementedJoints = []
-        #Above's N joints will be received and set on the V-REP side at the same time'''
+        #Above's N joints will be received and set on the V-REP side at the same time
+
+        #TODO this must be checked in the simulator class
         if (self.jointHandleCachePopulated == False): 
             self.sim.populateJointHandleCache(self.clientID)
             self.jointHandleCachePopulated = True
+
         error = self.sim.pauseSim(self.clientID) or error
         for joint in self.joints:
             if joint not in dontSupportedJoints:
                 RobotImplementedJoints.append(joint)
+
         jointsQty = len(RobotImplementedJoints)
         jointExecutedCounter=0
         for joint in RobotImplementedJoints:
-            angle = pose.getValue(joint)    
+            angle = pose.getValue(joint) 
+            angleAX = AXAngle()   
+            angleAX.setDegreeValue(angle)   
+
             if jointExecutedCounter < jointsQty - 1:
-                error = self.sim.setJointPositionNonBlock(self.clientID, joint, angle) or error
+                error = self.sim.setJointPositionNonBlock(self.clientID, joint, angleAX.toVrep()) or error
             else:
                 error = self.sim.resumePauseSim(self.clientID) or error
-                error = self.sim.setJointPosition(self.clientID, joint, angle) or error
+                error = self.sim.setJointPosition(self.clientID, joint, angleAX.toVrep()) or error
+
             jointExecutedCounter = jointExecutedCounter + 1
+            
         self.updateLucyPosition()
+        self.poseExecuted = self.poseExecuted + 1
         #if error:
         #    raise VrepException("error excecuting a pose", error)
 
