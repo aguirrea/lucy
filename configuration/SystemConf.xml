@@ -61,6 +61,6 @@
 </Property>
 <Property>
     <Name>Lucy simulated?</Name>
-    <Value>0</Value>    
+    <Value>1</Value>    
 </Property>
 </System>

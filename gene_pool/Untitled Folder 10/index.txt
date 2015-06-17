@@ -1,0 +1,6 @@
+witn gaussian mutator
+initial population of 51
+with rank selector
+mutation rate 0,2
+elitism with selection of 1/3 population best individuals
+fitness=distance
