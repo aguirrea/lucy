@@ -51,9 +51,9 @@ geneticPoolDir = os.pardir+conf.getDirectory("Genetic Pool")
 arguments = len(sys.argv)
 
 def createIndividual(filename):
-    if int(self.sysConf.getProperty("Lucy simulated?"))==1:
+    if int(conf.getProperty("Lucy simulated?"))==1:
         walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
-    else
+    else:
         walk = Individual(physicalProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))    
     return walk
 
