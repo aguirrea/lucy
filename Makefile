@@ -25,4 +25,7 @@ env:
 	ln -s $(VREP_VERSION)/programming/remoteApiBindings/python/python/vrep.py .
 	ln -s $(VREP_VERSION)/V-REP_PRO_EDU_V3_2_1_64_Linux/programming/remoteApiBindings/python/python/vrepConst.py .
 	ln -s $(VREP_VERSION)/V-REP_PRO_EDU_V3_2_1_64_Linux/programming/remoteApiBindings/lib/lib/64Bit/remoteApi.so .
-
+	cd tests
+	ln -s ../vrep.py .
+	ln -s ../vrepConst.py .
+	ln -s ../remoteApi.so .
