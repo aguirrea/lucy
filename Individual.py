@@ -73,19 +73,12 @@ class Individual:
         else:
             self.lucy = PhysicalLucy()
    
-        angleExecute = AXAngle()
         poseExecute={}
         i=0
         while (self.lucy.isLucyUp() and i < self.poseSize):
             for joint in self.robotConfig.getJointsName():
                 if not(self.property.avoidJoint(joint)):
                     value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]
-                    #angleExecute.setDegreeValue(value)
-                #else: # we need a zero value for the joint
-                #    value =  self.property.getPoseFix(joint)
-                #    angleExecute.setDegreeValue(value)
-                #poseExecute[joint] = angleExecute.toVrep() TODO think about it with physical robot
-                    #poseExecute[joint] = angleExecute.getValue()
                     poseExecute[joint] = value
             i = i + 1  
             self.lucy.executePose(Pose(poseExecute))
