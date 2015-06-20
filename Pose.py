@@ -21,26 +21,7 @@
 import math
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
-#TODO find a better place for this chunk of code :P
-jointNullValue ={}
-jointNullValue["R_Ankle_Pitch"]=0
-jointNullValue["R_Shoulder_Pitch"]=0
-jointNullValue["L_Ankle_Pitch"]=0
-jointNullValue["R_Hip_Pitch"]=0
-jointNullValue["Hip_Pitch"]=0
-jointNullValue["L_Knee angle"]=166.119092703
-jointNullValue["L_Hip_Roll"]=0
-jointNullValue["R_Ankle_Roll"]=0
-jointNullValue["L_Ankle_Roll"]=0
-jointNullValue["L_Shoulder_Pitch"]=0
-jointNullValue["R_Hip_Yaw"]=0
-jointNullValue["R_Hip_Roll"]=0
-jointNullValue["R_Knee"]=166.534881592
-jointNullValue["L_Hip_Yaw"]=0
-jointNullValue["L_Elbow_Yaw"]=0
-jointNullValue["R_Elbow_Yaw"]=0
-jointNullValue["L_Shoulder_Yaw"]=0
-jointNullValue["R_Shoulder_Yaw"]=0
+REPOSE_JOINT_VALUE = 150
 
 class Pose:
 
@@ -49,7 +30,7 @@ class Pose:
         configuration = LoadRobotConfiguration()
         for joint in configuration.getJointsName():
             if joint not in self.value.keys():
-                self.value[joint]=jointNullValue[joint]
+                self.value[joint]=REPOSE_JOINT_VALUE
 
     def setValue(self, key, value):
         self.value[key] = value
@@ -58,7 +39,7 @@ class Pose:
         if key in self.value.keys():
             return self.value[key]
         else: #it can't happen
-            return jointNullValue 
+            return REPOSE_JOINT_VALUE 
 
     def diff(self, pose):
         diff = 0
