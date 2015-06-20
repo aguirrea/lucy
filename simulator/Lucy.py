@@ -72,15 +72,14 @@ class PhysicalLucy(Lucy):
         self.comm_tty.connect()
         self.actuator = Actuator.Actuator(self.comm_tty)
         self.defaultSpeed = 600 #TODO change this, use configuration files
-        self.bioloidProperty = DTIndividualPropertyPhysicalBioloid()
+        self.initialPoses = {}
 
-        poses = {}
         #checking communication with motors
         for joint in self.joints:
             jointID = self.robotConfiguration.loadJointId(joint)
             print jointID
-            poses[joint] = self.actuator.get_position(jointID).toDegrees()
-            print jointID, joint, poses[joint]
+            self.initialPoses[joint] = self.actuator.get_position(jointID).toDegrees()
+            print jointID, joint, self.initialPoses[joint]
             time.sleep(0.1)
             self.actuator.led_state_change(jointID, 1)
             time.sleep(0.1)
@@ -89,9 +88,6 @@ class PhysicalLucy(Lucy):
         
         for joint in self.joints:
             self.actuator.led_state_change(self.robotConfiguration.loadJointId(joint), 0)
-
-        self.bioloidProperty.setPoseFix(poses)
-
         
     def executePose(self, pose):
         #set positions and wait that the actuator reaching that position
@@ -111,7 +107,7 @@ class PhysicalLucy(Lucy):
 
     def stopLucy(self):
         for joint in self.joints:
-            self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), self.bioloidProperty.getPoseFix(joint), self.defaultSpeed)
+            self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), self.initialPoses[joint], self.defaultSpeed)
 
     def getFrame(self):
         error = False
@@ -210,7 +206,7 @@ class SimulatedLucy(Lucy):
                 error = self.sim.setJointPosition(self.clientID, joint, angleAX.toVrep()) or error
 
             jointExecutedCounter = jointExecutedCounter + 1
-            
+
         self.updateLucyPosition()
         self.poseExecuted = self.poseExecuted + 1
         #if error:
