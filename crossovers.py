@@ -19,27 +19,28 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import pyevolve.Util as Util
-from random import randint
+from random import randint as rand_randint, choice as rand_choice
 #todo implement the distance function
-def LucyXSinglePoint(genome, **args):
+def G2DListCrossoverSingleHPoint(genome, **args):
+   """ The crossover of G2DList, Single Horizontal Point """
+ 
    sister = None
    brother = None
    gMom = args["mom"]
    gDad = args["dad"]
 
-   mom_poses = gMom.num_poses()
-
-   cut = randint(0, mom_poses-1)
+   cut = rand_randint(1, gMom.getHeight() - 1)
 
    if args["count"] >= 1:
       sister = gMom.clone()
       sister.resetStats()
-      sister.poses[cut:] = gDad.poses[cut:]
+      for i in xrange(cut, sister.getHeight()):
+         sister[i][:] = gDad[i][:]
 
    if args["count"] == 2:
       brother = gDad.clone()
       brother.resetStats()
-      brother.polygons[cut:] = gMom.poses[cut:]
+      for i in xrange(cut, brother.getHeight()):
+         brother[i][:] = gMom[i][:]
 
    return (sister, brother)
-
