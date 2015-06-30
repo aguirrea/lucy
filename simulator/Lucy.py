@@ -171,9 +171,9 @@ class SimulatedLucy(Lucy):
         distance = self.getSimDistance()
         #fitness = time + distance * time
         #fitness = distance**2 * time
-        fitness = distance * self.poseExecuted
-        if endFrameExecuted:
-            fitness = fitness * 2
+        fitness = distance * self.poseExecuted/400
+        ##if endFrameExecuted:
+        ##    fitness = fitness * 2
         return fitness
 
     def executePose(self, pose):
