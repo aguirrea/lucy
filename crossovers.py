@@ -72,14 +72,9 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
       if frameDiff < minimalDiff and frameDiff>5: #avoid 
          minimalDiff = frameDiff
          minimalDiffPosition = position
-         print minimalDiffPosition, minimalDiff, gDad.getHeight()
    print "difference between poses: ", minimalDiff
 
    frame2 = gDad[minimalDiffPosition]
-
-   print "frame1", frame1
-
-   print "frame2", frame2
 
    sister = gMom.clone()
    brother = gDad.clone()
@@ -94,5 +89,78 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
       for i in xrange(minimalDiffPosition, sister.getHeight()):
          if i < brother.getHeight() and cut+(i-minimalDiffPosition) < gMom.getHeight():
             brother[i][:] = gMom[cut+(i-minimalDiffPosition)][:]
+
+   return (sister, brother)
+
+def G2DListCrossoverSingleNearHPointImprove(genome, **args):
+   """ The crossover of G2DList, Single Horizontal Point"""
+   
+   sister = None
+   brother = None
+   gMom = args["mom"]
+   gDad = args["dad"]
+   minimalDiff = 1000000
+   minimalDiffPosition = 0
+
+   cut = rand_randint(1, gMom.getHeight() - 1)
+   
+   frame1 = gMom[cut]
+
+   for position in range(gDad.getHeight()):
+      frameDiff = diff(frame1, gDad[position])
+      if frameDiff < minimalDiff and frameDiff>5: #avoid 
+         minimalDiff = frameDiff
+         minimalDiffPosition = position
+         print minimalDiffPosition, minimalDiff, gDad.getHeight()
+   print "difference between poses: ", minimalDiff
+
+   frame2 = gDad[minimalDiffPosition]
+
+   print "frame1", frame1
+
+   print "frame2", frame2
+
+   sister = gMom.clone()
+   brother = gDad.clone()
+   if args["count"] >= 1:
+      sister.resetStats()
+   
+      for i in xrange(minimalDiffPosition, brother.getHeight()):
+         if cut+(i-minimalDiffPosition) < sister.getHeight():
+            sister[cut+(i-minimalDiffPosition)][:] = gDad[i][:]
+
+      lastGene = cut + (brother.getHeight()-1) - minimalDiffPosition
+      if lastGene < sister.getHeight():
+         frame1 = sister[lastGene]
+
+      for position in range(gDad.getHeight()):
+         frameDiff = diff(frame1, gDad[position])
+         if frameDiff < minimalDiff and frameDiff>5: #avoid 
+            minimalDiff = frameDiff
+            minimalDiffPosition = position
+
+         for i in xrange(lastGene, sister.getHeight()):
+            if minimalDiffPosition+lastGene-i < gMom.getHeight():
+               sister[i][:] = gMom[minimalDiffPosition+lastGene-i]
+
+   if args["count"] == 2:
+      brother.resetStats()
+      for i in xrange(minimalDiffPosition, sister.getHeight()):
+         if i < brother.getHeight() and cut+(i-minimalDiffPosition) < gMom.getHeight():
+            brother[i][:] = gMom[cut+(i-minimalDiffPosition)][:]
+
+      lastGene = cut + (sister.getHeight()-1) - minimalDiffPosition
+      if lastGene < brother.getHeight():
+         frame1 = brother[lastGene]
+
+      for position in range(gMom.getHeight()):
+         frameDiff = diff(frame1, gMom[position])
+         if frameDiff < minimalDiff and frameDiff>5: #avoid 
+            minimalDiff = frameDiff
+            minimalDiffPosition = position
+
+         for i in xrange(lastGene, brother.getHeight()):
+            if minimalDiffPosition+lastGene-i < gDad.getHeight():
+               brother[i][:] = gDad[minimalDiffPosition+lastGene-i]
 
    return (sister, brother)
