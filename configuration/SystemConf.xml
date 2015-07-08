@@ -63,4 +63,8 @@
     <Name>Lucy simulated?</Name>
     <Value>1</Value>    
 </Property>
+<Property>
+    <Name>Individual frames quantity</Name>
+    <Value>400</Value>    
+</Property>
 </System>
