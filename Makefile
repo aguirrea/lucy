@@ -20,12 +20,14 @@ VREP_VERSION = V-REP_PRO_EDU_V3_2_1_64_Linux
 VREP_URL = http://coppeliarobotics.com/$(VREP_VERSION).tar.gz
 
 env: 
-	wget $(VREP_URL)
-	tar zxvf V-REP_PRO_EDU*
+	#wget $(VREP_URL)
+	#rm -rf $(VREP_VERSION)
+	#tar zxvf V-REP_PRO_EDU*
+	rm -f vrep.py vrepConst.py remoteApi.so
+	rm -f tests/vrep.py tests/vrepConst.py tests/remoteApi.so
 	ln -s $(VREP_VERSION)/programming/remoteApiBindings/python/python/vrep.py .
-	ln -s $(VREP_VERSION)/V-REP_PRO_EDU_V3_2_1_64_Linux/programming/remoteApiBindings/python/python/vrepConst.py .
-	ln -s $(VREP_VERSION)/V-REP_PRO_EDU_V3_2_1_64_Linux/programming/remoteApiBindings/lib/lib/64Bit/remoteApi.so .
-	cd tests
-	ln -s ../vrep.py .
-	ln -s ../vrepConst.py .
-	ln -s ../remoteApi.so .
+	ln -s $(VREP_VERSION)/programming/remoteApiBindings/python/python/vrepConst.py .
+	ln -s $(VREP_VERSION)/programming/remoteApiBindings/lib/lib/64Bit/remoteApi.so .
+	ln -s ../vrep.py ./tests 
+	ln -s ../vrepConst.py ./tests
+	ln -s ../remoteApi.so ./tests
