@@ -1,0 +1,19 @@
+Gen. 80 (100.00%): Max/Min/Avg Fitness(Raw) [0.81(0.95)/0.42(0.17)/0.68(0.68)]
+Total time elapsed: 87698.457 seconds.
+- Statistics
+        Minimum raw score                             = 0.17
+        Fitness average                               = 0.68
+        Minimum fitness                               = 0.42
+        Raw scores variance                           = 0.04
+        Standard deviation of raw scores              = 0.19
+        Average of raw scores                         = 0.68
+        Maximum fitness                               = 0.81
+        Maximum raw score                             = 0.95
+
+initial pop 51
+custom crossover v0.1
+fitness = distance * self.poseExecuted/400
+ga.setMutationRate(0.1)
+genome.mutator.set(Mutators.G2DListMutatorRealGaussian
+ga.setCrossoverRate(0.9) 
+
