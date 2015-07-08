@@ -169,11 +169,15 @@ class SimulatedLucy(Lucy):
         #print "time ", self.getSimTime(), "distance ", self.getSimDistance()
         time = self.getSimTime()
         distance = self.getSimDistance()
+        print "distance traveled: ", distance
         #fitness = time + distance * time
         #fitness = distance**2 * time
-        fitness = distance * self.poseExecuted/400
-        ##if endFrameExecuted:
-        ##    fitness = fitness * 2
+        #fitness = distance * self.poseExecuted
+        #print "distance: ", distance, "poseExecuted: ", self.poseExecuted
+        framesQty = int(self.sysConf.getProperty("Individual frames quantity")) 
+        fitness = distance * self.poseExecuted/(framesQty+1) #the poseExecuted/framesQty+1 is always lower than 1 allowing easy normailization, I have to do the same with the distance
+        #if endFrameExecuted:
+            #fitness = fitness * 2
         return fitness
 
     def executePose(self, pose):
