@@ -36,6 +36,7 @@ from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 import time
 import os
 import glob
+import crossovers
 
 initialPopulationSetted = False
 gaEngine = None
@@ -74,7 +75,7 @@ def setInitialPopulation (ga_engine):
 #            print 'inserting individual: ' + filename + " into the initial population"
 #            walk = Individual(propVanilla, DTIndividualGeneticTimeSerieFile(filename))
 #            geneticMatrix = walk.getGenomeMatrix()
-#            if individualCounter < popSize:
+#            if individualCounter < popSize-1:
 #                adan = population[individualCounter]
 #                for i in xrange(adan.getHeight()):
 #                    if i == len(geneticMatrix):
@@ -92,7 +93,7 @@ def setInitialPopulation (ga_engine):
             print 'inserting individual: ' + filename + " into the initial population"
             walk = Individual(prop, DTIndividualGeneticTimeSerieFile(filename))
             geneticMatrix = walk.getGenomeMatrix()
-            if individualCounter < popSize:
+            if individualCounter < popSize-1:
                 adan = population[individualCounter]
                 for i in xrange(adan.getHeight()):
                     if i == len(geneticMatrix):
@@ -107,6 +108,10 @@ def setInitialPopulation (ga_engine):
     global initialPopulationSetted
     initialPopulationSetted = True
 
+def chromosomeToLucyGeneticMatrix(chromosome):
+    geneticMatrix = [[chromosome[i][j] for j in xrange(chromosome.getWidth())] for i in xrange(chromosome.getHeight())] #debería pedir solo los joints implementados
+    return geneticMatrix
+
 def generationCallback(ga_engine):
     # persist best individual at the moment
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
@@ -120,16 +125,13 @@ def generationCallback(ga_engine):
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
     bestIndividual.persist(geneticPoolDir + filename)
     ga_engine.getDBAdapter().commit()
+
     ##population = ga_engine.getPopulation()
     ##averagePopulation = getPopulationAverage(population)
     #averageGeneration = getPopulationAverage(gen)
     ##print "current population raw score average: ", averagePopulation
     #print "current generation raw score average: ", averageGeneration
     return False
-
-def chromosomeToLucyGeneticMatrix(chromosome):
-    geneticMatrix = [[chromosome[i][j] for j in xrange(chromosome.getWidth())] for i in xrange(chromosome.getHeight())] #debería pedir solo los joints implementados
-    return geneticMatrix
 
 # This function is the evaluation function
 def eval_func(chromosome):
@@ -148,27 +150,36 @@ def ConvergenceCriteria(ga_engine):
 
 def run_main():
     initialPopulationSize = 51
-    generations = 1500
+    generations = 806
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
-    genome = G2DList.G2DList(400, 18)
+    framesQty = int(conf.getProperty("Individual frames quantity"))
+    genome = G2DList.G2DList(framesQty, 18)
     genome.setParams(rangemin=0, rangemax=360)
 
     # The evaluator function (objective function)
     genome.evaluator.set(eval_func)
-    genome.crossover.set(Crossovers.G2DListCrossoverSingleHPoint)
-    #genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
-    genome.mutator.set(Mutators.G2DListMutatorIntegerGaussian)
-
+    genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
+    #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPointImprove)
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
     ga.setGenerations(generations)    #TODO class atribute
     ga.setPopulationSize(initialPopulationSize) #TODO class atribute
-    ga.setMutationRate(0.2)
+
+    #genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
+    genome.mutator.set(Mutators.G2DListMutatorRealGaussian)
+    #genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
+    ga.setMutationRate(0.1)
+    
     ga.selector.set(Selectors.GRankSelector)
+    '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation. 
+    While the rest of population...maybe by previous selection or you can define it as best fit survivors'''
+    ga.setCrossoverRate(0.9) 
+    
     #ga.selector.set(Selectors.GTournamentSelector)
     #ga.selector.set(Selectors.GRouletteWheel)
     ga.setElitism(True)
+    '''Set the number of best individuals to copy to the next generation on the elitism'''
     ga.setElitismReplacement(initialPopulationSize/3)
     #ga.terminationCriteria.set(ConvergenceCriteria)
 
@@ -196,9 +207,17 @@ def run_main():
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
     geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
     bestIndividual.persist(geneticPoolDir + filename)
-    
-    #TODO store all the population, not only the fitest
 
+    #store all the final population, not only the fitest
+    population = ga.getPopulation()
+    popSize = len(population)
+    for pos in range(popSize):
+        individual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(population[pos])))
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        filename = timestr + "-final" + str(pos) + ".xml"
+        individual.persist(geneticPoolDir + filename)
+
+    #do the stats    
     print ga.getStatistics()
 
 if __name__ == "__main__":
