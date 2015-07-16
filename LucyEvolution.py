@@ -229,7 +229,9 @@ def run_main():
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
     geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
-    bestIndividual.persist(geneticPoolDir + filename)
+    experimentDir = geneticPoolDir+timestr
+    os.mkdir(experimentDir)
+    bestIndividual.persist(experimentDir + filename)
 
     #store all the final population, not only the fitest
     population = ga.getPopulation()
@@ -238,7 +240,7 @@ def run_main():
         individual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(population[pos])))
         timestr = time.strftime("%Y%m%d-%H%M%S")
         filename = timestr + "-final" + str(pos) + ".xml"
-        individual.persist(geneticPoolDir + filename)
+        individual.persist(experimentDir + filename)
 
     #do the stats    
     print ga.getStatistics()
