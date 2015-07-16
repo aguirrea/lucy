@@ -150,7 +150,7 @@ def ConvergenceCriteria(ga_engine):
 
 def run_main():
     initialPopulationSize = 51
-    generations = 806
+    generations = 100
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
     framesQty = int(conf.getProperty("Individual frames quantity"))
@@ -159,8 +159,11 @@ def run_main():
 
     # The evaluator function (objective function)
     genome.evaluator.set(eval_func)
-    genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
+    #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
     #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPointImprove)
+    #genome.crossover.set(Crossovers.G2DListCrossoverSingleHPoint)
+    genome.crossover.set(crossovers.G2DListCrossoverSingleHPoint)
+
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
     ga.setGenerations(generations)    #TODO class atribute
@@ -171,7 +174,9 @@ def run_main():
     #genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
     ga.setMutationRate(0.1)
     
-    ga.selector.set(Selectors.GRankSelector)
+    #ga.selector.set(Selectors.GRankSelector)
+    ga.selector.set(Selectors.GTournamentSelector)
+    #ga.selector.set(Selectors.GRouletteWheel)
     '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation. 
     While the rest of population...maybe by previous selection or you can define it as best fit survivors'''
     ga.setCrossoverRate(0.9) 
@@ -180,7 +185,7 @@ def run_main():
     #ga.selector.set(Selectors.GRouletteWheel)
     ga.setElitism(True)
     '''Set the number of best individuals to copy to the next generation on the elitism'''
-    ga.setElitismReplacement(initialPopulationSize/3)
+    ga.setElitismReplacement(initialPopulationSize/2)
     #ga.terminationCriteria.set(ConvergenceCriteria)
 
     # Create DB Adapter and set as adapter
