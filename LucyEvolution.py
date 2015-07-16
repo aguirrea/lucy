@@ -151,12 +151,18 @@ def generationCallback(ga_engine):
 
 # This function is the evaluation function
 def eval_func(chromosome):
+    FITNESS_AVERAGE_ITERATIONS = 3
     if not initialPopulationSetted:
         setInitialPopulation(gaEngine)    
     #prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     prop = DTIndividualPropertyVanillaEvolutive()
     individual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome)))
     fitness = individual.execute() #return the fitness resulting from the simulator execution
+    #if we reach the fittest a average of FITNESS_AVERAGE_ITERATIONS executions is calculated as fitness to avoid the stocastic situation
+    if fitness > max_score:
+        for i in range(FITNESS_AVERAGE_ITERATIONS-1):
+            fitness = fitness + individual.execute()
+        fitness = fitness/FITNESS_AVERAGE_ITERATIONS
     return fitness
 
 # This function is the termination criteria for the algorithm
