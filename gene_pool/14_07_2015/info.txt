@@ -6,5 +6,5 @@ mutationRate = 0.1
 selector = GRouletteWheel
 crossoverRate = 0.9
 elitismReplacement = initialPopulationSize/2
-operador de cruzamiento G2DListCrossoverSingleHPoint pyevolve 0.6rc1
+crossover operator G2DListCrossoverSingleHPoint pyevolve 0.6rc1
 
