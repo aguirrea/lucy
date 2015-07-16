@@ -40,6 +40,12 @@ import crossovers
 
 initialPopulationSetted = False
 gaEngine = None
+NUMBER_GENERATIONS_CONVERGENCE_CRITERIA = 20
+max_score = 0
+max_score_generation = 0
+convergenceCriteria = False
+
+
 
 def getPopulationAverage(population):
     average = 0
@@ -68,25 +74,25 @@ def setInitialPopulation (ga_engine):
     popSize = len(population)
 
     individualCounter = 0
-    
-#    if individualCounter < popSize:
-#        for filename in glob.glob(os.path.join(GAwalkDir, '*.xml')):
-#            print individualCounter, " individuals processed!"
-#            print 'inserting individual: ' + filename + " into the initial population"
-#            walk = Individual(propVanilla, DTIndividualGeneticTimeSerieFile(filename))
-#            geneticMatrix = walk.getGenomeMatrix()
-#            if individualCounter < popSize-1:
-#                adan = population[individualCounter]
-#                for i in xrange(adan.getHeight()):
-#                    if i == len(geneticMatrix):
-#                            break
-#                    for j in xrange(adan.getWidth()):
-#                        adan.setItem(i,j,geneticMatrix[i][j])
-#                population[individualCounter]=adan
-#                individualCounter = individualCounter + 1
-#            else:
-#                break
-        
+    '''
+    if individualCounter < popSize:
+        for filename in glob.glob(os.path.join(GAwalkDir, '*.xml')):
+            print individualCounter, " individuals processed!"
+            print 'inserting individual: ' + filename + " into the initial population"
+            walk = Individual(propVanilla, DTIndividualGeneticTimeSerieFile(filename))
+            geneticMatrix = walk.getGenomeMatrix()
+            if individualCounter < popSize-1:
+                adan = population[individualCounter]
+                for i in xrange(adan.getHeight()):
+                    if i == len(geneticMatrix):
+                            break
+                    for j in xrange(adan.getWidth()):
+                        adan.setItem(i,j,geneticMatrix[i][j])
+                population[individualCounter]=adan
+                individualCounter = individualCounter + 1
+            else:
+                break
+    '''    
     if individualCounter < popSize:
         for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
             print individualCounter, " individuals processed!"
@@ -119,6 +125,16 @@ def generationCallback(ga_engine):
     gen = ga_engine.getCurrentGeneration()
     best = ga_engine.bestIndividual()
     score = best.getRawScore()
+
+    #check if the convergence criteria has been reached
+    global max_score, max_score_generation, convergenceCriteria
+    if score > max_score:
+        max_score = score
+        max_score_generation = gen
+    else:
+        if gen - max_score > NUMBER_GENERATIONS_CONVERGENCE_CRITERIA:
+            convergenceCriteria = True
+
     timestr = time.strftime("%Y%m%d-%H%M%S")
     filename = str(score) + "-" + timestr + "-" + str(gen) + ".xml"
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
@@ -145,12 +161,12 @@ def eval_func(chromosome):
 
 # This function is the termination criteria for the algorithm
 def ConvergenceCriteria(ga_engine):
-   pop = ga_engine.getPopulation()
-   return pop[0] == pop[len(pop)-1]
+    global convergenceCriteria
+    return convergenceCriteria
 
 def run_main():
     initialPopulationSize = 51
-    generations = 100
+    generations = 90
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
     framesQty = int(conf.getProperty("Individual frames quantity"))
@@ -159,11 +175,8 @@ def run_main():
 
     # The evaluator function (objective function)
     genome.evaluator.set(eval_func)
-    #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
+    genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
     #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPointImprove)
-    #genome.crossover.set(Crossovers.G2DListCrossoverSingleHPoint)
-    genome.crossover.set(crossovers.G2DListCrossoverSingleHPoint)
-
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
     ga.setGenerations(generations)    #TODO class atribute
@@ -176,7 +189,6 @@ def run_main():
     
     #ga.selector.set(Selectors.GRankSelector)
     ga.selector.set(Selectors.GTournamentSelector)
-    #ga.selector.set(Selectors.GRouletteWheel)
     '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation. 
     While the rest of population...maybe by previous selection or you can define it as best fit survivors'''
     ga.setCrossoverRate(0.9) 
@@ -186,7 +198,7 @@ def run_main():
     ga.setElitism(True)
     '''Set the number of best individuals to copy to the next generation on the elitism'''
     ga.setElitismReplacement(initialPopulationSize/2)
-    #ga.terminationCriteria.set(ConvergenceCriteria)
+    ga.terminationCriteria.set(ConvergenceCriteria)
 
     # Create DB Adapter and set as adapter
     sqlite_adapter = DBAdapters.DBSQLite(identify="Lucy walk", resetDB=True)
