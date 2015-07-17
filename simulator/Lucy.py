@@ -240,9 +240,16 @@ class SimulatedLucy(Lucy):
     def updateLucyPosition(self):
         if self.stop == False: 
             self.time = time.time() - self.startTime
-            errorPosition, x, y = self.sim.getBioloidPlannarPosition(self.clientID) 
+            errorPosition, x, y = self.sim.getBioloidPlannarPosition(self.clientID)
+            #print "x_position: ", x, "y_position: ", y 
             if self.startPosSetted and not errorPosition:
-                self.distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
+                #self.distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
+                distToGoal = math.sqrt((x-1)**2 + (y-0)**2)
+                distToGoal = 1 - distToGoal
+                if distToGoal < 0 :
+                    self.distance = 0
+                else: 
+                    self.distance = distToGoal
             
     def stopLucy(self):
         self.stop = True
