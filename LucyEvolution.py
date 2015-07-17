@@ -44,7 +44,7 @@ NUMBER_GENERATIONS_CONVERGENCE_CRITERIA = 20
 max_score = 0
 max_score_generation = 0
 convergenceCriteria = False
-
+experimentDir = ""
 
 
 def getPopulationAverage(population):
@@ -137,11 +137,13 @@ def generationCallback(ga_engine):
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
     filename = str(score) + "-" + timestr + "-" + str(gen) + ".xml"
-    experimentDir = geneticPoolDir+timestr
-    os.mkdir(experimentDir)
+    if gen == 0:
+        global experimentDir
+        experimentDir = geneticPoolDir + timestr
+        os.mkdir(experimentDir)
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
-    bestIndividual.persist(geneticPoolDir + experimentDir + filename)
+    bestIndividual.persist(os.path.join(experimentDir, filename))
     ga_engine.getDBAdapter().commit()
 
     ##population = ga_engine.getPopulation()
@@ -173,8 +175,8 @@ def ConvergenceCriteria(ga_engine):
     return convergenceCriteria
 
 def run_main():
-    initialPopulationSize = 51
-    generations = 100
+    initialPopulationSize = 4
+    generations = 600
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
     framesQty = int(conf.getProperty("Individual frames quantity"))
@@ -230,8 +232,8 @@ def run_main():
     filename = str(score) + "-" + timestr + "-" + str(generations) + ".xml"
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
-    geneticPoolDir = os.getcwd() + conf.getDirectory("Genetic Pool")
-    experimentDir = geneticPoolDir + timestr
+    #geneticPoolDir = os.getcwd() + conf.getDirectory("Genetic Pool")
+    #experimentDir = geneticPoolDir + timestr
     bestIndividual.persist(experimentDir + filename)
 
     #store all the final population, not only the fitest
