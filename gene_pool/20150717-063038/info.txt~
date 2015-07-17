@@ -14,7 +14,7 @@ population size = 51
 mutator = G2DListMutatorRealGaussian
 fitness = distance_to_1meter_above * (poses_executed/cant_poses+1)
 mutationRate = 0.1
-selector = GTournamentSelector
+selector = GRouletteWheel
 crossoverRate = 0.9
 elitismReplacement = initialPopulationSize/2
 crossover operator G2DListCrossoverSingleNearHPoint v0.1
