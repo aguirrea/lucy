@@ -137,9 +137,11 @@ def generationCallback(ga_engine):
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
     filename = str(score) + "-" + timestr + "-" + str(gen) + ".xml"
+    experimentDir = geneticPoolDir+timestr
+    os.mkdir(experimentDir)
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
-    bestIndividual.persist(geneticPoolDir + filename)
+    bestIndividual.persist(geneticPoolDir + experimentDir + filename)
     ga_engine.getDBAdapter().commit()
 
     ##population = ga_engine.getPopulation()
@@ -172,7 +174,7 @@ def ConvergenceCriteria(ga_engine):
 
 def run_main():
     initialPopulationSize = 51
-    generations = 90
+    generations = 100
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
     framesQty = int(conf.getProperty("Individual frames quantity"))
@@ -204,7 +206,7 @@ def run_main():
     ga.setElitism(True)
     '''Set the number of best individuals to copy to the next generation on the elitism'''
     ga.setElitismReplacement(initialPopulationSize/2)
-    ga.terminationCriteria.set(ConvergenceCriteria)
+    #ga.terminationCriteria.set(ConvergenceCriteria)
 
     # Create DB Adapter and set as adapter
     sqlite_adapter = DBAdapters.DBSQLite(identify="Lucy walk", resetDB=True)
@@ -228,9 +230,8 @@ def run_main():
     filename = str(score) + "-" + timestr + "-" + str(generations) + ".xml"
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
-    geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
-    experimentDir = geneticPoolDir+timestr
-    os.mkdir(experimentDir)
+    geneticPoolDir = os.getcwd() + conf.getDirectory("Genetic Pool")
+    experimentDir = geneticPoolDir + timestr
     bestIndividual.persist(experimentDir + filename)
 
     #store all the final population, not only the fitest
