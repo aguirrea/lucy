@@ -66,6 +66,5 @@ else:
     for filename in glob.glob(os.path.join(geneticPoolDir, '*.xml')):
         print 'executing individual: ' + filename
         walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(filename))
-
-walk.execute()
+        walk.execute()
 
