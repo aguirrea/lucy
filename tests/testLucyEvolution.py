@@ -62,6 +62,7 @@ if arguments > 1:
     for filename in files:
         print 'executing individual: ' + filename
         walk = createIndividual(filename)
+        walk.execute()
 else:
     for filename in glob.glob(os.path.join(geneticPoolDir, '*.xml')):
         print 'executing individual: ' + filename
