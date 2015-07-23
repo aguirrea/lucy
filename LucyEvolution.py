@@ -37,6 +37,7 @@ import time
 import os
 import glob
 import crossovers
+import shutil
 
 initialPopulationSetted = False
 gaEngine = None
@@ -175,8 +176,8 @@ def ConvergenceCriteria(ga_engine):
     return convergenceCriteria
 
 def run_main():
-    initialPopulationSize = 4
-    generations = 600
+    initialPopulationSize = 15
+    generations = 1200
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
     framesQty = int(conf.getProperty("Individual frames quantity"))
@@ -185,8 +186,9 @@ def run_main():
 
     # The evaluator function (objective function)
     genome.evaluator.set(eval_func)
-    genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
+    #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
     #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPointImprove)
+    genome.crossover.set(crossovers.G2DListCrossoverSingleHPoint)
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
     ga.setGenerations(generations)    #TODO class atribute
@@ -195,7 +197,7 @@ def run_main():
     #genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
     genome.mutator.set(Mutators.G2DListMutatorRealGaussian)
     #genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
-    ga.setMutationRate(0.1)
+    ga.setMutationRate(0.3)
     
     #ga.selector.set(Selectors.GRankSelector)
     ga.selector.set(Selectors.GTournamentSelector)
@@ -234,7 +236,7 @@ def run_main():
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
     #geneticPoolDir = os.getcwd() + conf.getDirectory("Genetic Pool")
     #experimentDir = geneticPoolDir + timestr
-    bestIndividual.persist(experimentDir + filename)
+    bestIndividual.persist(os.path.join(experimentDir,filename))
 
     #store all the final population, not only the fitest
     population = ga.getPopulation()
@@ -243,7 +245,10 @@ def run_main():
         individual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(population[pos])))
         timestr = time.strftime("%Y%m%d-%H%M%S")
         filename = timestr + "-final" + str(pos) + ".xml"
-        individual.persist(experimentDir + filename)
+        individual.persist(os.path.join(experimentDir, filename))
+    
+    shutil.copy2('pyevolve.db', experimentDir)
+
 
     #do the stats    
     print ga.getStatistics()
