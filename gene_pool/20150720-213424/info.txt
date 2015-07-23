@@ -1,0 +1,8 @@
+generations = 1200
+initialPopulationSize = 15
+G2DListMutatorRealGaussian
+MutationRate = 0.3
+CrossoverRate = 0.9 
+ElitismReplacement = initialPopulationSize/2
+crossover operator = CrossoverSingleNearHPoint
+fitness = distance to point 1, 0 * poses_executed/poses+1

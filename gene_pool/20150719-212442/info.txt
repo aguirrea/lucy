@@ -1,0 +1,14 @@
+Gen. 600 (100.00%): Max/Min/Avg Fitness(Raw) [0.17(0.27)/0.11(0.02)/0.15(0.15)]
+Total time elapsed: 48329.492 seconds.
+- Statistics
+        Minimum raw score                             = 0.02
+        Fitness average                               = 0.15
+        Minimum fitness                               = 0.11
+        Raw scores variance                           = 0.01
+        Standard deviation of raw scores              = 0.11
+        Average of raw scores                         = 0.15
+        Maximum fitness                               = 0.17
+        Maximum raw score                             = 0.27
+
+andres@artemis:~/code/lucy$ Simulator ended.
+
