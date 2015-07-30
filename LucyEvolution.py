@@ -165,8 +165,11 @@ def eval_func(chromosome):
     fitness = individual.execute() #return the fitness resulting from the simulator execution
     #if we reach the fittest a average of FITNESS_AVERAGE_ITERATIONS executions is calculated as fitness to avoid the stocastic situation
     if fitness > max_score:
+        print "best fitness", fitness
         for i in range(FITNESS_AVERAGE_ITERATIONS-1):
-            fitness = fitness + individual.execute()
+            testerIndividual = individual.execute()
+            print "new candidate fitness", testerIndividual
+            fitness = fitness + testerIndividual
         fitness = fitness/FITNESS_AVERAGE_ITERATIONS
     return fitness
 
@@ -186,9 +189,9 @@ def run_main():
 
     # The evaluator function (objective function)
     genome.evaluator.set(eval_func)
-    #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
+    genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
     #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPointImprove)
-    genome.crossover.set(crossovers.G2DListCrossoverSingleHPoint)
+    #genome.crossover.set(crossovers.G2DListCrossoverSingleHPoint)
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
     ga.setGenerations(generations)    #TODO class atribute
@@ -209,7 +212,7 @@ def run_main():
     #ga.selector.set(Selectors.GRouletteWheel)
     ga.setElitism(True)
     '''Set the number of best individuals to copy to the next generation on the elitism'''
-    ga.setElitismReplacement(initialPopulationSize/2)
+    ga.setElitismReplacement(initialPopulationSize/3)
     #ga.terminationCriteria.set(ConvergenceCriteria)
 
     # Create DB Adapter and set as adapter
