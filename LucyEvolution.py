@@ -179,8 +179,8 @@ def ConvergenceCriteria(ga_engine):
     return convergenceCriteria
 
 def run_main():
-    initialPopulationSize = 15
-    generations = 1200
+    initialPopulationSize = 50
+    generations = 600
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
     framesQty = int(conf.getProperty("Individual frames quantity"))
