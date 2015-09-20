@@ -1,0 +1,23 @@
+Gen. 600 (100.00%): Max/Min/Avg Fitness(Raw) [0.06(0.14)/0.05(0.00)/0.05(0.05)]
+Total time elapsed: 156039.340 seconds.
+- Statistics
+        Minimum raw score                             = 0.00
+        Fitness average                               = 0.05
+        Minimum fitness                               = 0.05
+        Raw scores variance                           = 0.00
+        Standard deviation of raw scores              = 0.05
+        Average of raw scores                         = 0.05
+        Maximum fitness                               = 0.06
+        Maximum raw score                             = 0.14
+
+
+
+population size = 50 (FIXED simetry bug in initial pop)
+mutator = G2DListMutatorRealGaussian
+fitness = distance_to_1meter_above * (poses_executed/cant_poses+1)
+mutationRate = 0.3
+selector = GTournamentSelector
+crossoverRate = 0.9
+elitismReplacement = initialPopulationSize/3
+crossover operator G2DListCrossoverSingleNearHPoint v0.1
+
