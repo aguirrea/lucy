@@ -3,7 +3,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 #
-# Execution of the best individuals 
+# Execution of individuals resulted from the evolution experiment
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ arguments = len(sys.argv)
 
 def createIndividual(filename):
     if int(conf.getProperty("Lucy simulated?"))==1:
-        walk = Individual(propCMUDaz, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
+        walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
     else:
         walk = Individual(physicalProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))    
     return walk
