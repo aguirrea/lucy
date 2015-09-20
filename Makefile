@@ -1,7 +1,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 #
-# Makefile for Lucy
+# Makefile for setting V-REP enviroment required for Lucy
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-VREP_VERSION = V-REP_PRO_EDU_V3_2_1_64_Linux
+VREP_VERSION = V-REP_PRO_EDU_V3_2_2_64_Linux
 VREP_URL = http://coppeliarobotics.com/$(VREP_VERSION).tar.gz
 
 env: 
