@@ -27,7 +27,7 @@ from LoadSystemConfiguration import LoadSystemConfiguration
 
 bulletEngine = 0
 odeEngine    = 1
-simulationTimeStepDT = 0.060
+simulationTimeStepDT = 0.020
 _instance    = None
 class Simulator:
 
@@ -91,7 +91,7 @@ class Simulator:
 
     def startSim(self, clientID, screen=True):
         vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_dynamic_engine,bulletEngine ,vrep.simx_opmode_oneshot_wait)
-        #vrep.simxSetFloatingParameter(clientID,vrep.sim_floatparam_simulation_time_step, simulationTimeStepDT, vrep.simx_opmode_oneshot_wait)
+        vrep.simxSetFloatingParameter(clientID,vrep.sim_floatparam_simulation_time_step, simulationTimeStepDT, vrep.simx_opmode_oneshot_wait)
         #vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_realtime_simulation,1,vrep.simx_opmode_oneshot_wait)
         error=vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot)
         if not screen:
