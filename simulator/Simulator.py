@@ -97,6 +97,7 @@ class Simulator:
         if not screen:
             vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_visible_layers,2,vrep.simx_opmode_oneshot_wait)
             #vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
+        vrep.simxSynchronous(clientID,True)
         return error
         
     def pauseSim(self, clientID):
@@ -120,6 +121,7 @@ class Simulator:
             error = errorGetObjetHandle or error
             self.jointHandleMapping[joint]=handle
         error = error or vrep.simxSetJointPosition(clientID,handle,angle,vrep.simx_opmode_oneshot_wait)
+        vrep.simxSynchronousTrigger(clientID)
         return error
     
     def setJointPositionNonBlock(self, clientID, joint, angle):
@@ -129,6 +131,8 @@ class Simulator:
             error, handle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot)
             self.jointHandleMapping[joint]=handle
         vrep.simxSetJointPosition(clientID,handle,angle,vrep.simx_opmode_streaming)
+        vrep.simxSynchronousTrigger(clientID)
+        #return error TODO?
         
     def getJointPositionNonBlock(self, clientID, joint, firstTime):
         error = False
@@ -151,6 +155,7 @@ class Simulator:
         error=errorStop or errorClose
         errorFinish=vrep.simxFinish(clientID)
         error=error or errorFinish
+        vrep.simxSynchronous(clientID,False)
         return error
         
     def getBioloidPlannarPosition(self, clientID):
