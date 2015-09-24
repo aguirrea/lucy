@@ -48,7 +48,8 @@ class Simulator:
             self.synchronous = True
         else:
             self.synchronous = False
-
+        self.speedmodifier = int(self.sysConf.getProperty("speedmodifier"))
+            
     def getInstance(self, simulatorModel):
         global _instance
         if _instance is None:
@@ -92,14 +93,13 @@ class Simulator:
         error = False
         error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait) or error
         error, bioloid_position = self.getObjectPositionWrapper(clientID, LSP_Handle) or error 
-        if self.synchronous:
-            vrep.simxSynchronousTrigger(clientID)
         return error, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD"))
 
     def startSim(self, clientID, screen=True):
         vrep.simxSetIntegerParameter(clientID, vrep.sim_intparam_dynamic_engine, bulletEngine, vrep.simx_opmode_oneshot_wait)
-        vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_speedmodifier, 4, vrep.simx_opmode_oneshot_wait) # skip 3 out of 4 simulation frame display
-        vrep.simxSetFloatingParameter(clientID,vrep.sim_floatparam_simulation_time_step, simulationTimeStepDT, vrep.simx_opmode_oneshot_wait)
+        if self.speedmodifier > 0:
+            vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_speedmodifier, self.speedmodifier, vrep.simx_opmode_oneshot_wait) 
+        #vrep.simxSetFloatingParameter(clientID,vrep.sim_floatparam_simulation_time_step, simulationTimeStepDT, vrep.simx_opmode_oneshot_wait)
         #vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_realtime_simulation,1,vrep.simx_opmode_oneshot_wait)
         error=vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot)
         if self.synchronous:
@@ -114,6 +114,8 @@ class Simulator:
          
     def resumePauseSim(self, clientID):
         ret=vrep.simxPauseCommunication(clientID,False)
+        if self.speedmodifier > 0:
+            vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_speedmodifier, self.speedmodifier, vrep.simx_opmode_oneshot_wait) 
         if self.synchronous:
             vrep.simxSynchronousTrigger(clientID)
         return ret
