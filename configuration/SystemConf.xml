@@ -68,6 +68,10 @@
     <Value>0</Value>    
 </Property>
 <Property>
+    <Name>speedmodifier</Name>
+    <Value>10</Value>    
+</Property>
+<Property>
     <Name>Individual frames quantity</Name>
     <Value>400</Value>    
 </Property>
