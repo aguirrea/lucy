@@ -31,3 +31,7 @@ env:
 	ln -s ../vrep.py ./tests 
 	ln -s ../vrepConst.py ./tests
 	ln -s ../remoteApi.so ./tests
+	
+clean:
+	rm -rf V-REP_PRO_EDU_V*
+
