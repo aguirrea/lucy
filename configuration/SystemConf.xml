@@ -64,6 +64,10 @@
     <Value>1</Value>    
 </Property>
 <Property>
+    <Name>synchronous mode?</Name>
+    <Value>0</Value>    
+</Property>
+<Property>
     <Name>Individual frames quantity</Name>
     <Value>400</Value>    
 </Property>
