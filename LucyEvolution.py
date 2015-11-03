@@ -98,7 +98,7 @@ def setInitialPopulation (ga_engine):
         for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
             print individualCounter, " individuals processed!"
             print 'inserting individual: ' + filename + " into the initial population"
-            walk = Individual(prop, DTIndividualGeneticTimeSerieFile(filename))
+            walk = Individual(propVanilla, DTIndividualGeneticTimeSerieFile(filename))
             geneticMatrix = walk.getGenomeMatrix()
             if individualCounter < popSize-1:
                 adan = population[individualCounter]
@@ -179,7 +179,7 @@ def ConvergenceCriteria(ga_engine):
     return convergenceCriteria
 
 def run_main():
-    initialPopulationSize = 4
+    initialPopulationSize = 50
     generations = 600
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
