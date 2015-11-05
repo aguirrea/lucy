@@ -264,10 +264,10 @@ class SimulatedLucy(Lucy):
             x3 = 1; y3 = 0; z3 = 0;
             x2 = 0; y2 = 0; z2 = 0;
             x1 = x; y1 = y; z1 = 0;   
-            u = (x2 - x1) + 1j*(z2 - z1)
-            v = (x3 - x1) + 1j*(z3 - z1)
+            u = (x2 - x1) + 1j*(y2 - y1)
+            v = (x3 - x1) + 1j*(y3 - y1)
             r = self.angle(u*conjugate(v))
-            print "the angle formed by the start point, lucy and destiny is:", r.real        
+            print "the angle formed by the start point, lucy and destiny is:", r.real
             
     def stopLucy(self):
         self.stop = True
