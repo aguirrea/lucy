@@ -175,7 +175,7 @@ class SimulatedLucy(Lucy):
         #fitness = distance * self.poseExecuted
         #print "distance: ", distance, "poseExecuted: ", self.poseExecuted
         framesQty = int(self.sysConf.getProperty("Individual frames quantity")) 
-        fitness = distance * self.poseExecuted/(framesQty) 
+        fitness = distance * self.poseExecuted/framesQty 
         #if endFrameExecuted:
             #fitness = fitness * 2
         return fitness
