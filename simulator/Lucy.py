@@ -241,6 +241,7 @@ class SimulatedLucy(Lucy):
         if self.stop == False: 
             self.time = time.time() - self.startTime
             errorPosition, x, y = self.sim.getBioloidPlannarPosition(self.clientID)
+            print "x:", x, "y:", y
             #print "x_position: ", x, "y_position: ", y 
             if self.startPosSetted and not errorPosition:
                 #self.distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)

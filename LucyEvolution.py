@@ -179,7 +179,7 @@ def ConvergenceCriteria(ga_engine):
     return convergenceCriteria
 
 def run_main():
-    initialPopulationSize = 4
+    initialPopulationSize = 50
     generations = 600
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance

@@ -31,6 +31,7 @@ import os   #only for the tests
 import glob #only for the tests
 import time
 import xml.etree.cElementTree as ET
+import random
 
 class Individual:
 
@@ -60,7 +61,8 @@ class Individual:
         for i in xrange(self.poseSize):
             for joint in self.robotImplementedJoints:
                 #print "i: ", i, "j: ", joint
-                value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint) #TODO this can be a problem for the physical robot
+                value = random.uniform(0.0, 300)
+                #value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint) #TODO this can be a problem for the physical robot
                 self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]=value
     
     def stopLucy(self):
