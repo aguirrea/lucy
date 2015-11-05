@@ -29,6 +29,9 @@ from datatypes.DTIndividualProperty import DTIndividualProperty, DTIndividualPro
 from Communication                  import CommSerial
 import Actuator
 from AXAngle                        import AXAngle
+from numpy import conjugate
+from numpy import angle
+import math
 
 import os, threading, time
 
@@ -236,7 +239,14 @@ class SimulatedLucy(Lucy):
         #if error:
         #    raise VrepException("error geting a frame", error)
         return error, pose
-
+    
+    def angle(self,v):
+        if v.imag >=0:
+            resAngle = angle(v, True) #angle second argument is for operate with degrees instead of radians
+        else:
+            resAngle = 180+angle(-v, True) #angle second argument is for operate with degrees instead of radians
+        return resAngle
+    
     def updateLucyPosition(self):
         if self.stop == False: 
             self.time = time.time() - self.startTime
@@ -250,6 +260,14 @@ class SimulatedLucy(Lucy):
                     self.distance = 0
                 else: 
                     self.distance = distToGoal
+            #calculates the angle in the frontal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise 
+            x3 = 1; y3 = 0; z3 = 0;
+            x2 = 0; y2 = 0; z2 = 0;
+            x1 = x; y1 = y; z1 = 0;   
+            u = (x2 - x1) + 1j*(z2 - z1)
+            v = (x3 - x1) + 1j*(z3 - z1)
+            r = self.angle(u*conjugate(v))
+            print "the angle formed by the start point, lucy and destiny is:", r.real        
             
     def stopLucy(self):
         self.stop = True
