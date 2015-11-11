@@ -31,6 +31,7 @@ import Actuator
 from AXAngle                        import AXAngle
 from numpy import conjugate
 from numpy import angle
+from collections import Counter
 import math
 
 import os, threading, time
@@ -168,11 +169,24 @@ class SimulatedLucy(Lucy):
     def getSimDistance(self):
         return self.distance        
     
+    def listAverage(l):
+        average = sum(l)/len(l) 
+        return average
+
+    def listMode(l):
+        data = Counter(l)
+        data.most_common()   # Returns all unique items and their counts
+        return data.most_common(1)[0][0]  # Returns the highest occurring item
+
     def getFitness(self, endFrameExecuted=False):
         distance = self.getSimDistance()
         print "distance traveled: ", distance
+        mode = listMode(self.angleBetweenOriginAndDestination)
+        normMode = mode/180
         framesQty = int(self.sysConf.getProperty("Individual frames quantity")) 
-        fitness = distance * self.poseExecuted/(framesQty) 
+        stability = self.poseExecuted/framesQty
+        fitness = distance * stability * normMode
+        print "normMode: ", normMode
         return fitness
 
     def executePose(self, pose):
@@ -238,7 +252,7 @@ class SimulatedLucy(Lucy):
         else:
             resAngle = 180+angle(-v, True) #angle second argument is for operate with degrees instead of radians
         return resAngle
-    
+
     def updateLucyPosition(self):
         if self.stop == False: 
             self.time = time.time() - self.startTime
@@ -259,9 +273,11 @@ class SimulatedLucy(Lucy):
             u = (x2 - x1) + 1j*(y2 - y1)
             v = (x3 - x1) + 1j*(y3 - y1)
             r = self.angle(u*conjugate(v))
-
-            self.angleBetweenOriginAndDestination.append(r.real)
-            print "the angle formed by the start point, lucy and destiny is:", r.real
+            angle = r.real
+            if angle > 180:
+                angle = 360 - angle
+            self.angleBetweenOriginAndDestination.append(angle)
+            #print "the angle formed by the start point, lucy and destiny is:", angle
 
     def stopLucy(self):
         self.stop = True
