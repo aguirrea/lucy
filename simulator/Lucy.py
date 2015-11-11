@@ -37,7 +37,6 @@ import os, threading, time
 
 X = 0
 Y = 1
-MAX_FITNESS_BONUS = 5
 
 #abstract class representing lucy abstraction base class
 class Lucy(object):
@@ -169,18 +168,10 @@ class SimulatedLucy(Lucy):
         return self.distance        
     
     def getFitness(self, endFrameExecuted=False):
-        #print "time ", self.getSimTime(), "distance ", self.getSimDistance()
-        time = self.getSimTime()
         distance = self.getSimDistance()
         print "distance traveled: ", distance
-        #fitness = time + distance * time
-        #fitness = distance**2 * time
-        #fitness = distance * self.poseExecuted
-        #print "distance: ", distance, "poseExecuted: ", self.poseExecuted
         framesQty = int(self.sysConf.getProperty("Individual frames quantity")) 
         fitness = distance * self.poseExecuted/(framesQty) 
-        #if endFrameExecuted:
-            #fitness = fitness * 2
         return fitness
 
     def executePose(self, pose):
@@ -267,7 +258,7 @@ class SimulatedLucy(Lucy):
             u = (x2 - x1) + 1j*(y2 - y1)
             v = (x3 - x1) + 1j*(y3 - y1)
             r = self.angle(u*conjugate(v))
-            print "the angle formed by the start point, lucy and destiny is:", r.real
+            print "the angle formed by the start point, lucy and destiny is:", r.real, "x: ", x, "y: ", y
             
     def stopLucy(self):
         self.stop = True
