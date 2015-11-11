@@ -144,6 +144,7 @@ class SimulatedLucy(Lucy):
         self.joints = configuration.getJointsName()
         self.startPosSetted = False
         self.firstCallGetFrame = True
+        self.angleBetweenOriginAndDestination = []
         error, x, y = self.sim.getBioloidPlannarPosition(self.clientID)
         if not error:
             self.startPosSetted = True
@@ -267,6 +268,7 @@ class SimulatedLucy(Lucy):
             u = (x2 - x1) + 1j*(y2 - y1)
             v = (x3 - x1) + 1j*(y3 - y1)
             r = self.angle(u*conjugate(v))
+            self.angleBetweenOriginAndDestination.append(r.real)
             print "the angle formed by the start point, lucy and destiny is:", r.real
             
     def stopLucy(self):
