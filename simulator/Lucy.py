@@ -169,11 +169,11 @@ class SimulatedLucy(Lucy):
     def getSimDistance(self):
         return self.distance        
     
-    def listAverage(l):
+    def listAverage(self, l):
         average = sum(l)/len(l) 
         return average
 
-    def listMode(l):
+    def listMode(self, l):
         data = Counter(l)
         data.most_common()   # Returns all unique items and their counts
         return data.most_common(1)[0][0]  # Returns the highest occurring item
@@ -181,7 +181,7 @@ class SimulatedLucy(Lucy):
     def getFitness(self, endFrameExecuted=False):
         distance = self.getSimDistance()
         print "distance traveled: ", distance
-        mode = listMode(self.angleBetweenOriginAndDestination)
+        mode = self.listMode(self.angleBetweenOriginAndDestination)
         normMode = mode/180
         framesQty = int(self.sysConf.getProperty("Individual frames quantity")) 
         stability = self.poseExecuted/framesQty
