@@ -131,6 +131,7 @@ class Individual:
         tree = ET.ElementTree(root)
         tree.write(file)
 
+##Test case:
 #prop = DTIndividualPropertyCMUDaz()
 #propVanilla = DTIndividualPropertyVanilla()
 #balieroProp = DTIndividualPropertyBaliero()
