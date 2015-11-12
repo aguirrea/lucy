@@ -60,39 +60,36 @@ class Individual:
         for i in xrange(self.poseSize):
             for joint in self.robotImplementedJoints:
                 #print "i: ", i, "j: ", joint
-                value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint)
+                value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint) #TODO this can be a problem for the physical robot
                 self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]=value
     
     def stopLucy(self):
         self.lucy.stopLucy()
 
     def execute(self):
-        #TODO create a instance of the Lucy class depending if its simulated or physical
-        print "property: ", self.sysConf.getProperty("Lucy simulated?")
+        #create the corresponding instance of Lucy, depending if it's real or simulated.
         if int(self.sysConf.getProperty("Lucy simulated?"))==1:
             self.lucy = SimulatedLucy(int(self.configuration.getProperty("Lucy render enable")))
-            print "simulated Lucy"
         else:
             self.lucy = PhysicalLucy()
-            print "physical Lucy"
    
-        angleExecute = AXAngle()
         poseExecute={}
         i=0
         while (self.lucy.isLucyUp() and i < self.poseSize):
             for joint in self.robotConfig.getJointsName():
                 if not(self.property.avoidJoint(joint)):
                     value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]
-                    angleExecute.setDegreeValue(value)
-                    poseExecute[joint] = angleExecute.toVrep() 
+                    poseExecute[joint] = value
             i = i + 1  
             self.lucy.executePose(Pose(poseExecute))
         self.lucy.stopLucy()  #this function also updates time and distance
+        
         if i < self.poseSize:
             self.fitness = self.lucy.getFitness()
         else:
             endFrameExecuted = True
             self.fitness = self.lucy.getFitness(endFrameExecuted)
+
         print "fitness: ", self.fitness
         return self.fitness       
          

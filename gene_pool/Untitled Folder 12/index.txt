@@ -1,0 +1,7 @@
+witn gaussian mutator REAL
+initial population of 51
+with rank selector
+mutation rate 0,1
+elitism with selection of 1/3 population best individuals
+fitness=distance*frames_executed
+proposed crossover operator v0.1

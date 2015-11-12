@@ -90,21 +90,8 @@ class CommSerial(Communication):
         except:
             print "problems sending package"
             
-    '''
-    def read_msg(self,N_param):
-        print "leo serial"
-        aux = self.client.read(5+N_param)
-        for val in aux:
-            print (hex(ord(val)))
-        #aux= self.client.read(N_param)
-        #print "leo los demas "
-        #for val in aux:
-        #    print (hex(ord(val)))
-        self.client.read(1) #CHECK SUM
-        return aux
-
     def flushInput (self):
-        self.client.flushInput() '''
+        self.client.flushInput() 
 
     def recv_msg(self):
         checksum = 0;
@@ -113,35 +100,24 @@ class CommSerial(Communication):
 
         while (dato != chr(0xFF) and dato != ""):        
             dato = self.client.read(1)       
-            print "primer read", hex(ord(dato))
-
+            #print "first read", hex(ord(dato))
         if (dato == ""):
             return 0
 
-        print "antes del segundo read"
         dato = self.client.read(1)
-        print "segundo read"
         if (dato == chr(0xFF)):
             id_motor = ord(self.client.read(1))
-            print "tercer read"
-            packet.append(id_motor)
-
+            packet.append(id_motor) #packet[0]
             length = ord(self.client.read(1))
-            print "cuarto read"
-            packet.append(length)
-
+            packet.append(length)   #packet[1]
             error = ord(self.client.read(1))
-            print "quinto read"
-            packet.append(error)
+            packet.append(error)    #packet[2]
 
             for i in range(0, length - 2):
-                dato = self.client.read(1)
-                print "sexto read"
-                packet.append(ord(dato))
+                data = self.client.read(1)
+                packet.append(ord(data)) #packet[3]
 
-            dato = self.client.read(1)        
-            print "septimo read"
-            checksum = ord(dato)
-
+            data = self.client.read(1)        
+            checksum = ord(data)
         packet.append(checksum)
         return packet

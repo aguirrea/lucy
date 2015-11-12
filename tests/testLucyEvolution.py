@@ -3,7 +3,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 #
-# Execution of the best individuals 
+# Execution of individuals resulted from the evolution experiment
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 from simulator.SimLucy                          import SimLucy
 from simulator.AXAngle                          import AXAngle
 from parser.LoadPoses                           import LoadPoses
-from datatypes.DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive
+from datatypes.DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive, DTIndividualPropertyPhysicalBioloid
 from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticMaterial, DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
 from Pose                                       import Pose
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
@@ -36,6 +36,7 @@ import sys
 propCMUDaz = DTIndividualPropertyCMUDaz()
 propVanilla = DTIndividualPropertyVanilla()
 balieroProp = DTIndividualPropertyBaliero()
+physicalProp = DTIndividualPropertyPhysicalBioloid()
 geneticVanillaProp = DTIndividualPropertyVanillaEvolutive()
 
 conf = LoadSystemConfiguration()
@@ -49,12 +50,18 @@ geneticPoolDir = os.pardir+conf.getDirectory("Genetic Pool")
 
 arguments = len(sys.argv)
 
+def createIndividual(filename):
+    if int(conf.getProperty("Lucy simulated?"))==1:
+        walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
+    else:
+        walk = Individual(physicalProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))    
+    return walk
+
 if arguments > 1:
     files = sys.argv[1:]
     for filename in files:
         print 'executing individual: ' + filename
-        walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
-        #walk = Individual(propCMUDaz, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
+        walk = createIndividual(filename)
         walk.execute()
 else:
     for filename in glob.glob(os.path.join(geneticPoolDir, '*.xml')):

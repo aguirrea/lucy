@@ -27,28 +27,28 @@ class MocapLucyMapping:
         self.config = robotConfiguration
         self.jointCalc = JointCalculation(file)
         #TODO take into account that the elbowyaw can change from sagital plane to transversal
-        self.rElbowYaw = self.jointCalc.calculateSagital("rForeArm", "rShldr", "rHand") #validado 
+        self.rElbowYaw = self.jointCalc.calculateRightSagital("rForeArm", "rShldr", "rHand") #validado 
         self.framesQty = len(self.rElbowYaw)
         self.frameVectors = {}  
         self.frameVectors["R_Shoulder_Yaw"] = self.jointCalc.calculateTransversal("rCollar","chest", "rShldr") #validado, por ahora no usar o tener cuidado
-        self.frameVectors["R_Shoulder_Pitch"] = self.jointCalc.calculateSagital("rShldr", "head", "rForeArm" ) #validado, revisar signo
+        self.frameVectors["R_Shoulder_Pitch"] = self.jointCalc.calculateRightSagital("rShldr", "head", "rForeArm" ) #validado, revisar signo
         self.frameVectors["R_Hip_Yaw"] = self.jointCalc.calculateTransversal("rShin", "rThigh", "rFoot") #validado, por ahora no usar
         self.frameVectors["R_Hip_Roll"] = self.jointCalc.calculateFrontal("rThigh", "abdomen", "rShin")  #validado 
-        self.frameVectors["R_Hip_Pitch"] = self.jointCalc.calculateSagital("rThigh", "abdomen", "rShin") #validado
-        self.frameVectors["R_Knee"] = self.jointCalc.calculateSagital("rShin", "rThigh","rFoot") #validado
-        self.frameVectors["R_Ankle_Pitch"] = self.jointCalc.calculateSagital("rFoot", "rShin", "End Site12") #validado
+        self.frameVectors["R_Hip_Pitch"] = self.jointCalc.calculateRightSagital("rThigh", "abdomen", "rShin") #validado
+        self.frameVectors["R_Knee"] = self.jointCalc.calculateRightSagital("rShin", "rThigh","rFoot") #validado
+        self.frameVectors["R_Ankle_Pitch"] = self.jointCalc.calculateRightSagital("rFoot", "rShin", "End Site12") #validado
         self.frameVectors["R_Ankle_Roll"] = self.jointCalc.calculateFrontal("rFoot", "rShin", "End Site12") #self.nullFrameVector(self.framesQty)
         self.frameVectors["R_Elbow_Yaw"] = self.rElbowYaw  #validado
         
         self.frameVectors["L_Shoulder_Yaw"] = self.jointCalc.calculateFrontal("lCollar","chest", "lShldr") #validado 
-        self.frameVectors["L_Shoulder_Pitch"] = self.jointCalc.calculateSagital("lShldr", "head", "lForeArm") #validado 
+        self.frameVectors["L_Shoulder_Pitch"] = self.jointCalc.calculateLeftSagital("lShldr", "head", "lForeArm") #validado 
         self.frameVectors["L_Hip_Yaw"] = self.jointCalc.calculateTransversal("lShin", "lThigh", "lFoot") #validado 
         self.frameVectors["L_Hip_Roll"] = self.jointCalc.calculateFrontal("lThigh", "abdomen", "lShin")  #validado 
-        self.frameVectors["L_Hip_Pitch"] = self.jointCalc.calculateSagital("lThigh", "abdomen", "lShin") #validado
-        self.frameVectors["L_Knee"] = self.jointCalc.calculateSagital("lShin", "lThigh","lFoot") #validado
-        self.frameVectors["L_Ankle_Pitch"] = self.jointCalc.calculateSagital("lFoot", "lShin", "End Site13") #validado
+        self.frameVectors["L_Hip_Pitch"] = self.jointCalc.calculateLeftSagital("lThigh", "abdomen", "lShin") #validado
+        self.frameVectors["L_Knee"] = self.jointCalc.calculateLeftSagital("lShin", "lThigh","lFoot") #validado
+        self.frameVectors["L_Ankle_Pitch"] = self.jointCalc.calculateLeftSagital("lFoot", "lShin", "End Site13") #validado
         self.frameVectors["L_Ankle_Roll"] =  self.jointCalc.calculateFrontal("lFoot", "lShin", "End Site13") #self.nullFrameVector(self.framesQty)
-        self.frameVectors["L_Elbow_Yaw"] = self.jointCalc.calculateSagital("lForeArm", "lShldr", "lHand") #validado
+        self.frameVectors["L_Elbow_Yaw"] = self.jointCalc.calculateLeftSagital("lForeArm", "lShldr", "lHand") #validado
         
     def generateFile(self,file):
         root = ET.Element("root")

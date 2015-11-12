@@ -45,7 +45,7 @@ class JointCalculation:
         return v
 
     #calculates the angle in the sagital plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise
-    def calculateSagital(self, joint1, joint2, joint3):
+    def calculateLeftSagital(self, joint1, joint2, joint3):
         #with points 1, 2 and 3 
         x1, y1, z1 = self.parser.getNodePositionsFromName(joint1)
         x2, y2, z2 = self.parser.getNodePositionsFromName(joint2)
@@ -67,6 +67,29 @@ class JointCalculation:
         #corresponds with the sum of the angle with x axis of each number
         r = self.angle(u*conjugate(v))
         return r.real
+
+    def calculateRightSagital(self, joint1, joint2, joint3):
+        #with points 1, 2 and 3 
+        x1, y1, z1 = self.parser.getNodePositionsFromName(joint1)
+        x2, y2, z2 = self.parser.getNodePositionsFromName(joint2)
+        x3, y3, z3 = self.parser.getNodePositionsFromName(joint3)
+        #as we are calculating in the sagital plane only z and y components are used as they describe this plane
+        az1 = array(z1.values())
+        az2 = array(z2.values())
+        az3 = array(z3.values())
+        ay1 = array(y1.values())
+        ay2 = array(y2.values())
+        ay3 = array(y3.values())
+        #u vector, is the projection in the sagital plane of the j2 to j1 vector, 
+        #complex number is usded for the sake of simplicity
+        u = (ay2 - ay1) + 1j*(az2 - az1)
+        #v vector, is the projection in the sagital plane of the j3 to j1 vector, 
+        #complex number is usded for the sake of simplicity
+        v = (ay3 - ay1) + 1j*(az3 - az1)
+        #the angle with respect two x axis of the product of two complex numbers 
+        #corresponds with the sum of the angle with x axis of each number
+        r = self.angle(u*conjugate(v))
+        return 360 - r.real
 
     #calculates the angle in the frontal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise 
     #WARNING Blender swaps Z and Y axis

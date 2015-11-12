@@ -28,6 +28,7 @@ from LoadSystemConfiguration        import LoadSystemConfiguration
 from datatypes.DTIndividualProperty import DTIndividualProperty, DTIndividualPropertyPhysicalBioloid
 from Communication                  import CommSerial
 import Actuator
+from AXAngle                        import AXAngle
 
 import os, threading, time
 
@@ -45,6 +46,7 @@ class Lucy(object):
         self.startTime = time.time()
         self.distance = 0
         self.stop = False
+        self.poseExecuted = 0
 
     def getFitness(self, endFrameExecuted=False):
         pass
@@ -70,15 +72,20 @@ class PhysicalLucy(Lucy):
         self.comm_tty.connect()
         self.actuator = Actuator.Actuator(self.comm_tty)
         self.defaultSpeed = 600 #TODO change this, use configuration files
-        self.bioloidProperty = DTIndividualPropertyPhysicalBioloid()
+        self.initialPoses = {}
 
         #checking communication with motors
         for joint in self.joints:
-            self.actuator.led_state_change(self.robotConfiguration.loadJointId(joint), 1)
-            print joint, self.actuator.get_position(self.robotConfiguration.loadJointId(joint))
-            time.sleep(1)
-        print "led on"
-        time.sleep(14)
+            jointID = self.robotConfiguration.loadJointId(joint)
+            print jointID
+            self.initialPoses[joint] = self.actuator.get_position(jointID).toDegrees()
+            print jointID, joint, self.initialPoses[joint]
+            time.sleep(0.1)
+            self.actuator.led_state_change(jointID, 1)
+            time.sleep(0.1)
+        
+        time.sleep(1)
+        
         for joint in self.joints:
             self.actuator.led_state_change(self.robotConfiguration.loadJointId(joint), 0)
         
@@ -89,16 +96,18 @@ class PhysicalLucy(Lucy):
         for joint in self.joints:
             if joint not in dontSupportedJoints:
                 RobotImplementedJoints.append(joint)
-        jointsQty = len(RobotImplementedJoints)
         for joint in RobotImplementedJoints:
-            angle = pose.getValue(joint)   
+            angle = pose.getValue(joint)
+            angleAX = AXAngle()   
+            angleAX.setDegreeValue(angle)
             #TODO implement method for setting position of all actuators at the same time
-            self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), int(angle), self.defaultSpeed)
-        time.sleep(1)
+            self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), int(angleAX.getValue()), self.defaultSpeed)
+            self.poseExecuted = self.poseExecuted + 1
+        time.sleep(3)
 
     def stopLucy(self):
         for joint in self.joints:
-            self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), self.bioloidProperty.getPoseFix(joint), self.defaultSpeed)
+            self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), self.initialPoses[joint], self.defaultSpeed)
 
     def getFrame(self):
         error = False
@@ -160,35 +169,50 @@ class SimulatedLucy(Lucy):
         #print "time ", self.getSimTime(), "distance ", self.getSimDistance()
         time = self.getSimTime()
         distance = self.getSimDistance()
+        print "distance traveled: ", distance
         #fitness = time + distance * time
-        fitness = distance * time
-        if endFrameExecuted:
-            fitness = fitness * 2
+        #fitness = distance**2 * time
+        #fitness = distance * self.poseExecuted
+        #print "distance: ", distance, "poseExecuted: ", self.poseExecuted
+        framesQty = int(self.sysConf.getProperty("Individual frames quantity")) 
+        fitness = distance * self.poseExecuted/(framesQty) 
+        #if endFrameExecuted:
+            #fitness = fitness * 2
         return fitness
 
     def executePose(self, pose):
         error = False
         dontSupportedJoints = self.sysConf.getVrepNotImplementedBioloidJoints()
         RobotImplementedJoints = []
-        #Above's N joints will be received and set on the V-REP side at the same time'''
+        #Above's N joints will be received and set on the V-REP side at the same time
+
+        #TODO this must be checked in the simulator class
         if (self.jointHandleCachePopulated == False): 
             self.sim.populateJointHandleCache(self.clientID)
             self.jointHandleCachePopulated = True
+
         error = self.sim.pauseSim(self.clientID) or error
         for joint in self.joints:
             if joint not in dontSupportedJoints:
                 RobotImplementedJoints.append(joint)
+
         jointsQty = len(RobotImplementedJoints)
         jointExecutedCounter=0
         for joint in RobotImplementedJoints:
-            angle = pose.getValue(joint)    
+            angle = pose.getValue(joint) 
+            angleAX = AXAngle()   
+            angleAX.setDegreeValue(angle)   
+
             if jointExecutedCounter < jointsQty - 1:
-                error = self.sim.setJointPositionNonBlock(self.clientID, joint, angle) or error
+                error = self.sim.setJointPositionNonBlock(self.clientID, joint, angleAX.toVrep()) or error
             else:
                 error = self.sim.resumePauseSim(self.clientID) or error
-                error = self.sim.setJointPosition(self.clientID, joint, angle) or error
+                error = self.sim.setJointPosition(self.clientID, joint, angleAX.toVrep()) or error
+
             jointExecutedCounter = jointExecutedCounter + 1
+
         self.updateLucyPosition()
+        self.poseExecuted = self.poseExecuted + 1
         #if error:
         #    raise VrepException("error excecuting a pose", error)
 
@@ -216,9 +240,16 @@ class SimulatedLucy(Lucy):
     def updateLucyPosition(self):
         if self.stop == False: 
             self.time = time.time() - self.startTime
-            errorPosition, x, y = self.sim.getBioloidPlannarPosition(self.clientID) 
+            errorPosition, x, y = self.sim.getBioloidPlannarPosition(self.clientID)
+            #print "x_position: ", x, "y_position: ", y 
             if self.startPosSetted and not errorPosition:
-                self.distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
+                #self.distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
+                distToGoal = math.sqrt((x-1)**2 + (y-0)**2)
+                distToGoal = 1 - distToGoal
+                if distToGoal < 0 :
+                    self.distance = 0
+                else: 
+                    self.distance = distToGoal
             
     def stopLucy(self):
         self.stop = True
