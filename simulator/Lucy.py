@@ -184,9 +184,10 @@ class SimulatedLucy(Lucy):
         mode = self.listMode(self.angleBetweenOriginAndDestination)
         normMode = mode/180
         framesQty = int(self.sysConf.getProperty("Individual frames quantity")) 
-        stability = self.poseExecuted/framesQty
+        stability = self.poseExecuted / float(framesQty)
         fitness = distance * stability * normMode
         print "normMode: ", normMode
+        print "stability: ", stability 
         return fitness
 
     def executePose(self, pose):
