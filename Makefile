@@ -16,7 +16,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-VREP_VERSION = V-REP_PRO_EDU_V3_2_2_64_Linux
+#VREP_VERSION = V-REP_PRO_EDU_V3_2_2_Linux #32bits version
+#VREP_VERSION = V-REP_PRO_EDU_V3_2_2_64_Linux
 VREP_URL = http://coppeliarobotics.com/$(VREP_VERSION).tar.gz
 
 env: 
