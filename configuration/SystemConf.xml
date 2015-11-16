@@ -65,11 +65,15 @@
 </Property>
 <Property>
     <Name>synchronous mode?</Name>
-    <Value>0</Value>    
+    <Value>1</Value>    
 </Property>
 <Property>
     <Name>speedmodifier</Name>
-    <Value>10</Value>    
+    <Value>0</Value>    
+</Property>
+<Property>
+    <Name>simulation time step</Name>
+    <Value>0.100</Value>    
 </Property>
 <Property>
     <Name>Individual frames quantity</Name>
