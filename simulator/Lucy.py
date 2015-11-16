@@ -63,6 +63,9 @@ class Lucy(object):
     def isLucyUp(self):
         pass
 
+    def getPosesExecutedByStepQty(self):
+        pass  
+
 #Lucy instanciated in a Bioloid Premium robot
 class PhysicalLucy(Lucy):
 
@@ -88,7 +91,10 @@ class PhysicalLucy(Lucy):
         
         for joint in self.joints:
             self.actuator.led_state_change(self.robotConfiguration.loadJointId(joint), 0)
-        
+    
+    def getPosesExecutedByStepQty(self):
+        return 1
+
     def executePose(self, pose):
         #set positions and wait that the actuator reaching that position
         dontSupportedJoints = self.sysConf.getVrepNotImplementedBioloidJoints()
@@ -176,9 +182,13 @@ class SimulatedLucy(Lucy):
         #print "distance: ", distance, "poseExecuted: ", self.poseExecuted
         framesQty = int(self.sysConf.getProperty("Individual frames quantity")) 
         fitness = distance * self.poseExecuted/framesQty 
+        print "execution time: ", time
         #if endFrameExecuted:
             #fitness = fitness * 2
         return fitness
+
+    def getPosesExecutedByStepQty(self):
+        return self.sim.getPosesExecutedByStepQty(self.clientID)
 
     def executePose(self, pose):
         error = False
@@ -212,7 +222,7 @@ class SimulatedLucy(Lucy):
             jointExecutedCounter = jointExecutedCounter + 1
 
         self.updateLucyPosition()
-        self.poseExecuted = self.poseExecuted + 1
+        self.poseExecuted = self.poseExecuted + self.getPosesExecutedByStepQty()
         #if error:
         #    raise VrepException("error excecuting a pose", error)
 

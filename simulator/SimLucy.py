@@ -30,7 +30,6 @@ import os, threading, time
 
 X = 0
 Y = 1
-MAX_FITNESS_BONUS = 5
 
 class SimLucy:
 

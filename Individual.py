@@ -80,7 +80,7 @@ class Individual:
                 if not(self.property.avoidJoint(joint)):
                     value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]
                     poseExecute[joint] = value
-            i = i + 1  
+            i = i + self.lucy.getPosesExecutedByStepQty()  
             self.lucy.executePose(Pose(poseExecute))
         self.lucy.stopLucy()  #this function also updates time and distance
         

@@ -40,7 +40,7 @@ class DTIndividualGeneticTimeSerieFile(DTIndividualGeneticMaterial):
 
 class DTIndividualGeneticMatrix(DTIndividualGeneticMaterial):
 
-    def __init__(self, geneticMaterial):
+    def __init__(self, geneticMaterial=[[0 for j in xrange(18)] for i in xrange(1)]):
         DTIndividualGeneticMaterial.__init__(self)
         self.geneticMatrix = geneticMaterial
 

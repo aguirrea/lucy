@@ -75,6 +75,9 @@ def setInitialPopulation (ga_engine):
     popSize = len(population)
 
     individualCounter = 0
+    walk = Individual(propVanilla, DTIndividualGeneticMatrix()) #dummy individual to initialise the simulator and enable the time step configuration
+    walk.execute()
+    print "please set the proper time step in vrep"
     '''
     if individualCounter < popSize:
         for filename in glob.glob(os.path.join(GAwalkDir, '*.xml')):
