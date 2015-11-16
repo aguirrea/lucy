@@ -136,7 +136,8 @@ def generationCallback(ga_engine):
         max_score = score
         max_score_generation = gen
     else:
-        if gen - max_score > NUMBER_GENERATIONS_CONVERGENCE_CRITERIA:
+        #if the score doesn't improve in NUMBER_GENERATIONS_CONVERGENCE_CRITERIA generations then there is no reason to continue and we have reach a convergence
+        if gen - max_score_generation > NUMBER_GENERATIONS_CONVERGENCE_CRITERIA:
             convergenceCriteria = True
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -159,22 +160,12 @@ def generationCallback(ga_engine):
 
 # This function is the evaluation function
 def eval_func(chromosome):
-    FITNESS_AVERAGE_ITERATIONS = 3
     if not initialPopulationSetted:
         setInitialPopulation(gaEngine)    
     #prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     prop = DTIndividualPropertyVanillaEvolutive()
     individual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome)))
-    fitness = individual.execute() #return the fitness resulting from the simulator execution
-    #if we reach the fittest a average of FITNESS_AVERAGE_ITERATIONS executions is calculated as fitness to avoid the stocastic situation
-    if fitness > max_score:
-        print "best fitness", fitness
-        for i in range(FITNESS_AVERAGE_ITERATIONS-1):
-            testerIndividual = individual.execute()
-            print "new candidate fitness", testerIndividual
-            fitness = fitness + testerIndividual
-        fitness = fitness/FITNESS_AVERAGE_ITERATIONS
-    return fitness
+    return individual.execute() #return the fitness resulting from the simulator execution
 
 # This function is the termination criteria for the algorithm
 def ConvergenceCriteria(ga_engine):
@@ -182,7 +173,7 @@ def ConvergenceCriteria(ga_engine):
     return convergenceCriteria
 
 def run_main():
-    initialPopulationSize = 4
+    initialPopulationSize = 50
     generations = 600
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance

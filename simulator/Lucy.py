@@ -29,12 +29,15 @@ from datatypes.DTIndividualProperty import DTIndividualProperty, DTIndividualPro
 from Communication                  import CommSerial
 import Actuator
 from AXAngle                        import AXAngle
+from numpy import conjugate
+from numpy import angle
+from collections import Counter
+import math
 
 import os, threading, time
 
 X = 0
 Y = 1
-MAX_FITNESS_BONUS = 5
 
 #abstract class representing lucy abstraction base class
 class Lucy(object):
@@ -147,6 +150,7 @@ class SimulatedLucy(Lucy):
         self.joints = configuration.getJointsName()
         self.startPosSetted = False
         self.firstCallGetFrame = True
+        self.angleBetweenOriginAndDestination = []
         error, x, y = self.sim.getBioloidPlannarPosition(self.clientID)
         if not error:
             self.startPosSetted = True
@@ -171,20 +175,27 @@ class SimulatedLucy(Lucy):
     def getSimDistance(self):
         return self.distance        
     
+    def listAverage(self, l):
+        average = sum(l)/len(l) 
+        return average
+
+    def listMode(self, l):
+        data = Counter(l)
+        data.most_common()   # Returns all unique items and their counts
+        return data.most_common(1)[0][0]  # Returns the highest occurring item
+
     def getFitness(self, endFrameExecuted=False):
-        #print "time ", self.getSimTime(), "distance ", self.getSimDistance()
-        time = self.getSimTime()
         distance = self.getSimDistance()
         print "distance traveled: ", distance
-        #fitness = time + distance * time
-        #fitness = distance**2 * time
-        #fitness = distance * self.poseExecuted
-        #print "distance: ", distance, "poseExecuted: ", self.poseExecuted
-        framesQty = int(self.sysConf.getProperty("Individual frames quantity")) 
-        fitness = distance * self.poseExecuted/framesQty 
+        mode = self.listMode(self.angleBetweenOriginAndDestination)
+        normMode = mode/180
+        framesQty = int(self.sysConf.getProperty("Individual frames quantity"))
+        time = self.getSimTime() 
         print "execution time: ", time
-        #if endFrameExecuted:
-            #fitness = fitness * 2
+        stability = self.poseExecuted / float(framesQty)
+        fitness = distance * stability * normMode
+        print "normMode: ", normMode
+        print "stability: ", stability 
         return fitness
 
     def getPosesExecutedByStepQty(self):
@@ -246,6 +257,13 @@ class SimulatedLucy(Lucy):
         #if error:
         #    raise VrepException("error geting a frame", error)
         return error, pose
+    
+    def angle(self,v):
+        if v.imag >=0:
+            resAngle = angle(v, True) #angle second argument is for operate with degrees instead of radians
+        else:
+            resAngle = 180+angle(-v, True) #angle second argument is for operate with degrees instead of radians
+        return resAngle
 
     def updateLucyPosition(self):
         if self.stop == False: 
@@ -260,7 +278,19 @@ class SimulatedLucy(Lucy):
                     self.distance = 0
                 else: 
                     self.distance = distToGoal
-            
+            #calculates the angle in the frontal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise 
+            x3 = 1; y3 = 0; z3 = 0;
+            x2 = 0; y2 = 0; z2 = 0;
+            x1 = x; y1 = y; z1 = 0;   
+            u = (x2 - x1) + 1j*(y2 - y1)
+            v = (x3 - x1) + 1j*(y3 - y1)
+            r = self.angle(u*conjugate(v))
+            angle = r.real
+            if angle > 180:
+                angle = 360 - angle
+            self.angleBetweenOriginAndDestination.append(angle)
+            #print "the angle formed by the start point, lucy and destiny is:", angle
+
     def stopLucy(self):
         self.stop = True
         self.updateLucyPosition()

@@ -134,6 +134,8 @@ class Individual:
     def getJointMatrixIDFromName(self, jointName):
         return self.genomeMatrixJointNameIDMapping[jointName]
 
+
+##Test case:
 #prop = DTIndividualPropertyCMUDaz()
 #propVanilla = DTIndividualPropertyVanilla()
 #balieroProp = DTIndividualPropertyBaliero()
