@@ -219,9 +219,8 @@ class Simulator:
         return True, None, None
 
     def getPosesExecutedByStepQty(self, clientID):
-        res = int(float(vrep.simxGetFloatingParameter(clientID, vrep.sim_floatparam_simulation_time_step, vrep.simx_opmode_oneshot_wait)[1] ) / float(0.050))
-        print res
-        return res
+        return int(float(vrep.simxGetFloatingParameter(clientID, vrep.sim_floatparam_simulation_time_step, vrep.simx_opmode_oneshot_wait)[1] ) / float(0.050))
+        
 
 
 

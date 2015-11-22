@@ -28,7 +28,7 @@ class BvhImport:
         bvh_serial_path = os.path.join(os.path.dirname(__file__), file)
         self.animation = Animation.from_bvh(bvh_serial_path)
         self.nodeNameIndexMapping = {}
-        pose = self.animation.get_pose(1)
+        pose = self.animation.get_pose(0)
         for j in xrange(len(pose.positions)):
             key = pose.bone.node_list[j].name
             if key in self.nodeNameIndexMapping.keys():
