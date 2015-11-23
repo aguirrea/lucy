@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from simulator.SimLucy   import SimLucy
+from simulator.Lucy   import SimulatedLucy
 from simulator.AXAngle   import AXAngle
 from parser.LoadPoses    import LoadPoses
 from RobotSniffer        import RobotSniffer
@@ -30,14 +30,16 @@ import time
 print 'Program started' 
 angle = AXAngle()
 
-lucy = SimLucy(True)
+sniffingCounter = 0
+lucy = SimulatedLucy()
 
 sniffer = RobotSniffer(lucy)
 sniffer.startSniffing()
 
-while  lucy.isLucyUp():
+while  lucy.isLucyUp() and sniffingCounter < 41:
     time.sleep(1)
     print 'sniffing'
+    sniffingCounter = sniffingCounter + 1
     
 sniffer.stopSniffing()
 lucy.stopLucy()

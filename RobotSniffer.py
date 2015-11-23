@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from simulator.SimLucy   import SimLucy
+from simulator.Lucy   import SimulatedLucy
 from simulator.AXAngle   import AXAngle
 from Pose                import Pose
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
@@ -33,16 +33,15 @@ class RobotSniffer:
         self.lucy = robot
         self.framesCapturedQty = 0
         self.poses = {}
-        self.sniffing = False
+        self.sniffing = True
         self.configuration = LoadRobotConfiguration()
 
     def startSniffing(self):
-        self.sniffing = True
-        frame = self.lucy.getFrame()
+        error, frame = self.lucy.getFrame()
         self.poses[self.framesCapturedQty] = Pose(frame) # TODO take into account that angles are represented in simlulator encoding
         self.framesCapturedQty = self.framesCapturedQty + 1
         if self.sniffing:
-            threading.Timer(2, self.startSniffing).start()
+            threading.Timer(1, self.startSniffing).start()
 
     def stopSniffing(self):
         self.sniffing = False
