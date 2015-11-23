@@ -249,9 +249,8 @@ class SimulatedLucy(Lucy):
             if joint not in dontSupportedJoints: #actual model of vrep bioloid don't support this joints
                 errorGetJoint, value = self.sim.getJointPositionNonBlock(self.clientID, joint, self.firstCallGetFrame)
                 error = error or errorGetJoint 
-                pose[joint] = value
-            else:
-                pose[joint] = 0
+                pose[joint] = 150 - value * 60
+
         self.firstCallGetFrame = False
         error = self.sim.resumePauseSim(self.clientID) or error
         #if error:
@@ -278,18 +277,19 @@ class SimulatedLucy(Lucy):
                     self.distance = 0
                 else: 
                     self.distance = distToGoal
-            #calculates the angle in the frontal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise 
-            x3 = 1; y3 = 0; z3 = 0;
-            x2 = 0; y2 = 0; z2 = 0;
-            x1 = x; y1 = y; z1 = 0;   
-            u = (x2 - x1) + 1j*(y2 - y1)
-            v = (x3 - x1) + 1j*(y3 - y1)
-            r = self.angle(u*conjugate(v))
-            angle = r.real
-            if angle > 180:
-                angle = 360 - angle
-            self.angleBetweenOriginAndDestination.append(angle)
-            #print "the angle formed by the start point, lucy and destiny is:", angle
+            
+                #calculates the angle in the frontal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise 
+                x3 = 1; y3 = 0; z3 = 0;
+                x2 = 0; y2 = 0; z2 = 0;
+                x1 = x; y1 = y; z1 = 0;   
+                u = (x2 - x1) + 1j*(y2 - y1)
+                v = (x3 - x1) + 1j*(y3 - y1)
+                r = self.angle(u*conjugate(v))
+                angle = r.real
+                if angle > 180:
+                    angle = 360 - angle
+                self.angleBetweenOriginAndDestination.append(angle)
+                #print "the angle formed by the start point, lucy and destiny is:", angle
 
     def stopLucy(self):
         self.stop = True
