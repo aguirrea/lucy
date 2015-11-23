@@ -189,12 +189,10 @@ class Simulator:
             error, handle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot)
             self.jointHandleMapping[joint]=handle
         if not error:
-            '''while we are connected:'''
-            while vrep.simxGetConnectionId(clientID) != -1:
-                if firstTime:
-                    error, value = vrep.simxGetJointPosition(clientID,handle,vrep.simx_opmode_streaming)
-                else:
-                    error, value = vrep.simxGetJointPosition(clientID,handle,vrep.simx_opmode_buffer)
+            if firstTime:
+                error, value = vrep.simxGetJointPosition(clientID,handle,vrep.simx_opmode_streaming)
+            else:
+                error, value = vrep.simxGetJointPosition(clientID,handle,vrep.simx_opmode_buffer)
         return error, value
 
     def finishSimulation(self, clientID):
