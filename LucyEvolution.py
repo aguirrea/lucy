@@ -37,6 +37,7 @@ import time
 import os
 import glob
 import crossovers
+import mutators
 import shutil
 
 initialPopulationSetted = False
@@ -192,7 +193,7 @@ def run_main():
     ga.setPopulationSize(initialPopulationSize) #TODO class atribute
 
     #genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
-    genome.mutator.set(Mutators.G2DListMutatorRealGaussian)
+    genome.mutator.set(mutators.G2DListMutatorRealGaussianSpline)
     #genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
     ga.setMutationRate(0.1)
     
