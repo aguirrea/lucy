@@ -31,6 +31,38 @@ CDefG2DListMutRealSIGMA = 1
 CDefRangeMin = 0
 CDefRangeMax = 100
 
+interpolationPointsQty = 10
+num = interpolationPointsQty/2
+
+
+def interpolate(genome, which_x, which_y):
+
+   if which_y - interpolationPointsQty/2 < 0:
+      interpolationPointsQty = interpolationPointsQty - abs(which_y - interpolationPointsQty/2) * 2
+      num = interpolationPointsQty/2
+
+   elif which_y + interpolationPointsQty/2 > genome.getHeight()-1:
+      interpolationPointsQty = interpolationPointsQty - (which_y + interpolationPointsQty/2 - (genome.getHeight()-1)) * 2
+      num = interpolationPointsQty/2
+
+   if interpolationPointsQty > 4:
+      x = np.ndarray(interpolationPointsQty)
+      y = np.ndarray(interpolationPointsQty)
+      for k in xrange(interpolationPointsQty):
+         poseToSmooth = which_y - num + k
+         x[k] = poseToSmooth
+         y[k] = genome[poseToSmooth][which_x]
+      spl = UnivariateSpline(x, y)
+      spl.set_smoothing_factor(0.3) #2 - 0,3
+      #plt.plot(x, y, 'ro', ms=5)
+      #plt.plot(x, spl(x), 'g', lw=3)
+
+      for k in xrange(interpolationPointsQty):
+         #print "xk", x[k], "intxk ", int(x[k])
+         #print "antes ", genome[int(x[k])][which_x], "ahora ", spl(int(x[k])), "k ", k, "diff ", genome[int(x[k])][which_x]-spl(int(x[k])), "offset ", offset
+         genome.setItem(int(x[k]), which_x, spl(int(x[k])))   
+
+
 
 def G2DListMutatorRealGaussianSpline(genome, **args):
    """ A gaussian mutator for G2DList of Real 
@@ -49,12 +81,6 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
    mu = genome.getParam("gauss_mu")
    sigma = genome.getParam("gauss_sigma")
    
-   interpolationPointsQty = 10
-   num = interpolationPointsQty/2
-
-   x = np.ndarray(interpolationPointsQty)
-   y = np.ndarray(interpolationPointsQty)
-
    if mu is None:
       mu = CDefG2DListMutRealMU
    
@@ -74,22 +100,13 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
 
                genome.setItem(i, j, final_value)
                
-               for k in xrange(interpolationPointsQty):
-                  x[k] = intxk - num + k
-                  y[k] = genome[x[k]][j]
-
-               spl = UnivariateSpline(x, y)
-               spl.set_smoothing_factor(0.5)
-
-               for k in xrange(interpolationPointsQty):
-                  genome.setItem(i - num + k, i, spl(x[k]))   
 
                mutations += 1
    else: 
 
       for it in xrange(int(round(mutations))):
-         which_x = rand_randint(0, genome.getWidth()-1)
-         which_y = rand_randint(0, genome.getHeight()-1)
+         which_x = rand_randint(0, genome.getWidth()-1)  #joint to mutate
+         which_y = rand_randint(0, genome.getHeight()-1) #pose to mutate
          #print "which_x ", which_x
          #print "which_y ", which_y
          offset = rand_gauss(mu, sigma)
@@ -101,14 +118,23 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
          #valueBeforeMutation = genome[which_y][which_x]
          genome.setItem(which_y, which_x, final_value)
 
-         if which_y < 395 and which_y > 5: #think about a generic algortithm for this
+         if which_y - interpolationPointsQty/2 < 0:
+            interpolationPointsQty = interpolationPointsQty - abs(which_y - interpolationPointsQty/2) * 2
+            num = interpolationPointsQty/2
+
+         elif which_y + interpolationPointsQty/2 > genome.getHeight()-1:
+            interpolationPointsQty = interpolationPointsQty - (which_y + interpolationPointsQty/2 - (genome.getHeight()-1)) * 2
+            num = interpolationPointsQty/2
+
+         if interpolationPointsQty > 4:
+            x = np.ndarray(interpolationPointsQty)
+            y = np.ndarray(interpolationPointsQty)
             for k in xrange(interpolationPointsQty):
                poseToSmooth = which_y - num + k
                x[k] = poseToSmooth
                y[k] = genome[poseToSmooth][which_x]
-               
             spl = UnivariateSpline(x, y)
-            spl.set_smoothing_factor(0.3)
+            spl.set_smoothing_factor(0.3) #2 - 0,3
             #plt.plot(x, y, 'ro', ms=5)
             #plt.plot(x, spl(x), 'g', lw=3)
 
