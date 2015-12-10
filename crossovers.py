@@ -67,7 +67,7 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
    
    frame1 = gMom[cut]
 
-   for position in range(gDad.getHeight()):
+   for position in xrange(gDad.getHeight()):
       frameDiff = diff(frame1, gDad[position])
       if frameDiff < minimalDiff and frameDiff>5: #avoid 
          minimalDiff = frameDiff

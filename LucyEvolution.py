@@ -181,7 +181,7 @@ def run_main():
     framesQty = int(conf.getProperty("Individual frames quantity"))
     genome = G2DList.G2DList(framesQty, 18)
     genome.setParams(rangemin=0, rangemax=360)
-
+    genome.setParams(gauss_sigma=3, gauss_mu=0)
     # The evaluator function (objective function)
     genome.evaluator.set(eval_func)
     genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
@@ -195,7 +195,7 @@ def run_main():
     #genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
     genome.mutator.set(mutators.G2DListMutatorRealGaussianSpline)
     #genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
-    ga.setMutationRate(0.1)
+    ga.setMutationRate(0.2)
     
     ga.selector.set(Selectors.GRankSelector)
     #ga.selector.set(Selectors.GTournamentSelector)
