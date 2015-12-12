@@ -108,11 +108,12 @@ def G2DListCrossoverSingleNearHPointImprove(genome, **args):
 
    for position in range(gDad.getHeight()):
       frameDiff = diff(frame1, gDad[position])
-      if frameDiff < minimalDiff and frameDiff>5: #avoid to choose a gene already injected gene
+      #if frameDiff < minimalDiff and frameDiff>5: #avoid to choose a gene already injected gene
+      if frameDiff < minimalDiff:
          minimalDiff = frameDiff
          minimalDiffPosition = position
          print minimalDiffPosition, minimalDiff, gDad.getHeight()
-   print "difference between poses: ", minimalDiff
+   print "difference between poses: ", minimalDiff, "crossover posititon:", crossover
 
    frame2 = gDad[minimalDiffPosition]
 
