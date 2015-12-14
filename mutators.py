@@ -57,7 +57,7 @@ def interpolate(genome, which_x, which_y, offset):
          y[k] = genome[poseToSmooth][which_x]
       
       spl = UnivariateSpline(x, y)
-      spl.set_smoothing_factor(0.3)
+      spl.set_smoothing_factor(0.5)
 
       for k in xrange(interpolationPointsQty):
          #print "before ", genome[int(x[k])][which_x], "now ", spl(int(x[k])), "k ", k, "diff ", genome[int(x[k])][which_x]-spl(int(x[k])), "offset ", offset
