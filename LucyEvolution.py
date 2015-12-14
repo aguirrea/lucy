@@ -195,7 +195,7 @@ def run_main():
     ga.setPopulationSize(initialPopulationSize) #TODO class atribute
 
     #genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
-    genome.mutator.set(conf.getProperty("Mutator operator"), gauss_sigma=1, gauss_mu=0)
+    genome.mutator.set(conf.getProperty("Mutator operator"))
     #genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
     ga.setMutationRate(float(conf.getProperty("MutationRate")))
     
