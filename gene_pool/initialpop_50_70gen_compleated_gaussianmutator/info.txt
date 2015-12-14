@@ -1,6 +1,0 @@
-initial pop 50 (120_19_fst_step_freeze_remove_many_adjust4.xml removed)
-70 generations
-rank selection
-gausian mutator with 0,2 rate
-fitness = time + distance * time
-

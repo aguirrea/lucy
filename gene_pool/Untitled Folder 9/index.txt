@@ -1,6 +1,0 @@
-1500 generations 
-witn gaussian mutator
-initial population of 19
-with tournament selector
-mutation rate 0,2
-elitism with selection of half population best individuals

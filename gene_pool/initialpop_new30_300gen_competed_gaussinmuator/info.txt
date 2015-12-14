@@ -1,6 +1,0 @@
-initial pop 30
-300 generations
-RouletteWheel selection
-gausian mutator with 0,2 rate
-fitness = distance + time * distance
-

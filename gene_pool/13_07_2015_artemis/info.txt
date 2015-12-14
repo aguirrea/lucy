@@ -1,9 +1,0 @@
-gen = 41
-population size = 51
-mutator = G2DListMutatorRealGaussian
-fitness = distance * (poses_executed/cant_poses+1)
-mutationRate = 0.1
-selector = GTournamentSelector
-crossoverRate = 0.9
-elitismReplacement = initialPopulationSize/2
-crossover operator = G2DListCrossoverSingleNearHPoint 0.1
