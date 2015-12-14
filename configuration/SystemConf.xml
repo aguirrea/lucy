@@ -79,13 +79,14 @@
     <Name>Individual frames quantity</Name>
     <Value>400</Value>    
 </Property>
+<!-- GA parameters -->
 <Property>
     <Name>Population size</Name>
     <Value>3</Value>    
 </Property>
 <Property>
     <Name>Number of generations</Name>
-    <Value>600</Value>    
+    <Value>4</Value>    
 </Property>
 <Property>
     <Name>Crossover operator</Name>
@@ -102,7 +103,7 @@
 <Property>
     <Name>CrossoverRate</Name>
     <Value>0.9</Value>    
-</Property
+</Property>
 <Property>
     <Name>MutationRate</Name>
     <Value>0.1</Value>    

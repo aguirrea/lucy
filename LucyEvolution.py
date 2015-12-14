@@ -174,9 +174,9 @@ def ConvergenceCriteria(ga_engine):
     return convergenceCriteria
 
 def run_main():
+    conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     initialPopulationSize = int(conf.getProperty("Population size"))
     generations = int(conf.getProperty("Number of generations"))
-    conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
     framesQty = int(conf.getProperty("Individual frames quantity")) #TODO change this to variable size genome
     genome = G2DList.G2DList(framesQty, 18)
@@ -185,7 +185,9 @@ def run_main():
 
     # The evaluator function (objective function)
     genome.evaluator.set(eval_func)
-    genome.crossover.set(conf.getProperty("Crossover operator"))
+    if conf.getProperty("Crossover operator") == "crossovers.G2DListCrossoverSingleNearHPoint":
+        genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
+
     #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPointImprove)
     #genome.crossover.set(crossovers.G2DListCrossoverSingleHPoint)
     
@@ -195,11 +197,14 @@ def run_main():
     ga.setPopulationSize(initialPopulationSize) #TODO class atribute
 
     #genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
-    genome.mutator.set(conf.getProperty("Mutator operator"))
+    if conf.getProperty("Mutator operator") == "mutators.G2DListMutatorRealGaussianSpline":
+        genome.mutator.set(mutators.G2DListMutatorRealGaussianSpline)
     #genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
     ga.setMutationRate(float(conf.getProperty("MutationRate")))
     
-    ga.selector.set(conf.getProperty("Selection operator")) 
+    if conf.getProperty("Selection operator") == "Selectors.GRankSelector" :
+        ga.selector.set(Selectors.GRankSelector) 
+
     #ga.selector.set(Selectors.GTournamentSelector)
     '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation. 
     While the rest of population...maybe by previous selection or you can define it as best fit survivors'''
@@ -210,7 +215,7 @@ def run_main():
     elitism = float(conf.getProperty("Elitism replacement percentage")) > 0
     ga.setElitism(elitism)
     '''Set the number of best individuals to copy to the next generation on the elitism'''
-    ga.setElitismReplacement(initialPopulationSize*float(conf.getProperty("Elitism replacement percentage")))
+    ga.setElitismReplacement(int(initialPopulationSize*float(conf.getProperty("Elitism replacement percentage"))))
     #ga.terminationCriteria.set(ConvergenceCriteria)
 
     # Create DB Adapter and set as adapter
@@ -250,7 +255,7 @@ def run_main():
     
     shutil.copy2('pyevolve.db', experimentDir)
 
-    file = open(experimentDir+"info.txt","w")
+    file = open(os.path.join(experimentDir,"info.txt"),"w")
     
     file.write("initialPopulationSize = " + conf.getProperty("Population size") + "\n")
     file.write("generations = " + conf.getProperty("Number of generations") + "\n")
@@ -268,5 +273,6 @@ def run_main():
     #do the stats    
     print ga.getStatistics()
 
+
 if __name__ == "__main__":
-   run_main()
+    run_main()
