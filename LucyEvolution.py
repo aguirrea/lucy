@@ -174,40 +174,43 @@ def ConvergenceCriteria(ga_engine):
     return convergenceCriteria
 
 def run_main():
-    initialPopulationSize = 50
-    generations = 600
+    initialPopulationSize = int(conf.getProperty("Population size"))
+    generations = int(conf.getProperty("Number of generations"))
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
     # Genome instance
-    framesQty = int(conf.getProperty("Individual frames quantity"))
+    framesQty = int(conf.getProperty("Individual frames quantity")) #TODO change this to variable size genome
     genome = G2DList.G2DList(framesQty, 18)
     genome.setParams(rangemin=0, rangemax=360)
     genome.setParams(gauss_sigma=3, gauss_mu=0)
+
     # The evaluator function (objective function)
     genome.evaluator.set(eval_func)
-    genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
+    genome.crossover.set(conf.getProperty("Crossover operator"))
     #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPointImprove)
     #genome.crossover.set(crossovers.G2DListCrossoverSingleHPoint)
+    
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
     ga.setGenerations(generations)    #TODO class atribute
     ga.setPopulationSize(initialPopulationSize) #TODO class atribute
 
     #genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
-    genome.mutator.set(mutators.G2DListMutatorRealGaussianSpline, gauss_sigma=1, gauss_mu=0)
+    genome.mutator.set(conf.getProperty("Mutator operator"), gauss_sigma=1, gauss_mu=0)
     #genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
-    ga.setMutationRate(0.1)
+    ga.setMutationRate(float(conf.getProperty("MutationRate")))
     
-    ga.selector.set(Selectors.GRankSelector)
+    ga.selector.set(conf.getProperty("Selection operator")) 
     #ga.selector.set(Selectors.GTournamentSelector)
     '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation. 
     While the rest of population...maybe by previous selection or you can define it as best fit survivors'''
-    ga.setCrossoverRate(0.9) 
+    ga.setCrossoverRate(float(conf.getProperty("CrossoverRate"))) 
     
     #ga.selector.set(Selectors.GTournamentSelector)
     #ga.selector.set(Selectors.GRouletteWheel)
-    ga.setElitism(True)
+    elitism = float(conf.getProperty("Elitism replacement percentage")) > 0
+    ga.setElitism(elitism)
     '''Set the number of best individuals to copy to the next generation on the elitism'''
-    ga.setElitismReplacement(initialPopulationSize/2)
+    ga.setElitismReplacement(initialPopulationSize*float(conf.getProperty("Elitism replacement percentage")))
     #ga.terminationCriteria.set(ConvergenceCriteria)
 
     # Create DB Adapter and set as adapter
@@ -247,7 +250,21 @@ def run_main():
     
     shutil.copy2('pyevolve.db', experimentDir)
 
-
+    file = open(experimentDir+"info.txt","w")
+    
+    file.write("initialPopulationSize = " + conf.getProperty("Population size") + "\n")
+    file.write("generations = " + conf.getProperty("Number of generations") + "\n")
+    file.write("genome.crossover = " + conf.getProperty("Crossover operator") + "\n")
+    file.write("genome.mutator = " + conf.getProperty("Mutator operator") + "\n")
+    
+    file.write("MutationRate = " + conf.getProperty("MutationRate") + "\n")
+    
+    file.write("selector = " + conf.getProperty("Selection operator") + "\n")
+    file.write("CrossoverRate = " + conf.getProperty("CrossoverRate") + "\n")
+    file.write("ElitismReplacement percentage = " + conf.getProperty("Elitism replacement percentage") + "\n")
+    
+    file.close()
+    
     #do the stats    
     print ga.getStatistics()
 

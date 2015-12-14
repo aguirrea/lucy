@@ -79,4 +79,36 @@
     <Name>Individual frames quantity</Name>
     <Value>400</Value>    
 </Property>
+<Property>
+    <Name>Population size</Name>
+    <Value>3</Value>    
+</Property>
+<Property>
+    <Name>Number of generations</Name>
+    <Value>600</Value>    
+</Property>
+<Property>
+    <Name>Crossover operator</Name>
+    <Value>crossovers.G2DListCrossoverSingleNearHPoint</Value>    
+</Property>
+<Property>
+    <Name>Mutator operator</Name>
+    <Value>mutators.G2DListMutatorRealGaussianSpline</Value>    
+</Property>
+<Property>
+    <Name>Selection operator</Name>
+    <Value>Selectors.GRankSelector</Value>    
+</Property>
+<Property>
+    <Name>CrossoverRate</Name>
+    <Value>0.9</Value>    
+</Property
+<Property>
+    <Name>MutationRate</Name>
+    <Value>0.1</Value>    
+</Property>
+<Property>
+    <Name>Elitism replacement percentage</Name>
+    <Value>0.5</Value>    
+</Property>
 </System>
