@@ -193,9 +193,9 @@ def run_main():
     ga.setPopulationSize(initialPopulationSize) #TODO class atribute
 
     #genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
-    genome.mutator.set(mutators.G2DListMutatorRealGaussianSpline)
+    genome.mutator.set(mutators.G2DListMutatorRealGaussianSpline, gauss_sigma=1, gauss_mu=0)
     #genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
-    ga.setMutationRate(0.2)
+    ga.setMutationRate(0.1)
     
     ga.selector.set(Selectors.GRankSelector)
     #ga.selector.set(Selectors.GTournamentSelector)
