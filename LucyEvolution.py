@@ -199,23 +199,27 @@ def run_main():
     #genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
     if conf.getProperty("Mutator operator") == "mutators.G2DListMutatorRealGaussianSpline":
         genome.mutator.set(mutators.G2DListMutatorRealGaussianSpline)
-    #genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
+    elif conf.getProperty("Mutator operator") == "Mutators.G2DListMutatorRealGaussianGradient":
+        genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
+    
     ga.setMutationRate(float(conf.getProperty("MutationRate")))
     
     if conf.getProperty("Selection operator") == "Selectors.GRankSelector" :
         ga.selector.set(Selectors.GRankSelector) 
-
-    #ga.selector.set(Selectors.GTournamentSelector)
+    elif conf.getProperty("Selection operator") == "Selectors.GTournamentSelector" :
+        ga.selector.set(Selectors.GTournamentSelector)
+    elif conf.getProperty("Selection operator") == "Selectors.GRouletteWheel" :
+        ga.selector.set(Selectors.GRouletteWheel)
+ 
     '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation. 
     While the rest of population...maybe by previous selection or you can define it as best fit survivors'''
     ga.setCrossoverRate(float(conf.getProperty("CrossoverRate"))) 
     
-    #ga.selector.set(Selectors.GTournamentSelector)
-    #ga.selector.set(Selectors.GRouletteWheel)
     elitism = float(conf.getProperty("Elitism replacement percentage")) > 0
     ga.setElitism(elitism)
     '''Set the number of best individuals to copy to the next generation on the elitism'''
     ga.setElitismReplacement(int(initialPopulationSize*float(conf.getProperty("Elitism replacement percentage"))))
+    
     #ga.terminationCriteria.set(ConvergenceCriteria)
 
     # Create DB Adapter and set as adapter
@@ -240,8 +244,7 @@ def run_main():
     filename = str(score) + "-" + timestr + "-" + str(generations) + ".xml"
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
-    #geneticPoolDir = os.getcwd() + conf.getDirectory("Genetic Pool")
-    #experimentDir = geneticPoolDir + timestr
+
     bestIndividual.persist(os.path.join(experimentDir,filename))
 
     #store all the final population, not only the fitest
