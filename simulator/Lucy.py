@@ -193,7 +193,7 @@ class SimulatedLucy(Lucy):
         time = self.getSimTime() 
         print "execution time: ", time
         stability = self.poseExecuted / float(framesQty)
-        fitness = distance * stability * normMode
+        fitness = 0.4 * distance + 0.35 * stability + 0.25 * normMode
         print "normMode: ", normMode
         print "stability: ", stability 
         return fitness
