@@ -21,6 +21,7 @@
 from simulator.Lucy                             import Lucy, SimulatedLucy, PhysicalLucy
 from simulator.AXAngle                          import AXAngle
 from parser.LoadPoses                           import LoadPoses
+from datatypes.DTModelRepose                    import DTModelRepose, DTModelVrepReda
 from datatypes.DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero
 from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticMaterial, DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
 from Pose                                       import Pose
@@ -34,8 +35,9 @@ import xml.etree.cElementTree as ET
 
 class Individual:
 
-    def __init__(self, idividualProperty, individualGeneticMaterial):
+    def __init__(self, idividualProperty, individualGeneticMaterial, modelReposeValue=DTModelVrepReda()):
         self.property = idividualProperty
+        self.modelReposeValue = modelReposeValue
         self.fitness = 0
         self.robotConfig = LoadRobotConfiguration()
         self.configuration = LoadSystemConfiguration()
@@ -60,7 +62,11 @@ class Individual:
         for i in xrange(self.poseSize):
             for joint in self.robotImplementedJoints:
                 #print "i: ", i, "j: ", joint
-                value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint) #TODO this can be a problem for the physical robot
+                if self.property.avoidJoint(joint):
+                    value = modelReposeValue.getReposeValue(joint)
+                else:                    
+                    value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint) #TODO this can be a problem for the physical robot
+                
                 self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]=value
     
     def stopLucy(self):
