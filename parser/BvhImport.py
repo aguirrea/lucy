@@ -62,17 +62,25 @@ class BvhImport:
             result_z[i] = node[2]
         return result_x, result_y, result_z
 
-    def getNodePositionsFromName(self,nodeName):
+    def getNodePositionsFromName(self, nodeName, endFrame=None):
         result_x={}
         result_y={}
         result_z={}
         nodeIndex=self.nodeNameIndexMapping[nodeName]
-        for i in xrange(len(self.animation.frames)):
-            pose = self.animation.get_pose(i)
-            node = pose.get_position(nodeIndex)
-            result_x[i] = node[0]
-            result_y[i] = node[1]
-            result_z[i] = node[2]
+        if endFrame!=None and len(self.animation.frames) > endFrame:
+            for i in xrange(endFrame+1):
+                pose = self.animation.get_pose(i)
+                node = pose.get_position(nodeIndex)
+                result_x[i] = node[0]
+                result_y[i] = node[1]
+                result_z[i] = node[2]
+        else:
+            for i in xrange(len(self.animation.frames)):
+                pose = self.animation.get_pose(i)
+                node = pose.get_position(nodeIndex)
+                result_x[i] = node[0]
+                result_y[i] = node[1]
+                result_z[i] = node[2]
         return result_x, result_y, result_z
 
 #parser = BvhImport("Example1.bvh")

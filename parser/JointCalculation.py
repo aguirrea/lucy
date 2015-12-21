@@ -26,6 +26,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from BvhImport import BvhImport
+from datatypes.DTSecuencePartitioning import DTSecuencePartitioning, DTWalkPartitioning
 from numpy import array
 from numpy import conjugate
 from numpy import angle
@@ -34,6 +35,8 @@ import math
 class JointCalculation:
     def __init__(self, file):
         self.parser = BvhImport(file)
+        end = DTWalkPartitioning(file).getIndividualEnd()
+        self.end = end
 
     def angle(self,v):
         #v is a time serie, so we have to iterate in time
@@ -47,9 +50,9 @@ class JointCalculation:
     #calculates the angle in the sagital plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise
     def calculateLeftSagital(self, joint1, joint2, joint3):
         #with points 1, 2 and 3 
-        x1, y1, z1 = self.parser.getNodePositionsFromName(joint1)
-        x2, y2, z2 = self.parser.getNodePositionsFromName(joint2)
-        x3, y3, z3 = self.parser.getNodePositionsFromName(joint3)
+        x1, y1, z1 = self.parser.getNodePositionsFromName(joint1, self.end)
+        x2, y2, z2 = self.parser.getNodePositionsFromName(joint2, self.end)
+        x3, y3, z3 = self.parser.getNodePositionsFromName(joint3, self.end)
         #as we are calculating in the sagital plane only z and y components are used as they describe this plane
         az1 = array(z1.values())
         az2 = array(z2.values())
@@ -70,9 +73,9 @@ class JointCalculation:
 
     def calculateRightSagital(self, joint1, joint2, joint3):
         #with points 1, 2 and 3 
-        x1, y1, z1 = self.parser.getNodePositionsFromName(joint1)
-        x2, y2, z2 = self.parser.getNodePositionsFromName(joint2)
-        x3, y3, z3 = self.parser.getNodePositionsFromName(joint3)
+        x1, y1, z1 = self.parser.getNodePositionsFromName(joint1, self.end)
+        x2, y2, z2 = self.parser.getNodePositionsFromName(joint2, self.end)
+        x3, y3, z3 = self.parser.getNodePositionsFromName(joint3, self.end)
         #as we are calculating in the sagital plane only z and y components are used as they describe this plane
         az1 = array(z1.values())
         az2 = array(z2.values())
@@ -94,9 +97,9 @@ class JointCalculation:
     #calculates the angle in the frontal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise 
     #WARNING Blender swaps Z and Y axis
     def calculateTransversal(self, joint1, joint2, joint3):
-        x1, y1, z1 = self.parser.getNodePositionsFromName(joint1)
-        x2, y2, z2 = self.parser.getNodePositionsFromName(joint2)
-        x3, y3, z3 = self.parser.getNodePositionsFromName(joint3)    
+        x1, y1, z1 = self.parser.getNodePositionsFromName(joint1, self.end)
+        x2, y2, z2 = self.parser.getNodePositionsFromName(joint2, self.end)
+        x3, y3, z3 = self.parser.getNodePositionsFromName(joint3, self.end)    
         az1 = array(z1.values())
         az2 = array(z2.values())
         az3 = array(z3.values())
@@ -112,9 +115,9 @@ class JointCalculation:
     #calculates the angle in the transversal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise
     #WARNING Blender swaps Z and Y axis
     def calculateFrontal(self, joint1, joint2, joint3):
-        x1, y1, z1 = self.parser.getNodePositionsFromName(joint1)
-        x2, y2, z2 = self.parser.getNodePositionsFromName(joint2)
-        x3, y3, z3 = self.parser.getNodePositionsFromName(joint3)    
+        x1, y1, z1 = self.parser.getNodePositionsFromName(joint1, self.end)
+        x2, y2, z2 = self.parser.getNodePositionsFromName(joint2, self.end)
+        x3, y3, z3 = self.parser.getNodePositionsFromName(joint3, self.end)    
         ay1 = array(y1.values())
         ay2 = array(y2.values())
         ay3 = array(y3.values())
