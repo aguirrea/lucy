@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #VREP_VERSION = V-REP_PRO_EDU_V3_2_2_Linux
-VREP_VERSION = V-REP_PRO_EDU_V3_2_3_64_BETA_Linux
+VREP_VERSION = V-REP_PRO_EDU_V3_2_3_64_Linux
 #VREP_VERSION = V-REP_PRO_EDU_V3_2_2_64_Linux
 VREP_URL = http://coppeliarobotics.com/$(VREP_VERSION).tar.gz
 
