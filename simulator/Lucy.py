@@ -181,8 +181,11 @@ class SimulatedLucy(Lucy):
 
     def listMode(self, l):
         data = Counter(l)
-        data.most_common()   # Returns all unique items and their counts
-        return data.most_common(1)[0][0]  # Returns the highest occurring item
+        if len(data) > 0:
+            data.most_common()   # Returns all unique items and their counts
+            return data.most_common(1)[0][0]  # Returns the highest occurring item
+        else:
+            return 0
 
     def getFitness(self, endFrameExecuted=False):
         distance = self.getSimDistance()
