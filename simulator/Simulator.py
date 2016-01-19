@@ -100,7 +100,8 @@ class Simulator:
         error = False
         error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait) or error
         error, bioloid_position = self.getObjectPositionWrapper(clientID, LSP_Handle) or error 
-        return error, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD"))
+        #print "bioloid osition", bioloid_position[2]
+        return error, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and bioloid_position[2] < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))
 
     def startSim(self, clientID, screen=True):
         #I need the simulator stopped in order to be started
