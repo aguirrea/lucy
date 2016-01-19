@@ -3,7 +3,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 #
-# Datatype for partitioning a secuence of poses taked from an instructor
+# Datatype for partitioning a secuence of poses executed by a instructor
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,17 +26,6 @@ import numpy as np
 from scipy.signal import argrelextrema
 from collections import Counter
 
-def firstMax(values1, values2):
-    res=0
-    for i in range(len(values1)-2):
-        if values1[i] < values1[i+1] and values1[i+1] > values1[i+2]: #i+1 is a local maximun
-            if (values1[i] - values2[i]) > THREADHOLD:  
-                res=i+1
-        elif values1[i] < values1[i+1] < values1[i+2]: #i is a local maximun
-            if (values1[i] - values2[i]) > THREADHOLD:  
-                res=i
-    return res
-
 def find_nearest(a, a0):
     "Element in nd array `a` closest to the scalar value `a0`"
     idx = np.abs(a - a0).argmin()
@@ -48,6 +37,7 @@ class DTSecuencePartitioning(object):
         self.end = 0
         self.Y_THREADHOLD = 11 #TODO calculate this as the average of the steps_highs
         self.X_THREADHOLD = 36
+        self.framesPerSecond = 20 #TODO add this to configuration xml
 
     def getIndividualEnd(self):
         return self.end
@@ -107,23 +97,16 @@ class DTWalkPartitioning(DTSecuencePartitioning):
                         stepsRfootIndexes.append(index)
             
 
-        if stepsLfootIndexes[0] < stepsRfootIndexes[0]:
-            if len(stepsLfootIndexes) > 2:
-                testPoint = stepsLfootIndexes[1]
-                while(y1[testPoint]>y2[testPoint]):
-                    testPoint = testPoint + 1
+        if stepsLfootIndexes[0] < stepsRfootIndexes[0]: #start walking with right leg
+            testPoint = stepsLfootIndexes[0]
+            while(y1[testPoint]>y2[testPoint]):
+                testPoint = testPoint + 1
 
-                self.end = testPoint + 5
-            else:
-                self.end = len(y1)
-
+            self.end = testPoint + 5
         else:
-            if len(stepsRfootIndexes) > 2:
-                testPoint = stepsRfootIndexes[1]
-                while(y2[testPoint]>y1[testPoint]):
-                    testPoint = testPoint + 1
-                self.end = testPoint + 5
-            else:
-                self.end = len(y2)
+            testPoint = stepsRfootIndexes[0]
+            while(y2[testPoint]>y1[testPoint]):
+                testPoint = testPoint + 1
+            self.end = testPoint + 5
 
 
