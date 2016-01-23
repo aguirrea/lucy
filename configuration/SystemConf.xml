@@ -1,4 +1,5 @@
 <System>
+<!-- System paths-->
 <Directory>
     <Name>GAWalk Files</Name> 
     <Value>/mocap/gawalk/xml</Value>
@@ -31,17 +32,23 @@
     <Name>Lucy vrep model</Name> 
     <Value>/simulator/models/genetic_bioloid.ttt</Value>
 </File>
+<!-- Vrep connection parameters -->
 <Property>
     <Name>Vrep IP</Name>
     <Value>127.0.0.1</Value>    
 </Property>
 <Property>
     <Name>Vrep port</Name>
-    <Value>19997</Value>    
+    <Value>19998</Value>    
+</Property>
+<!-- Lucy vrep parameters -->
+<Property>
+    <Name>FALL_THRESHOLD_DOWN</Name>
+    <Value>0.23</Value>    
 </Property>
 <Property>
-    <Name>FALL_THRESHOLD</Name>
-    <Value>0.17</Value>    
+    <Name>FALL_THRESHOLD_UP</Name>
+    <Value>0.28</Value>    
 </Property>
 <Property>
     <Name>ConnectionTimeout</Name>
@@ -57,7 +64,7 @@
 </Property>
 <Property>
     <Name>Lucy render enable</Name>
-    <Value>0</Value>    
+    <Value>1</Value>
 </Property>
 <Property>
     <Name>Lucy simulated?</Name>
@@ -76,17 +83,21 @@
     <Value>0.100</Value>    
 </Property>
 <Property>
-    <Name>Individual frames quantity</Name>
-    <Value>400</Value>    
+    <Name>physics enable?</Name>
+    <Value>0</Value>
+</Property>
+<Property>
+    <Name>re-evaluate fittest?</Name>
+    <Value>0</Value>
 </Property>
 <!-- GA parameters -->
 <Property>
     <Name>Population size</Name>
-    <Value>3</Value>    
+    <Value>13</Value>
 </Property>
 <Property>
     <Name>Number of generations</Name>
-    <Value>4</Value>    
+    <Value>600</Value>
 </Property>
 <Property>
     <Name>Crossover operator</Name>
@@ -98,7 +109,7 @@
 </Property>
 <Property>
     <Name>Selection operator</Name>
-    <Value>Selectors.GRankSelector</Value>    
+    <Value>Selectors.GUniformSelector</Value>    
 </Property>
 <Property>
     <Name>CrossoverRate</Name>

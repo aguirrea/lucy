@@ -3,7 +3,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 #
-# Lucy evolution
+# Lucy evolution main program
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,26 +19,24 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
+import glob
+import os
+import shutil
+import time
+
+from pyevolve import DBAdapters
 from pyevolve import G2DList
 from pyevolve import GSimpleGA
-from pyevolve import Selectors
-from pyevolve import Crossovers
 from pyevolve import Mutators
-from pyevolve import DBAdapters
-from pyevolve import Statistics
+from pyevolve import Selectors
 
-from datatypes.DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive
-from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticMaterial, DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
+import configuration.constants as sysConstants
 from Individual                                 import Individual
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
-#from simulator.LoadRobotConfiguration import LoadRobotConfiguration
-
-import time
-import os
-import glob
-import crossovers
-import mutators
-import shutil
+from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
+from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive
+from genetic_operators import crossovers, mutators
+from genetic_operators.DTGenomeFunctions import  DTGenomeFunctions
 
 initialPopulationSetted = False
 gaEngine = None
@@ -48,6 +46,22 @@ max_score_generation = 0
 convergenceCriteria = False
 experimentDir = ""
 
+def storeExperimentGAparameters():
+    conf = LoadSystemConfiguration()
+    file = open(os.path.join(experimentDir,"info.txt"),"w")
+    
+    file.write("initialPopulationSize = " + conf.getProperty("Population size") + "\n")
+    file.write("generations = " + conf.getProperty("Number of generations") + "\n")
+    file.write("genome.crossover = " + conf.getProperty("Crossover operator") + "\n")
+    file.write("genome.mutator = " + conf.getProperty("Mutator operator") + "\n")
+    
+    file.write("MutationRate = " + conf.getProperty("MutationRate") + "\n")
+    
+    file.write("selector = " + conf.getProperty("Selection operator") + "\n")
+    file.write("CrossoverRate = " + conf.getProperty("CrossoverRate") + "\n")
+    file.write("ElitismReplacement percentage = " + conf.getProperty("Elitism replacement percentage") + "\n")
+    
+    file.close()
 
 def getPopulationAverage(population):
     average = 0
@@ -57,7 +71,7 @@ def getPopulationAverage(population):
     return average/len(population)
 
 
-def setInitialPopulation (ga_engine):
+def setInitialPopulation(ga_engine):
 
     prop = DTIndividualPropertyCMUDaz()    
     propVanilla = DTIndividualPropertyVanilla()
@@ -98,19 +112,25 @@ def setInitialPopulation (ga_engine):
             else:
                 break
     '''    
+    dtgenoma = DTGenomeFunctions()
+    #the random initia population created is replaced by the imitation motion capture database
     if individualCounter < popSize:
         for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
-            print individualCounter, " individuals processed!"
-            print 'inserting individual: ' + filename + " into the initial population"
-            walk = Individual(prop, DTIndividualGeneticTimeSerieFile(filename))
-            geneticMatrix = walk.getGenomeMatrix()
-            if individualCounter < popSize-1:
+            if individualCounter < popSize:
+                print individualCounter, " individuals processed!"
+                print 'inserting individual: ' + filename + " into the initial population"
+                walk = Individual(prop, DTIndividualGeneticTimeSerieFile(filename))
+                teacherGeneticMatrix = walk.getGenomeMatrix()
                 adan = population[individualCounter]
-                for i in xrange(adan.getHeight()):
-                    if i == len(geneticMatrix):
-                            break
-                    for j in xrange(adan.getWidth()):
-                        adan.setItem(i,j,geneticMatrix[i][j])
+                adanIndividualLength=dtgenoma.getIndividualLength(adan)
+                adanJointLength=dtgenoma.getIndividualFrameLength(adan)
+                for i in xrange(adanIndividualLength):
+                    for j in xrange(adanJointLength):
+                        if i < len(teacherGeneticMatrix): #if the fixed gnoma representation size is less than the teacher size
+                            adan.setItem(i, j, teacherGeneticMatrix[i][j])
+                        else:
+                            #put a sentinel joint value to mark the end of the individual
+                            adan.setItem(i,j,sysConstants.JOINT_SENTINEL)
                 population[individualCounter]=adan
                 individualCounter = individualCounter + 1
             else:
@@ -147,11 +167,15 @@ def generationCallback(ga_engine):
         global experimentDir
         experimentDir = geneticPoolDir + timestr
         os.mkdir(experimentDir)
+        storeExperimentGAparameters()
     prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
     bestIndividual.persist(os.path.join(experimentDir, filename))
     ga_engine.getDBAdapter().commit()
 
+    population = ga_engine.getPopulation()
+    popSize = len(population)
+    print "*********************** popSize: ", popSize
     ##population = ga_engine.getPopulation()
     ##averagePopulation = getPopulationAverage(population)
     #averageGeneration = getPopulationAverage(gen)
@@ -161,12 +185,28 @@ def generationCallback(ga_engine):
 
 # This function is the evaluation function
 def eval_func(chromosome):
+    conf = LoadSystemConfiguration()
     if not initialPopulationSetted:
-        setInitialPopulation(gaEngine)    
+        setInitialPopulation(gaEngine)
+
     #prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     prop = DTIndividualPropertyVanillaEvolutive()
-    individual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome)))
-    return individual.execute() #return the fitness resulting from the simulator execution
+    embryo = DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome))
+    embryoLength = embryo.getLength()
+    individual = Individual(prop, embryo)
+    individual.setLength(embryoLength)
+    fitness = individual.execute() #return the fitness resulting from the simulator execution
+
+    if int(conf.getProperty("re-evaluate fittest?"))==1:
+        if fitness > max_score: #is really a better fitness ?
+            candidateFitness = fitness
+            fitness = individual.execute()
+            print "candidateFitness: ", candidateFitness, "fitness: ", fitness
+            while candidateFitness-fitness > 0.1:
+                candidateFitness=fitness
+                fitness = individual.execute()
+                print "candidateFitness: ", candidateFitness, "fitness: ", fitness
+    return fitness
 
 # This function is the termination criteria for the algorithm
 def ConvergenceCriteria(ga_engine):
@@ -178,7 +218,7 @@ def run_main():
     initialPopulationSize = int(conf.getProperty("Population size"))
     generations = int(conf.getProperty("Number of generations"))
     # Genome instance
-    framesQty = int(conf.getProperty("Individual frames quantity")) #TODO change this to variable size genome
+    framesQty = sysConstants.GENOMA_MAX_LENGTH
     genome = G2DList.G2DList(framesQty, 18)
     genome.setParams(rangemin=0, rangemax=360)
     genome.setParams(gauss_sigma=3, gauss_mu=0)
@@ -210,6 +250,8 @@ def run_main():
         ga.selector.set(Selectors.GTournamentSelector)
     elif conf.getProperty("Selection operator") == "Selectors.GRouletteWheel" :
         ga.selector.set(Selectors.GRouletteWheel)
+    elif conf.getProperty("Selection operator") == "Selectors.GUniformSelector" :
+        ga.selector.set(Selectors.GUniformSelector)
  
     '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation. 
     While the rest of population...maybe by previous selection or you can define it as best fit survivors'''
@@ -218,7 +260,8 @@ def run_main():
     elitism = float(conf.getProperty("Elitism replacement percentage")) > 0
     ga.setElitism(elitism)
     '''Set the number of best individuals to copy to the next generation on the elitism'''
-    ga.setElitismReplacement(int(initialPopulationSize*float(conf.getProperty("Elitism replacement percentage"))))
+    if elitism:
+        ga.setElitismReplacement(int(initialPopulationSize*float(conf.getProperty("Elitism replacement percentage"))))
     
     #ga.terminationCriteria.set(ConvergenceCriteria)
 
@@ -257,21 +300,6 @@ def run_main():
         individual.persist(os.path.join(experimentDir, filename))
     
     shutil.copy2('pyevolve.db', experimentDir)
-
-    file = open(os.path.join(experimentDir,"info.txt"),"w")
-    
-    file.write("initialPopulationSize = " + conf.getProperty("Population size") + "\n")
-    file.write("generations = " + conf.getProperty("Number of generations") + "\n")
-    file.write("genome.crossover = " + conf.getProperty("Crossover operator") + "\n")
-    file.write("genome.mutator = " + conf.getProperty("Mutator operator") + "\n")
-    
-    file.write("MutationRate = " + conf.getProperty("MutationRate") + "\n")
-    
-    file.write("selector = " + conf.getProperty("Selection operator") + "\n")
-    file.write("CrossoverRate = " + conf.getProperty("CrossoverRate") + "\n")
-    file.write("ElitismReplacement percentage = " + conf.getProperty("Elitism replacement percentage") + "\n")
-    
-    file.close()
     
     #do the stats    
     print ga.getStatistics()
