@@ -18,35 +18,41 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+import matplotlib.pyplot as plt
+import configuration.constants as sysConstants
+import numpy as np
 
 from parser.BvhImport import BvhImport
-import matplotlib.pyplot as plt
 from configuration.LoadSystemConfiguration import LoadSystemConfiguration
-import numpy as np
 from scipy.signal import argrelextrema
 from collections import Counter
+
 
 def find_nearest(a, a0):
     "Element in nd array `a` closest to the scalar value `a0`"
     idx = np.abs(a - a0).argmin()
     return a.flat[idx]
 
-class DTSecuencePartitioning(object):
+class DTMotorTaskProperty(object):
     def __init__(self):
         self.filename = ""
         self.end = 0
         self.Y_THREADHOLD = 11 #TODO calculate this as the average of the steps_highs
         self.X_THREADHOLD = 36
         self.framesPerSecond = 20 #TODO add this to configuration xml
+        self.direction = sysConstants.RIGHT_TO_LEFT
 
     def getIndividualEnd(self):
         return self.end
 
+    def getMoveDirection(self):
+        return self.direction
 
-class DTWalkPartitioning(DTSecuencePartitioning):
+
+class DTWalkCycleProperty(DTMotorTaskProperty):
     
     def __init__(self, file):
-        DTSecuencePartitioning.__init__(self)
+        DTMotorTaskProperty.__init__(self)
         self.filename = file
         parser = BvhImport(self.filename)
         x_,y_,z_ = parser.getNodePositionsFromName("lFoot")
@@ -95,7 +101,21 @@ class DTWalkPartitioning(DTSecuencePartitioning):
             
                     else:
                         stepsRfootIndexes.append(index)
-            
+
+        absis_value = []
+        absis_key = []
+
+        for key, value in z_.iteritems():
+            absis_value.append(value)
+            absis_key.append(key)
+
+        #direction of the walking cycle
+        if absis_value[0] > absis_value[len(absis_value)-1]:
+            print "aumenta"
+            self.direction = sysConstants.LEFT_TO_RIGHT
+        else:
+            print "disminuye"
+            self.direction = sysConstants.RIGHT_TO_LEFT
 
         if stepsLfootIndexes[0] < stepsRfootIndexes[0]: #start walking with right leg
             testPoint = stepsLfootIndexes[0]
