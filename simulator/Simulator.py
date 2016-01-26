@@ -29,6 +29,7 @@ from vrepConst import *
 bulletEngine = 0
 odeEngine    = 1
 _instance    = None
+
 class Simulator:
 
     def __init__(self, simulatorModel=None):
@@ -43,7 +44,7 @@ class Simulator:
         for joint in self.LucyJoints:
             self.jointHandleMapping[joint]=0
         self.clientId = self.connectVREP()
-        
+
         if simulatorModel:
             self.loadscn(self.clientId, simulatorModel)
        
@@ -56,13 +57,22 @@ class Simulator:
 
         #setting the simulation time step                           
         self.simulationTimeStepDT = float(self.sysConf.getProperty("simulation time step"))
-            
-    def getInstance(self, simulatorModel):
+
+        #testing printing in vrep
+        error, consoleHandler = vrep.simxAuxiliaryConsoleOpen(self.clientId, "lucy debugging", 8, 22, None, None, None, None, vrep.simx_opmode_oneshot_wait)
+        print "console handler: ", consoleHandler
+        vrep.simxAuxiliaryConsoleShow(self.clientId, consoleHandler, 1, vrep.simx_opmode_oneshot_wait)
+        error = vrep.simxAuxiliaryConsolePrint(self.clientId, consoleHandler, "Hello World", vrep.simx_opmode_oneshot_wait)
+
+
+    def theGetInstance(simulatorModel):
         global _instance
         if _instance is None:
             _instance = Simulator(simulatorModel)
         return _instance
-    
+
+    getInstance = staticmethod(theGetInstance)
+
     def getClientId(self):
         return self.clientId
 
@@ -117,6 +127,11 @@ class Simulator:
             print "unable to set the physical engine"
         else:
             print "physical engine correctly setted"
+
+        if int(self.sysConf.getProperty("physics enable?"))==1:
+            vrep.simxSetBooleanParameter(clientID,sim_boolparam_dynamics_handling_enabled,True,vrep.simx_opmode_oneshot)
+        else:
+            vrep.simxSetBooleanParameter(clientID,sim_boolparam_dynamics_handling_enabled,False,vrep.simx_opmode_oneshot)
 
         #settig simulation speed
         if self.speedmodifier > 0:
@@ -219,6 +234,8 @@ class Simulator:
 
     def getPosesExecutedByStepQty(self, clientID):
         return int(float(vrep.simxGetFloatingParameter(clientID, vrep.sim_floatparam_simulation_time_step, vrep.simx_opmode_oneshot_wait)[1] ) / float(0.050))
+
+
         
 
 
