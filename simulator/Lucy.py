@@ -51,7 +51,7 @@ class Lucy(object):
         self.stop = False
         self.poseExecuted = 0
 
-    def getFitness(self, endFrameExecuted=False):
+    def getFitness(self, secuenceLength):
         pass
 
     def executePose(self, pose):
@@ -126,7 +126,7 @@ class PhysicalLucy(Lucy):
             pose[joint] = value
         return error, pose            
 
-    def getFitness(self, endFrameExecuted=False):
+    def getFitness(self, secuenceLength):
         return 0
 
     def isLucyUp(self):
@@ -140,7 +140,7 @@ class SimulatedLucy(Lucy):
         Lucy.__init__(self)
         self.visible = visible
         genetic_bioloid = os.getcwd() + self.sysConf.getFile("Lucy vrep model")
-        self.sim = Simulator().getInstance(genetic_bioloid)
+        self.sim = Simulator.getInstance(genetic_bioloid)
         self.clientID = self.sim.getClientId() 
         if self.clientID == -1:
             raise VrepException("error connecting with Vrep", -1)
@@ -187,18 +187,27 @@ class SimulatedLucy(Lucy):
         else:
             return 0
 
-    def getFitness(self, endFrameExecuted=False):
+    def getFitness(self, secuenceLength):
         distance = self.getSimDistance()
         print "distance traveled: ", distance
         mode = self.listMode(self.angleBetweenOriginAndDestination)
         normMode = mode/180
-        framesQty = int(self.sysConf.getProperty("Individual frames quantity"))
-        time = self.getSimTime() 
+        #framesQty = int(self.sysConf.getProperty("Individual frames quantity"))
+        framesQty = secuenceLength
+        time = self.getSimTime()
+        print "--------------------------------------------------------------------"
         print "execution time: ", time
-        stability = self.poseExecuted / float(framesQty)
-        fitness = 0.4 * distance + 0.35 * stability + 0.25 * normMode
+        print "poses executed: ",  self.poseExecuted
+        if framesQty > 0:
+            stability = self.poseExecuted / float(framesQty)
+        else:
+            stability = 0
+        fitness = 0.3 * distance + 0.45 * stability + 0.25 * normMode
         print "normMode: ", normMode
         print "stability: ", stability 
+        print "framesQty: ", framesQty
+        print "FITNESS: ", fitness
+        print "--------------------------------------------------------------------"
         return fitness
 
     def getPosesExecutedByStepQty(self):

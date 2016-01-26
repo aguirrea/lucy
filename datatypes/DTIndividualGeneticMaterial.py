@@ -20,7 +20,9 @@
 
 from parser.LoadPoses import LoadPoses
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from pyevolve import G2DList
 
+import configuration.constants as sysConstants
 
 class DTIndividualGeneticMaterial(object):
     def __init__(self):
@@ -29,6 +31,20 @@ class DTIndividualGeneticMaterial(object):
     def getGeneticMatrix(self):
         return self.geneticMatrix
 
+    def equalSentinelFrame(self, frame):
+        sentinelFramePresent = True
+        for jointValue in frame:
+            sentinelFramePresent = sentinelFramePresent and jointValue == sysConstants.JOINT_SENTINEL
+        return sentinelFramePresent
+
+    def getLength(self):
+        iter = 0
+        genomaRawLength = len(self.geneticMatrix)
+        while iter < genomaRawLength and not self.equalSentinelFrame(self.geneticMatrix[iter]):
+            iter = iter + 1
+        length = iter
+        return length
+
 class DTIndividualGeneticTimeSerieFile(DTIndividualGeneticMaterial):
     
     def __init__(self, geneticMaterial):
@@ -36,13 +52,24 @@ class DTIndividualGeneticTimeSerieFile(DTIndividualGeneticMaterial):
         lp = LoadPoses(geneticMaterial)
         robotConfig = LoadRobotConfiguration()
         poseSize = lp.getFrameQty()
+        newGenoma = G2DList.G2DList(poseSize, 18)
+        #for i in xrange(newGenoma.getHeight()):
+        #    for j in xrange(newGenoma.getWidth()):
+        #        newGenoma.setItem(i, j, lp.getPose(i).getValue(j))
+        #self.geneticMatrix = newGenoma
         self.geneticMatrix = [[lp.getPose(i).getValue(j) for j in robotConfig.getJointsName()] for i in xrange(poseSize)] #debería pedir solo los joints implementados
 
 class DTIndividualGeneticMatrix(DTIndividualGeneticMaterial):
 
+    #def __init__(self, geneticMaterial=G2DList.G2DList(1,18)):
     def __init__(self, geneticMaterial=[[0 for j in xrange(18)] for i in xrange(1)]):
         DTIndividualGeneticMaterial.__init__(self)
         self.geneticMatrix = geneticMaterial
+
+
+
+
+
 
 
 
