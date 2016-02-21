@@ -19,19 +19,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from simulator.Lucy                             import Lucy, SimulatedLucy, PhysicalLucy
-from simulator.AXAngle                          import AXAngle
-from parser.LoadPoses                           import LoadPoses
 from datatypes.DTModelRepose                    import DTModelRepose, DTModelVrepReda
-from datatypes.DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero
-from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticMaterial, DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
 from Pose                                       import Pose
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 from simulator.LoadRobotConfiguration           import LoadRobotConfiguration
+from genetic_operators.DTGenomeFunctions        import DTGenomeFunctions
 
-import os   #only for the tests
-import glob #only for the tests
-import time
 import xml.etree.cElementTree as ET
+
 
 class Individual:
 
@@ -42,7 +37,7 @@ class Individual:
         self.robotConfig = LoadRobotConfiguration()
         self.configuration = LoadSystemConfiguration()
         self.genomeMatrix = individualGeneticMaterial.getGeneticMatrix()
-        self.poseSize = len(self.genomeMatrix) 
+        self.length = individualGeneticMaterial.getLength()
         self.genomeMatrixJointNameIDMapping = {}
         self.sysConf = LoadSystemConfiguration()
 
@@ -59,16 +54,16 @@ class Individual:
                 self.robotImplementedJoints.append(joint)
 
         #is important to use only supported joints to avoid errors obtaining the handler of a joint that doesn't exists
-        for i in xrange(self.poseSize):
+        for i in xrange(self.length):
             for joint in self.robotImplementedJoints:
                 #print "i: ", i, "j: ", joint
                 if self.property.avoidJoint(joint):
                     value = modelReposeValue.getReposeValue(joint)
-                else:                    
+                else:
                     value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]] + self.property.getPoseFix(joint) #TODO this can be a problem for the physical robot
-                
+
                 self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]=value
-    
+
     def stopLucy(self):
         self.lucy.stopLucy()
 
@@ -80,56 +75,35 @@ class Individual:
             self.lucy = PhysicalLucy()
    
         poseExecute={}
+
         i=0
-        while (self.lucy.isLucyUp() and i < self.poseSize):
+        while (self.lucy.isLucyUp() and i < self.length):
             for joint in self.robotConfig.getJointsName():
                 if not(self.property.avoidJoint(joint)):
                     value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]
                     poseExecute[joint] = value
-            i = i + self.lucy.getPosesExecutedByStepQty()  
+            i = i + self.lucy.getPosesExecutedByStepQty()
             self.lucy.executePose(Pose(poseExecute))
+
         self.lucy.stopLucy()  #this function also updates time and distance
-        
-        if i < self.poseSize:
-            self.fitness = self.lucy.getFitness()
-        else:
-            endFrameExecuted = True
-            self.fitness = self.lucy.getFitness(endFrameExecuted)
-
-        print "fitness: ", self.fitness
-        return self.fitness       
-         
-    def getPoseQty(self):
-        return self.lp.getFrameQty()
-
-    def getPose(self, poseNumber):
-        return self.lp.getFramePose(poseNumber) 
-
-    def getMostSimilarPose(self, pose):
-        diff = MAX_INT 
-        moreSimilarPose = self.getPose(1)
-        for i in xrange(self.getPoseQty()):
-            myPose = getPose(i)
-            newDiff = pose.diff(myPose)
-            if (newDiff < diff):
-                diff = newDiff
-                moreSimilarPose = myPose
-        return moreSimilarPose
+        self.fitness = self.lucy.getFitness(self.length)
+        return self.fitness
 
     def getGenomeMatrix(self):
         return self.genomeMatrix
 
     def setGenomeMatrix(self, geneMatrix):
         self.genomeMatrix = geneMatrix
-        self.poseSize = len(geneMatrix)
+        dtGenome = DTGenomeFunctions()
+        self.length = dtGenome.individualLength(geneMatrix)
 
     def persist(self,file):
         root = ET.Element("root")
         lucy = ET.SubElement(root, "Lucy")
-        for frameIt in xrange(self.poseSize):
+        for frameIt in xrange(self.length):
             frame = ET.SubElement(lucy, "frame")
             frame.set("number" , str(frameIt))
-            for joint in self.robotImplementedJoints:
+            for joint in self.robotImplementedJoints: #TODO because the notImplementedJoints doesn't participate in the simulation and fitness evaluation, they are not stored
                 xmlJoint = ET.SubElement(frame, joint)
                 joint_id = self.robotConfig.loadJointId(joint)
                 pos = self.genomeMatrix[frameIt][self.genomeMatrixJointNameIDMapping[joint]]
@@ -139,6 +113,9 @@ class Individual:
 
     def getJointMatrixIDFromName(self, jointName):
         return self.genomeMatrixJointNameIDMapping[jointName]
+
+    def setLength(self, length):
+        self.length = length
 
 
 ##Test case:
