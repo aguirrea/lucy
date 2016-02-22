@@ -25,8 +25,7 @@ import math
 import numpy as np
 from scipy.interpolate import UnivariateSpline
 from pyevolve.G2DList import G2DList, GenomeBase
-
-
+from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 import configuration.constants as sysConstants
 
 from datatypes.DTIndividualProperty import DTIndividualPropertyVanillaEvolutive
@@ -38,19 +37,23 @@ SMOOTHING_WINDOW = 20
 
 class DTGenomeFunctions(object):
     def __init__(self):
-        pass
+        self.robotConfig = LoadRobotConfiguration()
+
 
     # returns the distance between two frame poses, if one of the poses is a sentinel pose the distance is INFINITE_DISTANCE
     def diff(self, frame1, frame2):
         diff = 0
         prop = DTIndividualPropertyVanillaEvolutive()
-        for joint in range(len(frame1)):
+        robotJoints = self.robotConfig.getJointsName()
+        jointIndex = 0
+        for joint in robotJoints:
+            jointIndex = jointIndex + 1
             if not prop.avoidJoint(joint):
-                if frame1[joint] == sysConstants.JOINT_SENTINEL or frame2[joint] == sysConstants.JOINT_SENTINEL:
+                if frame1[jointIndex] == sysConstants.JOINT_SENTINEL or frame2[jointIndex] == sysConstants.JOINT_SENTINEL:
                     diff = INFINITE_DISTANCE
                     break
                 else:
-                    diff += math.fabs(frame1[joint] - frame2[joint])
+                    diff += math.fabs(frame1[jointIndex] - frame2[jointIndex])
         return diff
 
     # compares every joint of a frame with the JOINT_SENTINEL value, and return True if every joint has a value equal to it
@@ -62,13 +65,11 @@ class DTGenomeFunctions(object):
 
     # returns the length of a genome, as the number of poses it contains until the JOINT_SENTINEL value is present in all the joints of a pose
     def getIndividualLength(self, genome):
-        length = 0
-        for i in xrange(genome.getHeight()):
-            frameToCompare = genome[i]
-            if self.equalSentinelFrame(frameToCompare):
-                length = i
-                break
-        #print "+++++++++++++++++++++++++++++++++length: ", length, "len: ", len(genome)
+        iter = 0
+        genomaHeight =  genome.getHeight()
+        while iter < genomaHeight and not self.equalSentinelFrame(genome[iter]):
+            iter = iter + 1
+        length = iter
         return length
 
     def getIndividualFrameLength(self, genome):

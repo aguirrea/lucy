@@ -37,7 +37,10 @@ for filename in glob.glob(os.path.join(BVHDir, '*.bvh')):
     print "transforming: " + filename + " ..."
     lucyFileConversion = MocapLucyMapping(filename, robotConfiguration)
     newFile = ntpath.basename(filename)
+    transformedFileName = newFile
     newFile = rstrip(newFile[:-4]) + ".xml"
     newFile = XMLDir + newFile
     lucyFileConversion.generateFile(newFile)
     print "file: " + newFile + " generated!"
+    os.rename(filename, os.path.join(BVHDir)+"/transformed/"+transformedFileName)
+
