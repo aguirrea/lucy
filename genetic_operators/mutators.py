@@ -25,12 +25,19 @@ from random import random as rand_random
 
 import configuration.constants as sysConstants
 from genetic_operators.DTGenomeFunctions import DTGenomeFunctions
+import pca
 
 CDefG2DListMutRealMU = 0
 CDefG2DListMutRealSIGMA = 2
 
 CDefRangeMin = 0
 CDefRangeMax = 100
+
+
+def chromosomeToLucyGeneticMatrix(chromosome): #TODO encapsulate this in a helper class
+    geneticMatrix = [[chromosome[i][j] for j in xrange(chromosome.getWidth())] for i in xrange(chromosome.getHeight())]
+    return geneticMatrix
+    #TODO sacar los -1
 
 def randomFlipCoin(p):
    """ Returns True with the *p* probability. If the *p* is 1.0,
@@ -87,9 +94,9 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
                     final_value = min(final_value, genome.getParam("rangemax", CDefRangeMax))
                     final_value = max(final_value, genome.getParam("rangemin", CDefRangeMin))
 
-                    genome.setItem(i, j, final_value, offset)
+                    genome.setItem(i, j, final_value)
                     dtgenome.interpolate(genome, j, i, offset)
-
+                    ##pca.poseInterpolationWithPCA(chromosomeToLucyGeneticMatrix(genome), j)
                     mutations += 1
     else:
         for it in xrange(int(round(mutations))):
@@ -109,5 +116,7 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
                     # valueBeforeMutation = genome[which_y][which_x]
                     genome.setItem(which_y, which_x, final_value)
                     dtgenome.interpolate(genome, which_x, which_y, offset)
+                    ##pca.poseInterpolationWithPCA(chromosomeToLucyGeneticMatrix(genome), which_x)
+
 
     return int(mutations)
