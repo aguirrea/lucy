@@ -50,43 +50,66 @@ class BvhImport:
             for j in xrange(len(pose.positions)):
                 print str(pose.bone.node_list[j].name) + ": " + str(pose.get_position(j))
 
-    def getNodePositions(self,nodeIndex):
+    def getNodePositions(self,nodeIndex, endFrame=None, skipping=1):
         result_x={}
         result_y={}
         result_z={}
-        for i in xrange(len(self.animation.frames)):
-            pose = self.animation.get_pose(i)
-            node = pose.get_position(nodeIndex)
-            result_x[i] = node[0]
-            result_y[i] = node[1]
-            result_z[i] = node[2]
+        resultIter = 0
+        frameIter = resultIter
+        if endFrame!=None and len(self.animation.frames) > endFrame:
+            while frameIter < endFrame:
+                pose = self.animation.get_pose(frameIter)
+                node = pose.get_position(nodeIndex)
+                result_x[resultIter] = node[0]
+                result_y[resultIter] = node[1]
+                result_z[resultIter] = node[2]
+                resultIter += 1
+                frameIter = frameIter + skipping
+        else:
+            while frameIter < len(self.animation.frames):
+                pose = self.animation.get_pose(frameIter)
+                node = pose.get_position(nodeIndex)
+                result_x[resultIter] = node[0]
+                result_y[resultIter] = node[1]
+                result_z[resultIter] = node[2]
+                resultIter += 1
+                frameIter = frameIter + skipping
         return result_x, result_y, result_z
 
-    def getNodePositionsFromName(self, nodeName, endFrame=None):
+    def getNodePositionsFromName(self, nodeName, endFrame=None, skipping=1):
         result_x={}
         result_y={}
         result_z={}
         nodeIndex=self.nodeNameIndexMapping[nodeName]
+        resultIter = 0
+        frameIter = resultIter
         if endFrame!=None and len(self.animation.frames) > endFrame:
-            for i in xrange(endFrame+1):
-                pose = self.animation.get_pose(i)
+            while frameIter < endFrame:
+                pose = self.animation.get_pose(frameIter)
                 node = pose.get_position(nodeIndex)
-                result_x[i] = node[0]
-                result_y[i] = node[1]
-                result_z[i] = node[2]
+                result_x[resultIter] = node[0]
+                result_y[resultIter] = node[1]
+                result_z[resultIter] = node[2]
+                resultIter += 1
+                frameIter = frameIter + skipping
+                #print "frame: ", frameIter, "of: ", nodeName, "with skipping: ", skipping
         else:
-            for i in xrange(len(self.animation.frames)):
-                pose = self.animation.get_pose(i)
+            while frameIter < len(self.animation.frames):
+                pose = self.animation.get_pose(frameIter)
                 node = pose.get_position(nodeIndex)
-                result_x[i] = node[0]
-                result_y[i] = node[1]
-                result_z[i] = node[2]
+                result_x[resultIter] = node[0]
+                result_y[resultIter] = node[1]
+                result_z[resultIter] = node[2]
+                resultIter += 1
+                frameIter = frameIter + skipping
+                #print "frame: ", frameIter, "of: ", nodeName, "with skipping: ", skipping
         return result_x, result_y, result_z
 
-#parser = BvhImport("Example1.bvh")
-#print dir(parser)
-#u, v, z = parser.getNodePositionsFromName("hip")
-#print v
-#u, v, z = parser.getNodePositions(0)
-#print v
+
+'''parser = BvhImport("Example1.bvh")
+print dir(parser)
+u, v, z = parser.getNodePositionsFromName("hip")
+print v
+u, v, z = parser.getNodePositions(0)
+print v'''
 

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# Andrés Aguirre Dorelo
+# AndrÃ©s Aguirre Dorelo
 # MINA/INCO/UDELAR
 #
 # Parser for robot configuration file
