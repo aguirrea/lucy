@@ -29,8 +29,10 @@
     <Value>/gene_pool/</Value>
 </Directory>
 <File>
-    <Name>Lucy vrep model</Name> 
-    <Value>/simulator/models/genetic_bioloid.ttt</Value>
+    <Name>Lucy vrep model</Name>
+    <!--<Value>/simulator/models/genetic_bioloid_sweden.ttt</Value>-->
+    <Value>/simulator/models/genetic_bioloid_expert.ttt</Value>
+
 </File>
 <!-- Vrep connection parameters -->
 <Property>
@@ -44,11 +46,11 @@
 <!-- Lucy vrep parameters -->
 <Property>
     <Name>FALL_THRESHOLD_DOWN</Name>
-    <Value>0.23</Value>    
+    <Value>0.23</Value>
 </Property>
 <Property>
     <Name>FALL_THRESHOLD_UP</Name>
-    <Value>0.28</Value>    
+    <Value>0.28</Value>
 </Property>
 <Property>
     <Name>ConnectionTimeout</Name>
@@ -60,7 +62,8 @@
 </Property>
 <Property>
     <Name>Vrep not implemented joints</Name>
-    <Value>R_Elbow_Yaw L_Elbow_Yaw L_Shoulder_Yaw R_Shoulder_Yaw</Value>
+    <Value> </Value>
+    <!--<Value>R_Elbow_Yaw L_Elbow_Yaw L_Shoulder_Yaw R_Shoulder_Yaw</Value>-->
 </Property>
 <Property>
     <Name>Lucy render enable</Name>
@@ -80,20 +83,25 @@
 </Property>
 <Property>
     <Name>simulation time step</Name>
-    <Value>0.100</Value>    
+    <Value>0.100</Value>
 </Property>
 <Property>
     <Name>physics enable?</Name>
-    <Value>0</Value>
+    <Value>1</Value>
 </Property>
 <Property>
     <Name>re-evaluate fittest?</Name>
-    <Value>0</Value>
+    <Value>1</Value>
+</Property>
+<!-- Parser options -->
+<Property>
+    <Name>number of frames to skip</Name>
+    <Value>5</Value>
 </Property>
 <!-- GA parameters -->
 <Property>
     <Name>Population size</Name>
-    <Value>13</Value>
+    <Value>10</Value>
 </Property>
 <Property>
     <Name>Number of generations</Name>
