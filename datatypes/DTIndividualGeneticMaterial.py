@@ -57,7 +57,7 @@ class DTIndividualGeneticTimeSerieFile(DTIndividualGeneticMaterial):
         #    for j in xrange(newGenoma.getWidth()):
         #        newGenoma.setItem(i, j, lp.getPose(i).getValue(j))
         #self.geneticMatrix = newGenoma
-        self.geneticMatrix = [[lp.getPose(i).getValue(j) for j in robotConfig.getJointsName()] for i in xrange(poseSize)] #debería pedir solo los joints implementados
+        self.geneticMatrix = [[lp.getPose(i).getValue(j) for j in robotConfig.getJointsName()] for i in xrange(poseSize)]
 
 class DTIndividualGeneticMatrix(DTIndividualGeneticMaterial):
 
