@@ -40,7 +40,7 @@ from genetic_operators.DTGenomeFunctions import  DTGenomeFunctions
 
 initialPopulationSetted = False
 gaEngine = None
-NUMBER_GENERATIONS_CONVERGENCE_CRITERIA = 20
+NUMBER_GENERATIONS_CONVERGENCE_CRITERIA = 30
 max_score = 0
 max_score_generation = 0
 convergenceCriteria = False
@@ -73,7 +73,7 @@ def getPopulationAverage(population):
 
 def setInitialPopulation(ga_engine):
 
-    prop = DTIndividualPropertyCMUDaz()    
+    propCMUDaz = DTIndividualPropertyCMUDaz()
     propVanilla = DTIndividualPropertyVanilla()
     balieroProp = DTIndividualPropertyBaliero()
 
@@ -119,7 +119,7 @@ def setInitialPopulation(ga_engine):
             if individualCounter < popSize:
                 print individualCounter, " individuals processed!"
                 print 'inserting individual: ' + filename + " into the initial population"
-                walk = Individual(prop, DTIndividualGeneticTimeSerieFile(filename))
+                walk = Individual(propCMUDaz, DTIndividualGeneticTimeSerieFile(filename))
                 teacherGeneticMatrix = walk.getGenomeMatrix()
                 adan = population[individualCounter]
                 adanIndividualLength=dtgenoma.getIndividualLength(adan)
@@ -139,8 +139,8 @@ def setInitialPopulation(ga_engine):
     global initialPopulationSetted
     initialPopulationSetted = True
 
-def chromosomeToLucyGeneticMatrix(chromosome):
-    geneticMatrix = [[chromosome[i][j] for j in xrange(chromosome.getWidth())] for i in xrange(chromosome.getHeight())] #debería pedir solo los joints implementados
+def chromosomeToLucyGeneticMatrix(chromosome): #TODO encapsulate this in a helper class
+    geneticMatrix = [[chromosome[i][j] for j in xrange(chromosome.getWidth())] for i in xrange(chromosome.getHeight())]
     return geneticMatrix
 
 def generationCallback(ga_engine):
@@ -163,24 +163,23 @@ def generationCallback(ga_engine):
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
     filename = str(score) + "-" + timestr + "-" + str(gen) + ".xml"
+
+    #at generation 0 is the firs time to create de directory and store the GA parameters
     if gen == 0:
         global experimentDir
         experimentDir = geneticPoolDir + timestr
         os.mkdir(experimentDir)
         storeExperimentGAparameters()
-    prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
+
+    prop = DTIndividualPropertyVanilla()
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
     bestIndividual.persist(os.path.join(experimentDir, filename))
     ga_engine.getDBAdapter().commit()
 
     population = ga_engine.getPopulation()
     popSize = len(population)
-    print "*********************** popSize: ", popSize
-    ##population = ga_engine.getPopulation()
-    ##averagePopulation = getPopulationAverage(population)
-    #averageGeneration = getPopulationAverage(gen)
-    ##print "current population raw score average: ", averagePopulation
-    #print "current generation raw score average: ", averageGeneration
+    print "generation executed!, best fit of generation: ", score, "fittest: ", max_score, "reached in generation: ", max_score_generation
+
     return False
 
 # This function is the evaluation function
@@ -189,7 +188,6 @@ def eval_func(chromosome):
     if not initialPopulationSetted:
         setInitialPopulation(gaEngine)
 
-    #prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
     prop = DTIndividualPropertyVanillaEvolutive()
     embryo = DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome))
     embryoLength = embryo.getLength()
@@ -197,15 +195,17 @@ def eval_func(chromosome):
     individual.setLength(embryoLength)
     fitness = individual.execute() #return the fitness resulting from the simulator execution
 
-    if int(conf.getProperty("re-evaluate fittest?"))==1:
+    if int(conf.getProperty("re-evaluate fittest?"))==True:
         if fitness > max_score: #is really a better fitness ?
             candidateFitness = fitness
             fitness = individual.execute()
             print "candidateFitness: ", candidateFitness, "fitness: ", fitness
-            while candidateFitness-fitness > 0.1:
+            while abs(candidateFitness-fitness) > 0.01:
                 candidateFitness=fitness
                 fitness = individual.execute()
                 print "candidateFitness: ", candidateFitness, "fitness: ", fitness
+            #the candidateFitness was validated!
+            fitness = candidateFitness
     return fitness
 
 # This function is the termination criteria for the algorithm
@@ -214,7 +214,7 @@ def ConvergenceCriteria(ga_engine):
     return convergenceCriteria
 
 def run_main():
-    conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
+    conf = LoadSystemConfiguration()
     initialPopulationSize = int(conf.getProperty("Population size"))
     generations = int(conf.getProperty("Number of generations"))
     # Genome instance
@@ -233,8 +233,8 @@ def run_main():
     
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
-    ga.setGenerations(generations)    #TODO class atribute
-    ga.setPopulationSize(initialPopulationSize) #TODO class atribute
+    ga.setGenerations(generations)
+    ga.setPopulationSize(initialPopulationSize)
 
     #genome.mutator.set(Mutators.G2DListMutatorIntegerRange)
     if conf.getProperty("Mutator operator") == "mutators.G2DListMutatorRealGaussianSpline":
@@ -263,7 +263,7 @@ def run_main():
     if elitism:
         ga.setElitismReplacement(int(initialPopulationSize*float(conf.getProperty("Elitism replacement percentage"))))
     
-    #ga.terminationCriteria.set(ConvergenceCriteria)
+    ga.terminationCriteria.set(ConvergenceCriteria) #TODO use configuration.xml for this
 
     # Create DB Adapter and set as adapter
     sqlite_adapter = DBAdapters.DBSQLite(identify="Lucy walk", resetDB=True)
@@ -285,7 +285,7 @@ def run_main():
     score = best.getRawScore()
     timestr = time.strftime("%Y%m%d-%H%M%S")
     filename = str(score) + "-" + timestr + "-" + str(generations) + ".xml"
-    prop = DTIndividualPropertyVanilla() #TODO create a vanilla property as default argument in Individual constructor
+    prop = DTIndividualPropertyVanilla()
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
 
     bestIndividual.persist(os.path.join(experimentDir,filename))
@@ -298,6 +298,7 @@ def run_main():
         timestr = time.strftime("%Y%m%d-%H%M%S")
         filename = timestr + "-final" + str(pos) + ".xml"
         individual.persist(os.path.join(experimentDir, filename))
+    ga.getDBAdapter().commit()
     
     shutil.copy2('pyevolve.db', experimentDir)
     
