@@ -74,48 +74,48 @@ class DTWalkCycleProperty(DTMotorTaskProperty):
         maxRfootIndexes = [x for x in argrelextrema(np.array(y2), np.greater)[0]]
 
         stepsLfootIndexes = []
-        for i in range(len(maxLfootIndexes)):
-            index = maxLfootIndexes[i]
-            if y1[index] - y2[index] > self.Y_THREADHOLD: #one foot is up and the other is in the floor  
-                    if len(stepsLfootIndexes)>0:
-                        if abs(index - find_nearest(np.array(stepsLfootIndexes), index) > self.X_THREADHOLD): #avoid max near an existing point
-                            stepsLfootIndexes.append(index)
-                        else:
-                            if y1[find_nearest(np.array(stepsLfootIndexes), index)] < y1[index]:  #check if the exiting near max is a local maximun
-                                stepsLfootIndexes.remove(find_nearest(np.array(stepsLfootIndexes), index))
+        y_threadhold = self.Y_THREADHOLD
+        while True: #repeat until implementation in python
+            for i in range(len(maxLfootIndexes)):
+                index = maxLfootIndexes[i]
+                if y1[index] - y2[index] > y_threadhold: #one foot is up and the other is in the floor
+                        if len(stepsLfootIndexes)>0:
+                            if abs(index - find_nearest(np.array(stepsLfootIndexes), index) > self.X_THREADHOLD): #avoid max near an existing point
                                 stepsLfootIndexes.append(index)
-                    else:
-                        stepsLfootIndexes.append(index)
-        
-        stepsRfootIndexes = []
-        for i in range(len(maxRfootIndexes)):
-            index = maxRfootIndexes[i]
-            if y2[index] - y1[index] > self.Y_THREADHOLD: #one foot is up and the other is in the floor
-                    if len(stepsRfootIndexes)>0:
-                        if abs(index - find_nearest(np.array(stepsRfootIndexes),index) > self.X_THREADHOLD): #avoid max near an existing point
-                            stepsRfootIndexes.append(index)
+                            else:
+                                if y1[find_nearest(np.array(stepsLfootIndexes), index)] < y1[index]:  #check if the exiting near max is a local maximun
+                                    stepsLfootIndexes.remove(find_nearest(np.array(stepsLfootIndexes), index))
+                                    stepsLfootIndexes.append(index)
                         else:
-                            if y2[find_nearest(np.array(stepsRfootIndexes), index)] < y2[index]: #check if the exiting near max is a local maximun
-                                stepsRfootIndexes.remove(find_nearest(np.array(stepsRfootIndexes), index))
+                            stepsLfootIndexes.append(index)
+
+            if len(stepsLfootIndexes)>0:
+                break
+            else:
+                y_threadhold = y_threadhold - 1
+                print "new Y_THREADHOLD: ", y_threadhold
+
+        stepsRfootIndexes = []
+        y_threadhold = self.Y_THREADHOLD
+        while True: #repeat until implementation in python, until condition in the break statement
+            for i in range(len(maxRfootIndexes)):
+                index = maxRfootIndexes[i]
+                if y2[index] - y1[index] > y_threadhold: #one foot is up and the other is in the floor
+                        if len(stepsRfootIndexes)>0:
+                            if abs(index - find_nearest(np.array(stepsRfootIndexes),index) > self.X_THREADHOLD): #avoid max near an existing point
                                 stepsRfootIndexes.append(index)
-            
-                    else:
-                        stepsRfootIndexes.append(index)
+                            else:
+                                if y2[find_nearest(np.array(stepsRfootIndexes), index)] < y2[index]: #check if the exiting near max is a local maximun
+                                    stepsRfootIndexes.remove(find_nearest(np.array(stepsRfootIndexes), index))
+                                    stepsRfootIndexes.append(index)
 
-        absis_value = []
-        absis_key = []
-
-        for key, value in z_.iteritems():
-            absis_value.append(value)
-            absis_key.append(key)
-
-        #direction of the walking cycle
-        if absis_value[0] > absis_value[len(absis_value)-1]:
-            print "aumenta"
-            self.direction = sysConstants.LEFT_TO_RIGHT
-        else:
-            print "disminuye"
-            self.direction = sysConstants.RIGHT_TO_LEFT
+                        else:
+                            stepsRfootIndexes.append(index)
+            if len(stepsRfootIndexes)>0:
+                break
+            else:
+                y_threadhold = y_threadhold - 1
+                print "new Y_THREADHOLD: ", y_threadhold
 
         if stepsLfootIndexes[0] < stepsRfootIndexes[0]: #start walking with right leg
             testPoint = stepsLfootIndexes[0]
@@ -128,5 +128,18 @@ class DTWalkCycleProperty(DTMotorTaskProperty):
             while(y2[testPoint]>y1[testPoint]):
                 testPoint = testPoint + 1
             self.end = testPoint + 5
+
+        absis_value = []
+        absis_key = []
+
+        for key, value in z_.iteritems():
+            absis_value.append(value)
+            absis_key.append(key)
+
+        #direction of the walking cycle
+        if absis_value[0] > absis_value[self.end]:
+            self.direction = sysConstants.LEFT_TO_RIGHT
+        else:
+            self.direction = sysConstants.RIGHT_TO_LEFT
 
 

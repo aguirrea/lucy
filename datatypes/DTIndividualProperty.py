@@ -72,7 +72,7 @@ class DTIndividualPropertyCMUDaz(DTIndividualProperty):
     
     def __init__(self):
         DTIndividualProperty.__init__(self)
-        self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll", "L_Ankle_Pitch", "R_Ankle_Pitch"]    
+        self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll", "L_Ankle_Pitch", "R_Ankle_Pitch"]
         self.poseFix["R_Shoulder_Yaw"] = -101
         self.poseFix["R_Shoulder_Pitch"] = -23
         self.poseFix["R_Hip_Yaw"] = -202
@@ -151,7 +151,7 @@ class DTIndividualPropertyVanillaEvolutive(DTIndividualProperty):
 
     def __init__(self):
         DTIndividualProperty.__init__(self)
-        self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll"]    
+        self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll"]
         
         self.poseFix["R_Shoulder_Yaw"] = 0
         self.poseFix["R_Shoulder_Pitch"] = 0

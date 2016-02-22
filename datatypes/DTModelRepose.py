@@ -3,7 +3,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 #
-# Datatype for representing the repose value of each joint in an instace of a simulator
+# Datatype for representing the repose value of each joint in an instance of a simulator
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
