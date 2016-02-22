@@ -46,10 +46,12 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
     gDad = args["dad"]
     gDadLength = dtgenome.getIndividualLength(gDad)
     gMomLenght = dtgenome.getIndividualLength(gMom)
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     print "genome dad length: ", gDadLength
     print "genome mom length: ", gMomLenght
     minimalDiff = INFINITE_DISTANCE
     minimalDiffPosition = 0
+    differenceBetweenPosesThreshold = 35
 
     if gMomLenght > 0:
         cut = rand_randint(0, gMomLenght - 1)
@@ -65,47 +67,59 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
             minimalDiff = frameDiff
             minimalDiffPosition = position
 
-    print "difference between poses: ", minimalDiff, "in position: ", minimalDiffPosition
+    if minimalDiff < differenceBetweenPosesThreshold: #trying to preserve the walk cycle unit
+        print "difference between poses: ", minimalDiff, "in position: ", minimalDiffPosition
 
-    #TODO remove this, only here for debugging
-    gSisterLength = cut + gDadLength - minimalDiffPosition 
-    if gSisterLength > sysConstants.GENOMA_MAX_LENGTH:
-        gSisterLength = sysConstants.GENOMA_MAX_LENGTH - 1
-        print "************warning gSisterLength > sysConstants.GENOMA_MAX_LENGTH**************"
+        #TODO remove this, only here for debugging
+        gSisterLength = cut + gDadLength - minimalDiffPosition
+        if gSisterLength > sysConstants.GENOMA_MAX_LENGTH:
+            gSisterLength = sysConstants.GENOMA_MAX_LENGTH - 1
+            print "************warning gSisterLength > sysConstants.GENOMA_MAX_LENGTH**************"
 
 
-    gBrotherLength = minimalDiffPosition + gMomLenght - cut 
-    if gBrotherLength > sysConstants.GENOMA_MAX_LENGTH:
-        gBrotherLength = sysConstants.GENOMA_MAX_LENGTH - 1
-        print "************warning gBrotherLength > sysConstants.GENOMA_MAX_LENGTH*************"
+        gBrotherLength = minimalDiffPosition + gMomLenght - cut
+        if gBrotherLength > sysConstants.GENOMA_MAX_LENGTH:
+            gBrotherLength = sysConstants.GENOMA_MAX_LENGTH - 1
+            print "************warning gBrotherLength > sysConstants.GENOMA_MAX_LENGTH*************"
 
-    if args["count"] >= 1:
+        if args["count"] >= 1:
+            sister = gMom.clone()
+            sister.resetStats()
+            for i in xrange(minimalDiffPosition, gDadLength):
+                sisterIndex = cut+i-minimalDiffPosition
+                if sisterIndex < sysConstants.GENOMA_MAX_LENGTH -1:
+                    sister[sisterIndex][:] = gDad[i][:]
+                else:
+                    for joint in xrange(sister.getWidth()):
+                      sister[sisterIndex][joint] = sysConstants.JOINT_SENTINEL
+                    break
+
+            print "gSisterLength: ", gSisterLength
+
+        if args["count"] == 2:
+            brother = gDad.clone()
+            brother.resetStats()
+            for i in xrange(minimalDiffPosition, minimalDiffPosition + gMomLenght - cut):
+                if i < sysConstants.GENOMA_MAX_LENGTH -1:
+                    brother[i][:] = gMom[cut+i-minimalDiffPosition][:]
+                else:
+                    for joint in xrange(brother.getWidth()): #TODO usar método para obtener el frame length de dtgenomefunctions
+                       brother[i][joint] = sysConstants.JOINT_SENTINEL
+                    break
+
+            print "gBrotherLength: ", gBrotherLength
+
+        print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+
+        '''else:
+            print "***dad?: ", gDad[0]
+            print "***mom?: ", gMom[0]
+            print "***dad?: ", gDad[1]
+            print "***mom?: ", gMom[1]
+        print "counts args: ", args["count"]'''
+    else:
         sister = gMom.clone()
-        sister.resetStats()
-        for i in xrange(minimalDiffPosition, gDadLength):
-            sisterIndex = cut+i-minimalDiffPosition
-            if sisterIndex < sysConstants.GENOMA_MAX_LENGTH -1: 
-                sister[sisterIndex][:] = gDad[i][:]
-            else:
-                for joint in xrange(sister.getWidth()):
-                  sister[sisterIndex][joint] = sysConstants.JOINT_SENTINEL
-                break 
-
-        print "gSisterLength: ", gSisterLength
-
-    if args["count"] == 2:
         brother = gDad.clone()
-        brother.resetStats()
-        for i in xrange(minimalDiffPosition, minimalDiffPosition + gMomLenght - cut):
-            if i < sysConstants.GENOMA_MAX_LENGTH -1:
-                brother[i][:] = gMom[cut+i-minimalDiffPosition][:]
-            else:
-                for joint in xrange(brother.getWidth()): #TODO usar método para obtener el frame length de dtgenomefunctions
-                   brother[i][joint] = sysConstants.JOINT_SENTINEL
-                break
 
-        print "gBrotherLength: ", gBrotherLength          
-
-    print "counts args: ", args["count"]
     return (sister, brother)
 
