@@ -60,7 +60,7 @@ def createIndividual(filename):
 walk = Individual(geneticVanillaProp, DTIndividualGeneticMatrix()) #dummy individual to initialise the simulator and enable the time step configuration
 walk.execute()
 print "please set the proper time step in vrep"
-time.sleep(10)
+time.sleep(5)
 if arguments > 1:
     files = sys.argv[1:]
     for filename in files:
