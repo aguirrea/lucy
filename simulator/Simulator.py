@@ -19,8 +19,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import vrep
-import time
-import math
 
 from LoadRobotConfiguration import LoadRobotConfiguration
 from LoadSystemConfiguration import LoadSystemConfiguration
@@ -28,14 +26,12 @@ from vrepConst import *
 
 bulletEngine = 0
 odeEngine    = 1
-_instance    = None
 
 class Simulator:
 
     def __init__(self, simulatorModel=None):
         self.getObjectPositionFirstTime = True
         self.sysConf = LoadSystemConfiguration()
-        
         #this data structure is like a cache for the joint handles
         self.jointHandleMapping = {} 
         robotConf = LoadRobotConfiguration()
@@ -58,20 +54,11 @@ class Simulator:
         #setting the simulation time step                           
         self.simulationTimeStepDT = float(self.sysConf.getProperty("simulation time step"))
 
-        #testing printing in vrep
+        '''#testing printing in vrep
         error, consoleHandler = vrep.simxAuxiliaryConsoleOpen(self.clientId, "lucy debugging", 8, 22, None, None, None, None, vrep.simx_opmode_oneshot_wait)
         print "console handler: ", consoleHandler
         vrep.simxAuxiliaryConsoleShow(self.clientId, consoleHandler, 1, vrep.simx_opmode_oneshot_wait)
-        error = vrep.simxAuxiliaryConsolePrint(self.clientId, consoleHandler, "Hello World", vrep.simx_opmode_oneshot_wait)
-
-
-    def theGetInstance(simulatorModel):
-        global _instance
-        if _instance is None:
-            _instance = Simulator(simulatorModel)
-        return _instance
-
-    getInstance = staticmethod(theGetInstance)
+        error = vrep.simxAuxiliaryConsolePrint(self.clientId, consoleHandler, "Hello World", vrep.simx_opmode_oneshot_wait)'''
 
     def getClientId(self):
         return self.clientId
@@ -117,7 +104,7 @@ class Simulator:
         #I need the simulator stopped in order to be started
         retSimStop = vrep.simxStopSimulation(clientID,vrep.simx_opmode_oneshot_wait)
         if retSimStop != simx_return_ok :
-            print "simulation couldnt be stopped!"            
+            print "simulation couldnt be stopped!"
         else:
             print "simulation stopped!"
 
@@ -135,7 +122,7 @@ class Simulator:
 
         #settig simulation speed
         if self.speedmodifier > 0:
-            vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_speedmodifier, self.speedmodifier, vrep.simx_opmode_oneshot_wait) 
+            vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_speedmodifier, self.speedmodifier, vrep.simx_opmode_oneshot_wait)
 
         #settig simulation step
         retSetTimeStep = vrep.simxSetFloatingParameter(clientID,vrep.sim_floatparam_simulation_time_step, self.simulationTimeStepDT, vrep.simx_opmode_oneshot_wait)
@@ -148,13 +135,13 @@ class Simulator:
 
         #sync mode configuration
         if self.synchronous:
-            vrep.simxSynchronous(clientID,True)        
+            vrep.simxSynchronous(clientID,True)
 
-        #light mode configuration    
+        #light mode configuration
         if not screen:
             vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_visible_layers,2,vrep.simx_opmode_oneshot_wait)
             #vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
-        
+
         #start simulation
         error=vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot)
 
@@ -167,8 +154,6 @@ class Simulator:
         ret=vrep.simxPauseCommunication(clientID,False)
         if self.speedmodifier > 0:
             vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_speedmodifier, self.speedmodifier, vrep.simx_opmode_oneshot_wait) 
-        if self.synchronous:
-            vrep.simxSynchronousTrigger(clientID)
         return ret
 
     #when the simulator is paused the call to simxGetObjectHandle returns error    
@@ -186,9 +171,10 @@ class Simulator:
             error = errorGetObjetHandle or error
             self.jointHandleMapping[joint]=handle
         error = error or vrep.simxSetJointPosition(clientID,handle,angle,vrep.simx_opmode_oneshot_wait)
-        vrep.simxSynchronousTrigger(clientID)
+        if self.synchronous:
+            vrep.simxSynchronousTrigger(clientID)
         return error
-    
+
     def setJointPositionNonBlock(self, clientID, joint, angle):
         handle = self.jointHandleMapping[joint]
         error = False
@@ -196,7 +182,7 @@ class Simulator:
             error, handle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot)
             self.jointHandleMapping[joint]=handle
         return vrep.simxSetJointPosition(clientID,handle,angle,vrep.simx_opmode_streaming)
-        
+
     def getJointPositionNonBlock(self, clientID, joint, firstTime):
         error = False
         value = 0
