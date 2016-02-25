@@ -52,12 +52,15 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
     minimalDiff = INFINITE_DISTANCE
     minimalDiffPosition = 0
     differenceBetweenPosesThreshold = 35
+    MINIMAL_CROSSOVER_POINT = 5
 
-    if gMomLenght > 0:
-        cut = rand_randint(0, gMomLenght - 1)
-    else:
-        print "****************warning gMomLenght equals 0***************"
-        cut = 0
+    if gMomLenght > MINIMAL_CROSSOVER_POINT - 1:
+        cut = rand_randint(MINIMAL_CROSSOVER_POINT, gMomLenght - 1)
+    else: #trying to preserve the walk cycle unit we use "restrictions on the cross"
+        sister = gMom.clone()
+        brother = gDad.clone()
+
+    return (sister, brother)
 
     frame1 = gMom[cut]
 
@@ -67,16 +70,16 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
             minimalDiff = frameDiff
             minimalDiffPosition = position
 
-    if minimalDiff < differenceBetweenPosesThreshold: #trying to preserve the walk cycle unit
+    if minimalDiff < differenceBetweenPosesThreshold: #trying to preserve the walk cycle unit we use "restrictions on the cross"
         print "difference between poses: ", minimalDiff, "in position: ", minimalDiffPosition
 
-        #TODO remove this, only here for debugging
+        #TODO comment this, only here for debugging
         gSisterLength = cut + gDadLength - minimalDiffPosition
         if gSisterLength > sysConstants.GENOMA_MAX_LENGTH:
             gSisterLength = sysConstants.GENOMA_MAX_LENGTH - 1
             print "************warning gSisterLength > sysConstants.GENOMA_MAX_LENGTH**************"
 
-
+        #TODO comment this, only here for debugging
         gBrotherLength = minimalDiffPosition + gMomLenght - cut
         if gBrotherLength > sysConstants.GENOMA_MAX_LENGTH:
             gBrotherLength = sysConstants.GENOMA_MAX_LENGTH - 1
