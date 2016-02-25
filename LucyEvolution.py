@@ -176,8 +176,8 @@ def generationCallback(ga_engine):
     bestIndividual.persist(os.path.join(experimentDir, filename))
     ga_engine.getDBAdapter().commit()
 
-    population = ga_engine.getPopulation()
-    popSize = len(population)
+    #population = ga_engine.getPopulation()
+    #popSize = len(population)
     print "generation executed!, best fit of generation: ", score, "fittest: ", max_score, "reached in generation: ", max_score_generation
 
     return False

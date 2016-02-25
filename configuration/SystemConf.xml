@@ -30,9 +30,7 @@
 </Directory>
 <File>
     <Name>Lucy vrep model</Name>
-    <!--<Value>/simulator/models/genetic_bioloid_sweden.ttt</Value>-->
-    <Value>/simulator/models/genetic_bioloid_expert.ttt</Value>
-
+    <Value>/simulator/models/genetic_bioloid.ttt</Value>
 </File>
 <!-- Vrep connection parameters -->
 <Property>
@@ -67,7 +65,7 @@
 </Property>
 <Property>
     <Name>Lucy render enable</Name>
-    <Value>1</Value>
+    <Value>0</Value>
 </Property>
 <Property>
     <Name>Lucy simulated?</Name>
@@ -101,7 +99,7 @@
 <!-- GA parameters -->
 <Property>
     <Name>Population size</Name>
-    <Value>10</Value>
+    <Value>5</Value>
 </Property>
 <Property>
     <Name>Number of generations</Name>

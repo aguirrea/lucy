@@ -77,7 +77,7 @@ class Simulator:
 
     def connectVREP(self, ipAddr=LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"Vrep IP"), port=int(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"Vrep port"))):
         self.getObjectPositionFirstTime = True
-        vrep.simxFinish(-1) # just in case, close all opened connections
+        #vrep.simxFinish(-1) # just in case, close all opened connections #TODO this could be a problem when the connection pool is implemented
         return vrep.simxStart(ipAddr,port,True,True,5000,5)
         
     def loadscn(self, clientID, model):
