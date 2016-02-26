@@ -57,10 +57,7 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
     if gMomLenght > MINIMAL_CROSSOVER_POINT - 1:
         cut = rand_randint(MINIMAL_CROSSOVER_POINT, gMomLenght - 1)
     else: #trying to preserve the walk cycle unit we use "restrictions on the cross"
-        sister = gMom.clone()
-        brother = gDad.clone()
-
-    return (sister, brother)
+        cut = 0
 
     frame1 = gMom[cut]
 
