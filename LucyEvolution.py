@@ -277,8 +277,8 @@ def run_main():
     gaEngine = ga
 
     # Do the evolution, with stats dump
-    # frequency of 2 generations
-    ga.evolve(freq_stats=1)
+    # frequency of every generation
+    ga.evolve(freq_stats=0)
 
     # Best individual
     best = ga.bestIndividual()
@@ -298,7 +298,7 @@ def run_main():
         timestr = time.strftime("%Y%m%d-%H%M%S")
         filename = timestr + "-final" + str(pos) + ".xml"
         individual.persist(os.path.join(experimentDir, filename))
-    ga.getDBAdapter().commit()
+    #ga.getDBAdapter().commit()
     
     shutil.copy2('pyevolve.db', experimentDir)
     
