@@ -40,7 +40,7 @@ from genetic_operators.DTGenomeFunctions import  DTGenomeFunctions
 
 initialPopulationSetted = False
 gaEngine = None
-NUMBER_GENERATIONS_CONVERGENCE_CRITERIA = 30
+NUMBER_GENERATIONS_CONVERGENCE_CRITERIA = 50
 max_score = 0
 max_score_generation = 0
 convergenceCriteria = False
@@ -127,7 +127,7 @@ def setInitialPopulation(ga_engine):
                 for i in xrange(adanIndividualLength):
                     for j in xrange(adanJointLength):
                         if i < len(teacherGeneticMatrix): #if the fixed gnoma representation size is less than the teacher size
-                            adan.setItem(i, j, teacherGeneticMatrix[i][j])
+                            adan.setItem(i,j,teacherGeneticMatrix[i][j])
                         else:
                             #put a sentinel joint value to mark the end of the individual
                             adan.setItem(i,j,sysConstants.JOINT_SENTINEL)
@@ -262,8 +262,10 @@ def run_main():
     '''Set the number of best individuals to copy to the next generation on the elitism'''
     if elitism:
         ga.setElitismReplacement(int(initialPopulationSize*float(conf.getProperty("Elitism replacement percentage"))))
-    
-    ga.terminationCriteria.set(ConvergenceCriteria) #TODO use configuration.xml for this
+
+
+    if int(conf.getProperty("Convergence criteria enable?"))==True:
+        ga.terminationCriteria.set(ConvergenceCriteria) #TODO use configuration.xml for this
 
     # Create DB Adapter and set as adapter
     sqlite_adapter = DBAdapters.DBSQLite(identify="Lucy walk", resetDB=True)

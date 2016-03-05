@@ -39,7 +39,7 @@
 </Property>
 <Property>
     <Name>Vrep port</Name>
-    <Value>19998</Value>    
+    <Value>19997</Value>
 </Property>
 <!-- Lucy vrep parameters -->
 <Property>
@@ -48,7 +48,7 @@
 </Property>
 <Property>
     <Name>FALL_THRESHOLD_UP</Name>
-    <Value>0.28</Value>
+    <Value>0.30</Value>
 </Property>
 <Property>
     <Name>ConnectionTimeout</Name>
@@ -81,7 +81,7 @@
 </Property>
 <Property>
     <Name>simulation time step</Name>
-    <Value>0.100</Value>
+    <Value>0.50</Value>
 </Property>
 <Property>
     <Name>physics enable?</Name>
@@ -99,7 +99,7 @@
 <!-- GA parameters -->
 <Property>
     <Name>Population size</Name>
-    <Value>5</Value>
+    <Value>12</Value>
 </Property>
 <Property>
     <Name>Number of generations</Name>
@@ -115,7 +115,7 @@
 </Property>
 <Property>
     <Name>Selection operator</Name>
-    <Value>Selectors.GUniformSelector</Value>    
+    <Value>Selectors.GTournamentSelector</Value>
 </Property>
 <Property>
     <Name>CrossoverRate</Name>
@@ -123,10 +123,15 @@
 </Property>
 <Property>
     <Name>MutationRate</Name>
-    <Value>0.1</Value>    
+    <Value>0.03</Value>
 </Property>
 <Property>
     <Name>Elitism replacement percentage</Name>
-    <Value>0.5</Value>    
+    <Value>0.3</Value>
 </Property>
+<Property>
+    <Name>Convergence criteria enable?</Name>
+    <Value>0</Value>
+</Property>
+
 </System>
