@@ -46,7 +46,9 @@ class AXAngle:
     #asumes that the angle stored is a ax12 valid angle (between 0 and 300)
     def toVrep(self):
         normalized_angle=MODEL_ZERO_VALUE-self.toDegrees()
-        vrep_angle=normalized_angle/float(60)
+        #vrep_angle2=normalized_angle/float(60)
+        vrep_angle=normalized_angle*math.pi/180
+        #print vrep_angle, "  ", vrep_angle2
         return vrep_angle
 
 #for i in xrange(1024) :
