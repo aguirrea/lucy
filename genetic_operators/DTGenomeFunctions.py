@@ -20,19 +20,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-import sys
 import math
 import numpy as np
+import sys
 from scipy.interpolate import UnivariateSpline
-from pyevolve.G2DList import G2DList, GenomeBase
-from simulator.LoadRobotConfiguration import LoadRobotConfiguration
-import configuration.constants as sysConstants
 
+import configuration.constants as sysConstants
 from datatypes.DTIndividualProperty import DTIndividualPropertyVanillaEvolutive
+from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 INFINITE_DISTANCE = sys.maxint
 SPLINE_SMOOTHING_FACTOR = 0.3
 SMOOTHING_WINDOW = 10
+JOINT_DIFF_THRESHOLD = 3
 
 
 class DTGenomeFunctions(object):
@@ -53,7 +53,11 @@ class DTGenomeFunctions(object):
                     diff = INFINITE_DISTANCE
                     break
                 else:
-                    diff += math.fabs(frame1[jointIndex] - frame2[jointIndex])
+                    jointDiff = math.fabs(frame1[jointIndex] - frame2[jointIndex])
+                    if jointDiff <= JOINT_DIFF_THRESHOLD: #each joint distance can't be bigger than JOINT_DIFF_THRESHOLD
+                        diff += jointDiff
+                    else:
+                        diff = INFINITE_DISTANCE
         return diff
 
     # compares every joint of a frame with the JOINT_SENTINEL value, and return True if every joint has a value equal to it

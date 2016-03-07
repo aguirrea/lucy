@@ -44,7 +44,7 @@
 <!-- Lucy vrep parameters -->
 <Property>
     <Name>FALL_THRESHOLD_DOWN</Name>
-    <Value>0.23</Value>
+    <Value>0.24</Value>
 </Property>
 <Property>
     <Name>FALL_THRESHOLD_UP</Name>
