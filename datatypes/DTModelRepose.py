@@ -4,6 +4,7 @@
 # MINA/INCO/UDELAR
 #
 # Datatype for representing the repose value of each joint in an instance of a simulator
+# see mocap/tests/repose_cmu_model.xml
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,22 +40,22 @@ class DTModelVrepReda(DTModelRepose):
     def __init__(self):
         DTModelRepose.__init__(self)
         self.repose["R_Shoulder_Yaw"] = 150
-        self.repose["R_Shoulder_Pitch"] = 149
+        self.repose["R_Shoulder_Pitch"] = 149.4
         self.repose["R_Hip_Yaw"] = 150
         self.repose["R_Hip_Roll"] = 150
-        self.repose["R_Hip_Pitch"] = 154
+        self.repose["R_Hip_Pitch"] = 154.4
         self.repose["R_Knee"] = 166
-        self.repose["R_Ankle_Pitch"] = 132
+        self.repose["R_Ankle_Pitch"] = 131.8
         self.repose["R_Elbow_Yaw"] = 150
-        self.repose["R_Ankle_Roll"] = 151
+        self.repose["R_Ankle_Roll"] = 150
 
         self.repose["L_Shoulder_Yaw"] = 150
-        self.repose["L_Shoulder_Pitch"] = 150 
+        self.repose["L_Shoulder_Pitch"] = 150.5
         self.repose["L_Hip_Yaw"] = 150
         self.repose["L_Hip_Roll"] = 150 
-        self.repose["L_Hip_Pitch"] = 156
+        self.repose["L_Hip_Pitch"] = 156.1
         self.repose["L_Knee"] = 165
-        self.repose["L_Ankle_Pitch"] = 130
+        self.repose["L_Ankle_Pitch"] = 130.5
         self.repose["L_Elbow_Yaw"] = 150
         self.repose["L_Ankle_Roll"] = 150
     
