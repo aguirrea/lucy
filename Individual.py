@@ -117,6 +117,9 @@ class Individual:
     def setLength(self, length):
         self.length = length
 
+    def getLength(self):
+        return self.length
+
 
 ##Test case:
 #prop = DTIndividualPropertyCMUDaz()

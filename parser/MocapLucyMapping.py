@@ -34,9 +34,9 @@ class MocapLucyMapping:
         self.frameVectors["R_Shoulder_Pitch"] = self.jointCalc.calculateRightSagital("rShldr", "head", "rForeArm" ) #validado, revisar signo
         self.frameVectors["R_Hip_Yaw"] = self.jointCalc.calculateTransversal("rShin", "rThigh", "rFoot") #validado, por ahora no usar
         self.frameVectors["R_Hip_Roll"] = self.jointCalc.calculateFrontal("rThigh", "abdomen", "rShin")  #validado 
-        self.frameVectors["R_Hip_Pitch"] = self.jointCalc.calculateRightSagital("rThigh", "abdomen", "rShin") #validado
-        self.frameVectors["R_Knee"] = self.jointCalc.calculateRightSagital("rShin", "rThigh","rFoot") #validado
-        self.frameVectors["R_Ankle_Pitch"] = self.jointCalc.calculateRightSagital("rFoot", "rShin", "End Site12") #validado
+        self.frameVectors["R_Hip_Pitch"] = self.jointCalc.calculateLeftSagital("rThigh", "abdomen", "rShin") #validado
+        self.frameVectors["R_Knee"] = self.jointCalc.calculateLeftSagital("rShin", "rThigh","rFoot") #validado
+        self.frameVectors["R_Ankle_Pitch"] = self.jointCalc.calculateLeftSagital("rFoot", "rShin", "End Site12") #validado
         self.frameVectors["R_Ankle_Roll"] = self.jointCalc.calculateFrontal("rFoot", "rShin", "End Site12") #self.nullFrameVector(self.framesQty)
         self.frameVectors["R_Elbow_Yaw"] = self.rElbowYaw  #validado
         
