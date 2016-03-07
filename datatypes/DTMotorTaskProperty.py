@@ -27,6 +27,8 @@ from configuration.LoadSystemConfiguration import LoadSystemConfiguration
 from scipy.signal import argrelextrema
 from collections import Counter
 
+Y_THREADHOLD_SECURITY = -5
+
 
 def find_nearest(a, a0):
     "Element in nd array `a` closest to the scalar value `a0`"
@@ -92,8 +94,9 @@ class DTWalkCycleProperty(DTMotorTaskProperty):
             if len(stepsLfootIndexes)>0:
                 break
             else:
-                y_threadhold = y_threadhold - 1
-                print "new Y_THREADHOLD: ", y_threadhold
+                if y_threadhold > Y_THREADHOLD_SECURITY:
+                    y_threadhold = y_threadhold - 1
+                    print "new Y_THREADHOLD: ", y_threadhold
 
         stepsRfootIndexes = []
         y_threadhold = self.Y_THREADHOLD
@@ -114,20 +117,21 @@ class DTWalkCycleProperty(DTMotorTaskProperty):
             if len(stepsRfootIndexes)>0:
                 break
             else:
-                y_threadhold = y_threadhold - 1
-                print "new Y_THREADHOLD: ", y_threadhold
+                if y_threadhold > Y_THREADHOLD_SECURITY:
+                    y_threadhold = y_threadhold - 1
+                    print "new Y_THREADHOLD: ", y_threadhold
 
         if stepsLfootIndexes[0] < stepsRfootIndexes[0]: #start walking with right leg
             testPoint = stepsLfootIndexes[0]
             while(y1[testPoint]>y2[testPoint]):
                 testPoint = testPoint + 1
 
-            self.end = testPoint + 5
+            self.end = testPoint + 15
         else:
             testPoint = stepsRfootIndexes[0]
             while(y2[testPoint]>y1[testPoint]):
                 testPoint = testPoint + 1
-            self.end = testPoint + 5
+            self.end = testPoint + 15
 
         absis_value = []
         absis_key = []
@@ -138,8 +142,8 @@ class DTWalkCycleProperty(DTMotorTaskProperty):
 
         #direction of the walking cycle
         if absis_value[0] > absis_value[self.end]:
-            self.direction = sysConstants.LEFT_TO_RIGHT
-        else:
             self.direction = sysConstants.RIGHT_TO_LEFT
+        else:
+            self.direction = sysConstants.LEFT_TO_RIGHT
 
 
