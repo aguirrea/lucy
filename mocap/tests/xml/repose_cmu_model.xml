@@ -8,8 +8,8 @@
             <L_Hip_Roll angle="205.942331714" />
             <L_Hip_Yaw angle="8.13010235416" />
             <L_Knee angle="172.385700482" />
-            <L_Shoulder_Pitch angle="193.124823973" /
-            ><L_Shoulder_Yaw angle="274.60195907" />
+            <L_Shoulder_Pitch angle="193.124823973" >
+            <L_Shoulder_Yaw angle="274.60195907" />
             <R_Ankle_Pitch angle="259.478801865" />
             <R_Ankle_Roll angle="197.801578368" />
             <R_Elbow_Yaw angle="232.686295282" />
