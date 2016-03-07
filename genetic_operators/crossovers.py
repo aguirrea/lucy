@@ -49,12 +49,12 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
     print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     print "genome dad length: ", gDadLength
     print "genome mom length: ", gMomLenght
-    minimalDiff = INFINITE_DISTANCE
-    minimalDiffPosition = 0
-    differenceBetweenPosesThreshold = 35
-    MINIMAL_CROSSOVER_POINT = 5
+    MINIMAL_DIFF = INFINITE_DISTANCE
+    MINIMAL_DIFF_POSITION = 0
+    DIFFERENCE_BETWEEN_POSES_THREADHOLD = 15
+    MINIMAL_CROSSOVER_POINT = 0
 
-    if gMomLenght > MINIMAL_CROSSOVER_POINT - 1:
+    if gMomLenght > MINIMAL_CROSSOVER_POINT :
         cut = rand_randint(MINIMAL_CROSSOVER_POINT, gMomLenght - 1)
     else: #trying to preserve the walk cycle unit we use "restrictions on the cross"
         cut = 0
@@ -63,21 +63,21 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
 
     for position in xrange(gDadLength):
         frameDiff = dtgenome.diff(frame1, gDad[position])
-        if frameDiff < minimalDiff: 
-            minimalDiff = frameDiff
-            minimalDiffPosition = position
+        if frameDiff < MINIMAL_DIFF:
+            MINIMAL_DIFF = frameDiff
+            MINIMAL_DIFF_POSITION = position
 
-    if minimalDiff < differenceBetweenPosesThreshold: #trying to preserve the walk cycle unit we use "restrictions on the cross"
-        print "difference between poses: ", minimalDiff, "in position: ", minimalDiffPosition
+    if MINIMAL_DIFF < DIFFERENCE_BETWEEN_POSES_THREADHOLD: #trying to preserve the walk cycle unit we use "restrictions on the cross"
+        print "difference between poses: ", MINIMAL_DIFF, "in position: ", MINIMAL_DIFF_POSITION
 
         #TODO comment this, only here for debugging
-        gSisterLength = cut + gDadLength - minimalDiffPosition
+        gSisterLength = cut + gDadLength - MINIMAL_DIFF_POSITION
         if gSisterLength > sysConstants.GENOMA_MAX_LENGTH:
             gSisterLength = sysConstants.GENOMA_MAX_LENGTH - 1
             print "************warning gSisterLength > sysConstants.GENOMA_MAX_LENGTH**************"
 
         #TODO comment this, only here for debugging
-        gBrotherLength = minimalDiffPosition + gMomLenght - cut
+        gBrotherLength = MINIMAL_DIFF_POSITION + gMomLenght - cut
         if gBrotherLength > sysConstants.GENOMA_MAX_LENGTH:
             gBrotherLength = sysConstants.GENOMA_MAX_LENGTH - 1
             print "************warning gBrotherLength > sysConstants.GENOMA_MAX_LENGTH*************"
@@ -85,8 +85,8 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
         if args["count"] >= 1:
             sister = gMom.clone()
             sister.resetStats()
-            for i in xrange(minimalDiffPosition, gDadLength):
-                sisterIndex = cut+i-minimalDiffPosition
+            for i in xrange(MINIMAL_DIFF_POSITION, gDadLength):
+                sisterIndex = cut+i-MINIMAL_DIFF_POSITION
                 if sisterIndex < sysConstants.GENOMA_MAX_LENGTH -1:
                     sister[sisterIndex][:] = gDad[i][:]
                 else:
@@ -99,9 +99,9 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
         if args["count"] == 2:
             brother = gDad.clone()
             brother.resetStats()
-            for i in xrange(minimalDiffPosition, minimalDiffPosition + gMomLenght - cut):
+            for i in xrange(MINIMAL_DIFF_POSITION, MINIMAL_DIFF_POSITION + gMomLenght - cut):
                 if i < sysConstants.GENOMA_MAX_LENGTH -1:
-                    brother[i][:] = gMom[cut+i-minimalDiffPosition][:]
+                    brother[i][:] = gMom[cut+i-MINIMAL_DIFF_POSITION][:]
                 else:
                     for joint in xrange(brother.getWidth()): #TODO usar método para obtener el frame length de dtgenomefunctions
                        brother[i][joint] = sysConstants.JOINT_SENTINEL
@@ -120,6 +120,7 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
     else:
         sister = gMom.clone()
         brother = gDad.clone()
+        print "difference between poses less than DIFFERENCE_BETWEEN_POSES_THREADHOLD not found"
 
     return (sister, brother)
 

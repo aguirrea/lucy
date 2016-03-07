@@ -19,18 +19,21 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import math
+import configuration.constants as constants
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from datatypes.DTModelRepose import DTModelRepose, DTModelVrepReda
 
-REPOSE_JOINT_VALUE = 150
+
 
 class Pose:
 
     def __init__(self, poseValues={}):
         self.value = poseValues
+        self.modelReposeValue=DTModelVrepReda()
         configuration = LoadRobotConfiguration()
         for joint in configuration.getJointsName():
             if joint not in self.value.keys():
-                self.value[joint]=REPOSE_JOINT_VALUE
+                self.value[joint]=self.modelReposeValue.getReposeValue(joint)
 
     def setValue(self, key, value):
         self.value[key] = value
@@ -39,7 +42,7 @@ class Pose:
         if key in self.value.keys():
             return self.value[key]
         else: #it can't happen
-            return REPOSE_JOINT_VALUE 
+            return self.modelReposeValue.getReposeValue(key)
 
     def diff(self, pose):
         diff = 0

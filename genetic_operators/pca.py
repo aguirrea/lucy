@@ -277,4 +277,4 @@ def poseInterpolationWithPCA(geneticMatrix, mutationJointID):
     FinalAngles=np.hstack((NewAngles,PrincMatrix)) ##Esto solo sirve si siempre los ang principales son las ultimas columnas
     print FinalAngles.shape
 
-    #TODO reconstruct the matrix swaping what it was changed
+    #TODO reconstruct the matrix swaping what what it was changed

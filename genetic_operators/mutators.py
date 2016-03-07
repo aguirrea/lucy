@@ -37,7 +37,7 @@ CDefRangeMax = 100
 def chromosomeToLucyGeneticMatrix(chromosome): #TODO encapsulate this in a helper class
     geneticMatrix = [[chromosome[i][j] for j in xrange(chromosome.getWidth())] for i in xrange(chromosome.getHeight())]
     return geneticMatrix
-    #TODO sacar los -1
+    #TODO remove '-1' values
 
 def randomFlipCoin(p):
    """ Returns True with the *p* probability. If the *p* is 1.0,

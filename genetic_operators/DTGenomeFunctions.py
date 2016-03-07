@@ -31,8 +31,8 @@ import configuration.constants as sysConstants
 from datatypes.DTIndividualProperty import DTIndividualPropertyVanillaEvolutive
 
 INFINITE_DISTANCE = sys.maxint
-SPLINE_SMOOTHING_FACTOR = 0.1
-SMOOTHING_WINDOW = 20
+SPLINE_SMOOTHING_FACTOR = 0.3
+SMOOTHING_WINDOW = 10
 
 
 class DTGenomeFunctions(object):
