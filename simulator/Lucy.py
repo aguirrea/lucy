@@ -197,15 +197,16 @@ class SimulatedLucy(Lucy):
         #print "execution time: ", time
         print "--------------------------------------------------------------------"
         print "distance traveled: ", distance
-        print "poses executed: ",  self.poseExecuted
+        print "poses executed/total poses: ",  self.poseExecuted, "/", framesQty
         if framesQty > 0:
             stability = self.poseExecuted / float(framesQty)
         else:
             stability = 0
+        if stability == 1:
+            distance = distance + 0.5
         fitness = 0.3 * distance + 0.45 * stability + 0.25 * normMode
         print "normMode: ", normMode
         print "stability: ", stability 
-        print "framesQty: ", framesQty
         print "FITNESS: ", fitness
         print "--------------------------------------------------------------------"
         return fitness
@@ -284,12 +285,13 @@ class SimulatedLucy(Lucy):
             #print "x_position: ", x, "y_position: ", y 
             if self.startPosSetted and not errorPosition:
                 #self.distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
-                distToGoal = math.sqrt((x-1)**2 + (y-0)**2)
-                distToGoal = 1 - distToGoal
-                if distToGoal < 0 :
+                #distToGoal = math.sqrt((x-1)**2 + (y-0)**2)
+                error, distToGoal = self.sim.getDistanceToSceneGoal()
+                distTravelToGoal = 1 - distToGoal
+                if distTravelToGoal < 0 :
                     self.distance = 0
                 else: 
-                    self.distance = distToGoal
+                    self.distance = distTravelToGoal
             
                 #calculates the angle in the frontal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise 
                 x3 = 1; y3 = 0; z3 = 0;

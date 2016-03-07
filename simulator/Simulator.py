@@ -30,6 +30,8 @@ odeEngine    = 1
 class Simulator:
 
     def __init__(self, simulatorModel=None):
+        self.getDistanceToGoalFirstTime = True
+        self.getUpDistanceFirstTime = True
         self.getObjectPositionFirstTime = True
         self.sysConf = LoadSystemConfiguration()
         #this data structure is like a cache for the joint handles
@@ -59,6 +61,12 @@ class Simulator:
         print "console handler: ", consoleHandler
         vrep.simxAuxiliaryConsoleShow(self.clientId, consoleHandler, 1, vrep.simx_opmode_oneshot_wait)
         error = vrep.simxAuxiliaryConsolePrint(self.clientId, consoleHandler, "Hello World", vrep.simx_opmode_oneshot_wait)'''
+
+        error, self.upDistanceHandle = vrep.simxGetDistanceHandle(self.clientId, "upDistance#", vrep.simx_opmode_blocking)
+        error, self.distToGoalHandle = vrep.simxGetDistanceHandle(self.clientId, "distanceLucyGoal#", vrep.simx_opmode_blocking)
+        self.getDistanceToSceneGoal() #to fix the firt invocation
+        self.getUpDistance()
+
 
     def getClientId(self):
         return self.clientId
@@ -96,9 +104,12 @@ class Simulator:
     def isRobotUp(self, clientID):
         error = False
         error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait) or error
-        error, bioloid_position = self.getObjectPositionWrapper(clientID, LSP_Handle) or error 
-        #print "bioloid osition", bioloid_position[2]
+        error, bioloid_position = self.getObjectPositionWrapper(clientID, LSP_Handle) or error
+        #print "bioloid position", bioloid_position[2]
         return error, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and bioloid_position[2] < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))
+
+        #error, upDistance = self.getUpDistance()
+        #return error, upDistance > float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and upDistance < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))'''
 
     def startSim(self, clientID, screen=True):
         #I need the simulator stopped in order to be started
@@ -220,6 +231,22 @@ class Simulator:
 
     def getPosesExecutedByStepQty(self, clientID):
         return int(float(vrep.simxGetFloatingParameter(clientID, vrep.sim_floatparam_simulation_time_step, vrep.simx_opmode_oneshot_wait)[1] ) / float(0.050))
+
+    def getDistanceToSceneGoal(self):
+        if self.getDistanceToGoalFirstTime:
+            error, distance = vrep.simxReadDistance(self.clientId, self.distToGoalHandle, vrep.simx_opmode_streaming)
+            self.getDistanceToGoalFirstTime = False
+        else:
+            error, distance = vrep.simxReadDistance(self.clientId, self.distToGoalHandle, vrep.simx_opmode_buffer)
+        return error, distance
+
+    def getUpDistance(self):
+        if self.getUpDistanceFirstTime:
+            error, distance = vrep.simxReadDistance(self.clientId, self.upDistanceHandle, vrep.simx_opmode_streaming)
+            self.getUpDistanceFirstTime = False
+        else:
+            error, distance = vrep.simxReadDistance(self.clientId, self.upDistanceHandle, vrep.simx_opmode_buffer)
+        return error, distance
 
 
         
