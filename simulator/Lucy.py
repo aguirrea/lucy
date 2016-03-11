@@ -36,7 +36,6 @@ from Simulator                      import Simulator
 
 X = 0
 Y = 1
-FINISH_WALK_CYCLE_BONUS = 0.5
 
 #abstract class representing lucy abstraction base class
 class Lucy(object):
@@ -197,19 +196,19 @@ class SimulatedLucy(Lucy):
         print "--------------------------------------------------------------------"
         print "distance traveled: ", distance
         print "poses executed/total poses: ",  self.poseExecuted, "/", framesQty
-        if framesQty > 0:
-            stability = self.poseExecuted / float(framesQty)
+        if self.isLucyUp():
+            print "isRobotU?: True"
+            stability = 1
         else:
-            stability = 0
+            print "isRobotUp?: False"
+            if framesQty > 0:
+                stability = self.poseExecuted / float(framesQty)
+            else:
+                stability = 0
         fitness = 0.3 * distance + 0.45 * stability + 0.25 * normMode
         print "normMode: ", normMode
         print "stability: ", stability 
         print "FITNESS: ", fitness
-        if self.isLucyUp():
-            print "isRobotU?: True"
-            fitness += FINISH_WALK_CYCLE_BONUS
-        else:
-            print "isRobotUp?: False"
         print "--------------------------------------------------------------------"
         return fitness
 
