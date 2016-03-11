@@ -18,26 +18,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-import math
-from time                           import time
-from Simulator                      import Simulator
-from LoadRobotConfiguration         import LoadRobotConfiguration
+import os
+import threading
+import time
+from collections import Counter
+from numpy import angle
+from numpy import conjugate
+
 from errors.VrepException           import VrepException
-from Pose                           import Pose
-from LoadSystemConfiguration        import LoadSystemConfiguration
-from datatypes.DTIndividualProperty import DTIndividualProperty, DTIndividualPropertyPhysicalBioloid
-from Communication                  import CommSerial
+
 import Actuator
 from AXAngle                        import AXAngle
-from numpy import conjugate
-from numpy import angle
-from collections import Counter
-import math
-
-import os, threading, time
+from Communication                  import CommSerial
+from LoadRobotConfiguration         import LoadRobotConfiguration
+from LoadSystemConfiguration        import LoadSystemConfiguration
+from Simulator                      import Simulator
 
 X = 0
 Y = 1
+FINISH_WALK_CYCLE_BONUS = 0.5
 
 #abstract class representing lucy abstraction base class
 class Lucy(object):
@@ -202,12 +201,15 @@ class SimulatedLucy(Lucy):
             stability = self.poseExecuted / float(framesQty)
         else:
             stability = 0
-        if stability == 1:
-            distance = distance + 0.5
         fitness = 0.3 * distance + 0.45 * stability + 0.25 * normMode
         print "normMode: ", normMode
         print "stability: ", stability 
         print "FITNESS: ", fitness
+        if self.isLucyUp():
+            print "isRobotU?: True"
+            fitness += FINISH_WALK_CYCLE_BONUS
+        else:
+            print "isRobotUp?: False"
         print "--------------------------------------------------------------------"
         return fitness
 
