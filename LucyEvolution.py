@@ -298,7 +298,7 @@ def run_main():
     for pos in range(popSize):
         individual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(population[pos])))
         timestr = time.strftime("%Y%m%d-%H%M%S")
-        filename = timestr + "-final" + str(pos) + ".xml"
+        filename = "final-" + str(pos) + "-" + timestr + ".xml"
         individual.persist(os.path.join(experimentDir, filename))
     #ga.getDBAdapter().commit()
     
