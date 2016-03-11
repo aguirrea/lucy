@@ -81,7 +81,8 @@ class DTIndividualPropertyCMUDaz(DTIndividualProperty):
         self.poseFix["R_Hip_Pitch"] = -27.5
         #self.poseFix["R_Knee"] = -6
         self.poseFix["R_Knee"] = -18 #adhoc value
-        self.poseFix["R_Ankle_Pitch"] = -127.68
+        #self.poseFix["R_Ankle_Pitch"] = -127.68
+        self.poseFix["R_Ankle_Pitch"] = 232
         self.poseFix["R_Elbow_Yaw"] = 23
         self.poseFix["R_Ankle_Roll"] = -48
 
@@ -92,7 +93,8 @@ class DTIndividualPropertyCMUDaz(DTIndividualProperty):
         self.poseFix["L_Hip_Pitch"] = -25.8
         #self.poseFix["L_Knee"] = -7
         self.poseFix["L_Knee"] = -15 #adhoc value
-        self.poseFix["L_Ankle_Pitch"] = -128.98
+        #self.poseFix["L_Ankle_Pitch"] = -128.98
+        self.poseFix["L_Ankle_Pitch"] = 232
         self.poseFix["L_Elbow_Yaw"] = -49
         self.poseFix["L_Ankle_Roll"] = -12
 
