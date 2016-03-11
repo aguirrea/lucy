@@ -18,14 +18,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from simulator.Lucy                             import Lucy, SimulatedLucy, PhysicalLucy
-from datatypes.DTModelRepose                    import DTModelRepose, DTModelVrepReda
+import xml.etree.cElementTree as ET
+
 from Pose                                       import Pose
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
-from simulator.LoadRobotConfiguration           import LoadRobotConfiguration
+from datatypes.DTModelRepose                    import DTModelVrepReda
 from genetic_operators.DTGenomeFunctions        import DTGenomeFunctions
-
-import xml.etree.cElementTree as ET
+from simulator.LoadRobotConfiguration           import LoadRobotConfiguration
+from simulator.Lucy                             import SimulatedLucy, PhysicalLucy
 
 
 class Individual:
@@ -85,8 +85,8 @@ class Individual:
             i = i + self.lucy.getPosesExecutedByStepQty()
             self.lucy.executePose(Pose(poseExecute))
 
-        self.lucy.stopLucy()  #this function also updates time and distance
         self.fitness = self.lucy.getFitness(self.length)
+        self.lucy.stopLucy()  #this function also updates time and distance
         return self.fitness
 
     def getGenomeMatrix(self):
