@@ -20,7 +20,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-import math
 import numpy as np
 import sys
 from scipy.interpolate import UnivariateSpline
@@ -30,15 +29,13 @@ from datatypes.DTIndividualProperty import DTIndividualPropertyVanillaEvolutive
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 INFINITE_DISTANCE = sys.maxint
-SPLINE_SMOOTHING_FACTOR = 0.3
+#SPLINE_SMOOTHING_FACTOR = 0.3
+SPLINE_SMOOTHING_FACTOR = 0.5
 SMOOTHING_WINDOW = 10
-JOINT_DIFF_THRESHOLD = 3
-
 
 class DTGenomeFunctions(object):
     def __init__(self):
         self.robotConfig = LoadRobotConfiguration()
-
 
     # returns the distance between two frame poses, if one of the poses is a sentinel pose the distance is INFINITE_DISTANCE
     def diff(self, frame1, frame2):
@@ -53,11 +50,9 @@ class DTGenomeFunctions(object):
                     diff = INFINITE_DISTANCE
                     break
                 else:
-                    jointDiff = math.fabs(frame1[jointIndex] - frame2[jointIndex])
-                    if jointDiff <= JOINT_DIFF_THRESHOLD: #each joint distance can't be bigger than JOINT_DIFF_THRESHOLD
-                        diff += jointDiff
-                    else:
-                        diff = INFINITE_DISTANCE
+                    jointDiff = (frame1[jointIndex] - frame2[jointIndex])**2
+                    diff += jointDiff
+
         return diff
 
     # compares every joint of a frame with the JOINT_SENTINEL value, and return True if every joint has a value equal to it
@@ -79,7 +74,7 @@ class DTGenomeFunctions(object):
     def getIndividualFrameLength(self, genome):
         return genome.getWidth()
 
-    def interpolate(self, genome, which_x, which_y, offset):
+    def interpolate(self, genome, which_x, which_y):
         interpolationPointsQty = SMOOTHING_WINDOW
         which_y_InterpolationNeighborhood = interpolationPointsQty / 2
         minimunInterpolationNeighborhoodSize = 4
@@ -92,7 +87,7 @@ class DTGenomeFunctions(object):
             interpolationPointsQty -= (which_y + which_y_InterpolationNeighborhood - (genome.getHeight() - 1)) * 2
             which_y_InterpolationNeighborhood = interpolationPointsQty / 2
 
-        if minimunInterpolationNeighborhoodSize > 4:
+        if  which_y_InterpolationNeighborhood > minimunInterpolationNeighborhoodSize:
             x = np.ndarray(interpolationPointsQty)
             y = np.ndarray(interpolationPointsQty)
 
@@ -106,9 +101,14 @@ class DTGenomeFunctions(object):
 
             for k in xrange(interpolationPointsQty):
                 # print "before ", genome[int(x[k])][which_x], "now ", spl(int(x[k])), "k ", k, "diff ", genome[int(x[k])][which_x]-spl(int(x[k])), "offset ", offset
-                if x[k] == which_x:
-                    print "no mutation"
-                else:
-                    genome.setItem(int(x[k]), which_x, spl(int(x[k])))
+                #if x[k] == which_x:
+                #    print "no mutation"
+                #elif y[k]!= sysConstants.JOINT_SENTINEL:
+                if y[k]!= sysConstants.JOINT_SENTINEL:
+                    newValue = spl(int(x[k]))
+                    genome.setItem(int(x[k]), which_x, newValue)
+                    ##print "mutating value: ", y[k], "to value: ", newValue, "difference: ", abs(y[k]-newValue)
+        ##else:
+            ##print "oh no!, we have a problem in mutation operator .. :S"
 
 
