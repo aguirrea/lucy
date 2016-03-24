@@ -25,10 +25,9 @@ from random import random as rand_random
 
 import configuration.constants as sysConstants
 from genetic_operators.DTGenomeFunctions import DTGenomeFunctions
-import pca
 
 CDefG2DListMutRealMU = 0
-CDefG2DListMutRealSIGMA = 2
+CDefG2DListMutRealSIGMA = sysConstants.MUTATION_SIGMA
 
 CDefRangeMin = 0
 CDefRangeMax = 100
@@ -89,6 +88,7 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
             for j in xrange(genome.getWidth()):
                 if genome[i][j] != sysConstants.JOINT_SENTINEL and randomFlipCoin(pmut):
                     offset = rand_gauss(mu, sigma)
+                    print "OFFSET: ", offset
                     final_value = genome[i][j] + offset
 
                     final_value = min(final_value, genome.getParam("rangemax", CDefRangeMax))
@@ -115,7 +115,7 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
 
                     # valueBeforeMutation = genome[which_y][which_x]
                     genome.setItem(which_y, which_x, final_value)
-                    dtgenome.interpolate(genome, which_x, which_y, offset)
+                    dtgenome.interpolate(genome, which_x, which_y)
                     ##pca.poseInterpolationWithPCA(chromosomeToLucyGeneticMatrix(genome), which_x)
 
 
