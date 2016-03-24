@@ -18,6 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+import math
 import os
 import threading
 import time
@@ -36,6 +37,8 @@ from Simulator                      import Simulator
 
 X = 0
 Y = 1
+
+BALANCE_HEIGHT = 0.214 #Distance from the floor when lucy is straight up
 
 #abstract class representing lucy abstraction base class
 class Lucy(object):
@@ -187,6 +190,7 @@ class SimulatedLucy(Lucy):
 
     def getFitness(self, secuenceLength):
         distance = self.getSimDistance()
+        error, upD = self.sim.getUpDistance()
         mode = self.listMode(self.angleBetweenOriginAndDestination)
         normMode = mode/180
         #framesQty = int(self.sysConf.getProperty("Individual frames quantity"))
@@ -197,18 +201,26 @@ class SimulatedLucy(Lucy):
         print "distance traveled: ", distance
         print "poses executed/total poses: ",  self.poseExecuted, "/", framesQty
         if self.isLucyUp():
-            print "isRobotU?: True"
-            stability = 1
+            print "isRobotUp?: True"
+            framesExecuted = 1
+            endCycleBalance = upD/BALANCE_HEIGHT
+            if endCycleBalance > 1:
+                endCycleBalance = 1
         else:
             print "isRobotUp?: False"
             if framesQty > 0:
-                stability = self.poseExecuted / float(framesQty)
+                framesExecuted = self.poseExecuted / float(framesQty)
             else:
-                stability = 0
-        fitness = 0.3 * distance + 0.45 * stability + 0.25 * normMode
+                framesExecuted = 0
+            endCycleBalance = 0
+        fitness = 0.25 * math.sqrt(distance) + 0.35 * framesExecuted +  0.4 * endCycleBalance**6
+        #fitness = 0.25 * math.sqrt(distance) + 0.3 * framesExecuted + 0.15 * normMode + 0.3 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco
+        #fitness = 0.4 * framesExecuted + 0.2 * normMode + 0.4 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco
         print "normMode: ", normMode
-        print "stability: ", stability 
-        print "FITNESS: ", fitness
+        print "framesExecuted: ", framesExecuted
+        print "fitness: ", fitness
+        print "upDistance: ", self.sim.getUpDistance()
+        print "endCycleBalance", endCycleBalance
         print "--------------------------------------------------------------------"
         return fitness
 
