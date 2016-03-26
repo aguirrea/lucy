@@ -221,7 +221,7 @@ def run_main():
     framesQty = sysConstants.GENOMA_MAX_LENGTH
     genome = G2DList.G2DList(framesQty, 18)
     genome.setParams(rangemin=0, rangemax=360)
-    genome.setParams(gauss_sigma=3, gauss_mu=0)
+    genome.setParams(gauss_sigma=sysConstants.MUTATION_SIGMA, gauss_mu=0)
 
     # The evaluator function (objective function)
     genome.evaluator.set(eval_func)

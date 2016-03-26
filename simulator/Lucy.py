@@ -18,7 +18,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-import math
 import os
 import threading
 import time
@@ -213,12 +212,12 @@ class SimulatedLucy(Lucy):
             else:
                 framesExecuted = 0
             endCycleBalance = 0
-        fitness = 0.25 * math.sqrt(distance) + 0.35 * framesExecuted +  0.4 * endCycleBalance**6
+        fitness = 0.30 * distance**(1/4.0) + 0.30 * framesExecuted +  0.4 * endCycleBalance**6
         #fitness = 0.25 * math.sqrt(distance) + 0.3 * framesExecuted + 0.15 * normMode + 0.3 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco
         #fitness = 0.4 * framesExecuted + 0.2 * normMode + 0.4 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco
         print "normMode: ", normMode
         print "framesExecuted: ", framesExecuted
-        print "fitness: ", fitness
+        print "FITNESS: ", fitness
         print "upDistance: ", self.sim.getUpDistance()
         print "endCycleBalance", endCycleBalance
         print "--------------------------------------------------------------------"
@@ -249,7 +248,8 @@ class SimulatedLucy(Lucy):
         for joint in RobotImplementedJoints:
             angle = pose.getValue(joint) 
             angleAX = AXAngle()   
-            angleAX.setDegreeValue(angle)   
+            angleAX.setDegreeValue(angle)
+            #print "setting joint: ", joint, " to value: ", angle
 
             if jointExecutedCounter < jointsQty - 1:
                 error = self.sim.setJointPositionNonBlock(self.clientID, joint, angleAX.toVrep()) or error

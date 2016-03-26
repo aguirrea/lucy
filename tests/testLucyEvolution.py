@@ -18,20 +18,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from simulator.Lucy                             import SimulatedLucy
-from simulator.AXAngle                          import AXAngle
-from parser.LoadPoses                           import LoadPoses
-from datatypes.DTIndividualProperty             import DTIndividualProperty, DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive, DTIndividualPropertyPhysicalBioloid
-from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticMaterial, DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
-from Pose                                       import Pose
-from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
-from simulator.LoadRobotConfiguration           import LoadRobotConfiguration
-from Individual                                 import Individual
-
-import os 
-import glob 
-import time 
+import glob
+import os
 import sys
+import time
+
+from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
+from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
+from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive, DTIndividualPropertyPhysicalBioloid
+
+from Individual                                 import Individual
 
 propCMUDaz = DTIndividualPropertyCMUDaz()
 propVanilla = DTIndividualPropertyVanilla()
@@ -53,6 +49,7 @@ arguments = len(sys.argv)
 def createIndividual(filename):
     if int(conf.getProperty("Lucy simulated?"))==1:
         walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
+        #walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFileMakeWalkCycle(os.getcwd()+"/"+filename))
     else:
         walk = Individual(physicalProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))    
     return walk

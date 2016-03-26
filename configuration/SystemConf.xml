@@ -30,7 +30,8 @@
 </Directory>
 <File>
     <Name>Lucy vrep model</Name>
-    <Value>/simulator/models/genetic_bioloid.ttt</Value>
+    <!-- <Value>/simulator/models/genetic_bioloid.ttt</Value>-->
+    <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
 </File>
 <!-- Vrep connection parameters -->
 <Property>
@@ -94,12 +95,12 @@
 <!-- Parser options -->
 <Property>
     <Name>number of frames to skip</Name>
-    <Value>5</Value>
+    <Value>4</Value>
 </Property>
 <!-- GA parameters -->
 <Property>
     <Name>Population size</Name>
-    <Value>12</Value>
+    <Value>15</Value>
 </Property>
 <Property>
     <Name>Number of generations</Name>
@@ -115,15 +116,15 @@
 </Property>
 <Property>
     <Name>Selection operator</Name>
-    <Value>Selectors.GTournamentSelector</Value>
+    <Value>Selectors.Selectors.GUniformSelector</Value>
 </Property>
 <Property>
     <Name>CrossoverRate</Name>
-    <Value>0.9</Value>    
+    <Value>1.0</Value>
 </Property>
 <Property>
     <Name>MutationRate</Name>
-    <Value>0.03</Value>
+    <Value>0.25</Value>
 </Property>
 <Property>
     <Name>Elitism replacement percentage</Name>
