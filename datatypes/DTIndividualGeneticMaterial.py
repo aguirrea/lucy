@@ -18,11 +18,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from parser.LoadPoses import LoadPoses
-from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 from pyevolve import G2DList
 
 import configuration.constants as sysConstants
+from parser.LoadPoses import LoadPoses
+from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+
 
 class DTIndividualGeneticMaterial(object):
     def __init__(self):
@@ -67,8 +68,14 @@ class DTIndividualGeneticMatrix(DTIndividualGeneticMaterial):
         self.geneticMatrix = geneticMaterial
 
 
+class DTIndividualGeneticTimeSerieFileMakeWalkCycle(DTIndividualGeneticMaterial):
 
-
+    def __init__(self, geneticMaterial):
+        DTIndividualGeneticMaterial.__init__(self)
+        lp = LoadPoses(geneticMaterial)
+        robotConfig = LoadRobotConfiguration()
+        poseSize = 3*lp.getFrameQty()
+        self.geneticMatrix = [[lp.getPose(i%lp.getFrameQty()).getValue(j) for j in robotConfig.getJointsName()] for i in xrange(poseSize)]
 
 
 
