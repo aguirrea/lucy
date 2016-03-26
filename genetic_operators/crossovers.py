@@ -52,7 +52,7 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
     print "genome mom length: ", gMomLenght
     minimalDiff = INFINITE_DISTANCE
     minimalDiffPosition = 0
-    DIFFERENCE_BETWEEN_POSES_THREADHOLD = 6
+    DIFFERENCE_BETWEEN_POSES_THREADHOLD = 20
     MINIMAL_CROSSOVER_POINT = 0
 
     if gMomLenght > MINIMAL_CROSSOVER_POINT :
@@ -69,7 +69,7 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
             minimalDiffPosition = position
 
 
-    if minimalDiff < DIFFERENCE_BETWEEN_POSES_THREADHOLD: #trying to preserve the walk cycle unit we use "restrictions on the cross"
+    if minimalDiff <= DIFFERENCE_BETWEEN_POSES_THREADHOLD: #trying to preserve the walk cycle unit we use "restrictions on the cross"
         print "difference between poses: ", minimalDiff, "in position: ", minimalDiffPosition
 
         #TODO comment this, only here for debugging
@@ -95,7 +95,9 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
                     for joint in xrange(sister.getWidth()):
                       sister[sisterIndex][joint] = sysConstants.JOINT_SENTINEL
                     break
-
+            #apply spline smoothing for the new child
+            for joint in xrange(sister.getWidth()):
+                dtgenome.interpolate(sister, joint, cut)
             print "gSisterLength: ", gSisterLength
 
         if args["count"] == 2:
@@ -108,13 +110,11 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
                     for joint in xrange(brother.getWidth()): #TODO usar método para obtener el frame length de dtgenomefunctions
                        brother[i][joint] = sysConstants.JOINT_SENTINEL
                     break
-
+            #apply spline smoothing for the new child
+            for joint in xrange(brother.getWidth()):
+                dtgenome.interpolate(brother, joint, minimalDiffPosition)
             print "gBrotherLength: ", gBrotherLength
 
-        for joint in xrange(sister.getWidth()):
-            dtgenome.interpolate(sister, joint, cut)
-        for joint in xrange(brother.getWidth()):
-            dtgenome.interpolate(brother, joint, minimalDiffPosition)
         print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
         '''else:
@@ -127,6 +127,7 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
         sister = gMom.clone()
         brother = gDad.clone()
         print "difference between poses less than DIFFERENCE_BETWEEN_POSES_THREADHOLD not found, near difference: ", minimalDiff
+
 
     return (sister, brother)
 
