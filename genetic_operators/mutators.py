@@ -24,7 +24,9 @@ from random import randint as rand_randint, gauss as rand_gauss
 from random import random as rand_random
 
 import configuration.constants as sysConstants
+from datatypes.DTIndividualProperty import DTIndividualPropertyVanillaEvolutive
 from genetic_operators.DTGenomeFunctions import DTGenomeFunctions
+from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 CDefG2DListMutRealMU = 0
 CDefG2DListMutRealSIGMA = sysConstants.MUTATION_SIGMA
@@ -75,6 +77,17 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
     mu = genome.getParam("gauss_mu")
     sigma = genome.getParam("gauss_sigma")
 
+    prop = DTIndividualPropertyVanillaEvolutive()
+    robotConfig = LoadRobotConfiguration()
+    robotJoints = robotConfig.getJointsName()
+
+    validIDs = []
+    jointIndex = 0
+    for joint in robotJoints:
+        if not prop.avoidJoint(joint):
+            validIDs.append(jointIndex)
+            jointIndex += 1
+
     if mu is None:
         mu = CDefG2DListMutRealMU
 
@@ -86,9 +99,9 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
 
         for i in xrange(genome.getHeight()):
             for j in xrange(genome.getWidth()):
-                if genome[i][j] != sysConstants.JOINT_SENTINEL and randomFlipCoin(pmut):
+                if genome[i][j] != sysConstants.JOINT_SENTINEL and j in validIDs and randomFlipCoin(pmut):
                     offset = rand_gauss(mu, sigma)
-                    print "OFFSET: ", offset
+                    print "OFFSET: ", offset, "joint: ", j, "frame: ", i
                     final_value = genome[i][j] + offset
 
                     final_value = min(final_value, genome.getParam("rangemax", CDefRangeMax))
@@ -101,22 +114,26 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
     else:
         for it in xrange(int(round(mutations))):
             foundFrameDifferentThanSentinel = False
-            while not foundFrameDifferentThanSentinel:
+            validIDFound = False
+            while not foundFrameDifferentThanSentinel and not validIDFound:
                 which_x = rand_randint(0, genome.getWidth() - 1)  # joint to mutate
-                which_y = rand_randint(0, genome.getHeight() - 1)  # pose to mutate
-                if genome[which_y][which_x] != sysConstants.JOINT_SENTINEL:
-                    foundFrameDifferentThanSentinel = True
-                    offset = rand_gauss(mu, sigma)
-                    final_value = genome[which_y][which_x] + offset
+                if which_x in validIDs: #only mutate not avoid ids
+                    validIDFound = True
+                    which_y = rand_randint(0, genome.getHeight() - 1)  # pose to mutate
+                    if genome[which_y][which_x] != sysConstants.JOINT_SENTINEL:
+                        foundFrameDifferentThanSentinel = True
+                        offset = rand_gauss(mu, sigma)
+                        final_value = genome[which_y][which_x] + offset
+                        print "OFFSET: ", offset, "joint: ", which_x, "frame: ", which_y
 
-                    # to be sure that the value is less than the rangemax and more than the rangemin value
-                    final_value = min(final_value, genome.getParam("rangemax", CDefRangeMax))
-                    final_value = max(final_value, genome.getParam("rangemin", CDefRangeMin))
+                        # to be sure that the value is less than the rangemax and more than the rangemin value
+                        final_value = min(final_value, genome.getParam("rangemax", CDefRangeMax))
+                        final_value = max(final_value, genome.getParam("rangemin", CDefRangeMin))
 
-                    # valueBeforeMutation = genome[which_y][which_x]
-                    genome.setItem(which_y, which_x, final_value)
-                    dtgenome.interpolate(genome, which_x, which_y)
-                    ##pca.poseInterpolationWithPCA(chromosomeToLucyGeneticMatrix(genome), which_x)
+                        # valueBeforeMutation = genome[which_y][which_x]
+                        genome.setItem(which_y, which_x, final_value)
+                        dtgenome.interpolate(genome, which_x, which_y)
+                        ##pca.poseInterpolationWithPCA(chromosomeToLucyGeneticMatrix(genome), which_x)
 
 
     return int(mutations)
