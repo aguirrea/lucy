@@ -31,7 +31,7 @@ from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 INFINITE_DISTANCE = sys.maxint
 #SPLINE_SMOOTHING_FACTOR = 0.3
 SPLINE_SMOOTHING_FACTOR = 0.5
-SMOOTHING_WINDOW = 10
+SMOOTHING_WINDOW = 20
 
 class DTGenomeFunctions(object):
     def __init__(self):
@@ -44,7 +44,6 @@ class DTGenomeFunctions(object):
         robotJoints = self.robotConfig.getJointsName()
         jointIndex = 0
         for joint in robotJoints:
-            jointIndex = jointIndex + 1
             if not prop.avoidJoint(joint):
                 if frame1[jointIndex] == sysConstants.JOINT_SENTINEL or frame2[jointIndex] == sysConstants.JOINT_SENTINEL:
                     diff = INFINITE_DISTANCE
@@ -52,7 +51,7 @@ class DTGenomeFunctions(object):
                 else:
                     jointDiff = (frame1[jointIndex] - frame2[jointIndex])**2
                     diff += jointDiff
-
+            jointIndex = jointIndex + 1
         return diff
 
     # compares every joint of a frame with the JOINT_SENTINEL value, and return True if every joint has a value equal to it
