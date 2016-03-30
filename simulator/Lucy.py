@@ -189,6 +189,7 @@ class SimulatedLucy(Lucy):
             return 0
 
     def getFitness(self, secuenceLength):
+        error, angle = self.sim.robotOrientationToGoal()
         distance = self.getSimDistance()
         error, upD = self.sim.getUpDistance()
         mode = self.listMode(self.angleBetweenOriginAndDestination)
@@ -198,6 +199,7 @@ class SimulatedLucy(Lucy):
         #time = self.getSimTime()
         #print "execution time: ", time
         print "--------------------------------------------------------------------"
+        print "orientation: ", angle
         print "distance traveled: ", distance
         print "poses executed/total poses: ",  self.poseExecuted, "/", framesQty
         if self.isLucyUp():
@@ -213,7 +215,9 @@ class SimulatedLucy(Lucy):
             else:
                 framesExecuted = 0
             endCycleBalance = 0
-        fitness = 0.30 * distance**(1/4.0) + 0.30 * framesExecuted +  0.4 * endCycleBalance**6
+        fitness = 0.30 * distance**(1/4.0) + 0.30 * framesExecuted +  0.4 * endCycleBalance**6 - abs(angle)
+        if fitness <= 0:
+            fitness = 0
         #fitness = 0.25 * math.sqrt(distance) + 0.3 * framesExecuted + 0.15 * normMode + 0.3 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco
         #fitness = 0.4 * framesExecuted + 0.2 * normMode + 0.4 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco
         print "normMode: ", normMode
@@ -221,10 +225,8 @@ class SimulatedLucy(Lucy):
         print "FITNESS: ", fitness
         print "upDistance: ", self.sim.getUpDistance()
         print "endCycleBalance: ", endCycleBalance
-        error, angle = self.sim.robotOrientationToGoal()
-        print "orientation: ", angle
         print "--------------------------------------------------------------------"
-        return fitness - abs(angle)
+        return fitness
 
     def getPosesExecutedByStepQty(self):
         return self.sim.getPosesExecutedByStepQty(self.clientID)
