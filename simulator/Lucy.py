@@ -152,6 +152,7 @@ class SimulatedLucy(Lucy):
         self.firstCallGetFrame = True
         self.angleBetweenOriginAndDestination = []
         error, x, y = self.sim.getBioloidPlannarPosition(self.clientID)
+        error, angle = self.sim.robotOrientationToGoal()
         if not error:
             self.startPosSetted = True
             self.startPos = [x,y]
@@ -219,9 +220,11 @@ class SimulatedLucy(Lucy):
         print "framesExecuted: ", framesExecuted
         print "FITNESS: ", fitness
         print "upDistance: ", self.sim.getUpDistance()
-        print "endCycleBalance", endCycleBalance
+        print "endCycleBalance: ", endCycleBalance
+        error, angle = self.sim.robotOrientationToGoal()
+        print "orientation: ", angle
         print "--------------------------------------------------------------------"
-        return fitness
+        return fitness - abs(angle)
 
     def getPosesExecutedByStepQty(self):
         return self.sim.getPosesExecutedByStepQty(self.clientID)

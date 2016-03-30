@@ -30,6 +30,7 @@ odeEngine    = 1
 class Simulator:
 
     def __init__(self, simulatorModel=None):
+        self.robotOrientationFirstTime = True
         self.getDistanceToGoalFirstTime = True
         self.getUpDistanceFirstTime = True
         self.getObjectPositionFirstTime = True
@@ -248,6 +249,18 @@ class Simulator:
             error, distance = vrep.simxReadDistance(self.clientId, self.upDistanceHandle, vrep.simx_opmode_buffer)
         return error, distance
 
+    def robotOrientationToGoal(self):
+        error = False
+        error, bioloidHandle=vrep.simxGetObjectHandle(self.clientId,"Bioloid", vrep.simx_opmode_oneshot_wait) or error
+        error, cuboidHandle=vrep.simxGetObjectHandle(self.clientId,"Cuboid", vrep.simx_opmode_oneshot_wait) or error
+        print "cubic handle: ", cuboidHandle
+        cuboidHandle = -1
+        if self.robotOrientationFirstTime:
+            error, angle = vrep.simxGetObjectOrientation(self.clientId, bioloidHandle, cuboidHandle, vrep.simx_opmode_streaming)
+            self.robotOrientationFirstTime = False
+        else:
+            error, angle = vrep.simxGetObjectOrientation(self.clientId, bioloidHandle, cuboidHandle, vrep.simx_opmode_buffer)
+        return error, angle[1]
 
         
 
