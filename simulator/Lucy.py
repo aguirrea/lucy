@@ -23,7 +23,6 @@ import threading
 import time
 from collections import Counter
 from numpy import angle
-from numpy import conjugate
 
 from errors.VrepException           import VrepException
 
@@ -143,7 +142,16 @@ class SimulatedLucy(Lucy):
         self.sim = Simulator(genetic_bioloid)
         self.clientID = self.sim.getClientId() 
         if self.clientID == -1:
-            raise VrepException("error connecting with Vrep", -1)
+            retry_counter = 1000
+            time.sleep(0.1)
+            self.clientID = self.sim.getClientId()
+            while self.clientID == -1 and retry_counter > 0:
+                time.sleep(0.5)
+                retry_counter = retry_counter - 1
+                self.clientID = self.sim.getClientId()
+                print "waiting for vrep connection"
+            if self.clientID == -1:
+                raise VrepException("error connecting with Vrep", -1)
         self.sim.startSim(self.clientID,self.visible)
         self.jointHandleCachePopulated = False
         configuration = LoadRobotConfiguration()
@@ -305,24 +313,25 @@ class SimulatedLucy(Lucy):
                 #self.distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
                 #distToGoal = math.sqrt((x-1)**2 + (y-0)**2)
                 error, distToGoal = self.sim.getDistanceToSceneGoal()
-                distTravelToGoal = 1 - distToGoal
+                distTravelToGoal = 1.0 - distToGoal
                 if distTravelToGoal < 0 :
                     self.distance = 0
                 else: 
                     self.distance = distTravelToGoal
-            
-                #calculates the angle in the frontal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise 
-                x3 = 1; y3 = 0; z3 = 0;
-                x2 = 0; y2 = 0; z2 = 0;
-                x1 = x; y1 = y; z1 = 0;   
-                u = (x2 - x1) + 1j*(y2 - y1)
-                v = (x3 - x1) + 1j*(y3 - y1)
-                r = self.angle(u*conjugate(v))
-                angle = r.real
-                if angle > 180:
-                    angle = 360 - angle
-                self.angleBetweenOriginAndDestination.append(angle)
-                #print "the angle formed by the start point, lucy and destiny is:", angle
+                # not used now and deprecated by a vrep function
+                # #calculates the angle in the frontal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise
+                #
+                # x3 = 1; y3 = 0; z3 = 0;
+                # x2 = 0; y2 = 0; z2 = 0;
+                # x1 = x; y1 = y; z1 = 0;
+                # u = (x2 - x1) + 1j*(y2 - y1)
+                # v = (x3 - x1) + 1j*(y3 - y1)
+                # r = self.angle(u*conjugate(v))
+                # angle = r.real
+                # if angle > 180:
+                #     angle = 360 - angle
+                # self.angleBetweenOriginAndDestination.append(angle)
+                # #print "the angle formed by the start point, lucy and destiny is:", angle
 
     def stopLucy(self):
         self.stop = True
