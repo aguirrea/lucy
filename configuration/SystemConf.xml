@@ -108,11 +108,11 @@
 </Property>
 <Property>
     <Name>Crossover operator</Name>
-    <Value>crossovers.G2DListCrossoverSingleNearHPoint</Value>    
+    <Value>crossovers.G2DListCrossoverSingleNearHPoint</Value>
 </Property>
 <Property>
     <Name>Mutator operator</Name>
-    <Value>mutators.G2DListMutatorRealGaussianSpline</Value>    
+    <Value>mutators.G2DListMutatorRealGaussianSpline</Value>
 </Property>
 <Property>
     <Name>Selection operator</Name>

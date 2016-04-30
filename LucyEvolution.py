@@ -33,7 +33,7 @@ from pyevolve import Selectors
 import configuration.constants as sysConstants
 from Individual                                 import Individual
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
-from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
+from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix, DTIndividualGeneticMatrixWalk
 from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive
 from genetic_operators import crossovers, mutators
 from genetic_operators.DTGenomeFunctions import  DTGenomeFunctions
@@ -189,7 +189,7 @@ def eval_func(chromosome):
         setInitialPopulation(gaEngine)
 
     prop = DTIndividualPropertyVanillaEvolutive()
-    embryo = DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome))
+    embryo = DTIndividualGeneticMatrixWalk(chromosomeToLucyGeneticMatrix(chromosome))
     embryoLength = embryo.getLength()
     individual = Individual(prop, embryo)
     individual.setLength(embryoLength)

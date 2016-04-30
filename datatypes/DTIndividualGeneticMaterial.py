@@ -74,8 +74,38 @@ class DTIndividualGeneticTimeSerieFileMakeWalkCycle(DTIndividualGeneticMaterial)
         DTIndividualGeneticMaterial.__init__(self)
         lp = LoadPoses(geneticMaterial)
         robotConfig = LoadRobotConfiguration()
-        poseSize = 3*lp.getFrameQty()
+        poseSize = 2*lp.getFrameQty()
         self.geneticMatrix = [[lp.getPose(i%lp.getFrameQty()).getValue(j) for j in robotConfig.getJointsName()] for i in xrange(poseSize)]
+
+class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
+
+    def __init__(self, geneticMaterial):
+        DTIndividualGeneticMaterial.__init__(self)
+        robotConfig = LoadRobotConfiguration()
+        walkCycleCounter = 0
+        noSentinelFound = True
+        geneticMaterialLength = 0
+        cycleRepetitionQuantity = 2
+        while noSentinelFound:
+            if super(DTIndividualGeneticMatrixWalk, self).equalSentinelFrame(geneticMaterial[geneticMaterialLength]):
+                noSentinelFound = False
+            else:
+                geneticMaterialLength = geneticMaterialLength + 1
+
+        newLength = geneticMaterialLength * cycleRepetitionQuantity + 1 # +1 for the sentinel value
+        self.geneticMatrix = [[-1 for j in xrange(robotConfig.getJointQuantity())] for i in xrange(newLength)]
+        frameIter = 0
+        while walkCycleCounter < cycleRepetitionQuantity:
+            for jointIter in range(robotConfig.getJointQuantity()):
+                data = geneticMaterial[frameIter][jointIter]
+                if data!= sysConstants.JOINT_SENTINEL:
+                    self.geneticMatrix[frameIter+(geneticMaterialLength-1)*walkCycleCounter][jointIter] = data
+                else:
+                    walkCycleCounter = walkCycleCounter + 1
+                    frameIter  = 0
+                    break
+            frameIter = frameIter + 1
+
 
 
 
