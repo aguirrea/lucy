@@ -64,10 +64,11 @@ class Simulator:
         error = vrep.simxAuxiliaryConsolePrint(self.clientId, consoleHandler, "Hello World", vrep.simx_opmode_oneshot_wait)'''
 
         error, self.upDistanceHandle = vrep.simxGetDistanceHandle(self.clientId, "upDistance#", vrep.simx_opmode_blocking)
-        error, self.distToGoalHandle = vrep.simxGetDistanceHandle(self.clientId, "distanceLucyGoal#", vrep.simx_opmode_blocking)
-        self.getDistanceToSceneGoal() #to fix the firt invocation
-        self.getUpDistance()
+        error, self.distLFootToGoalHandle = vrep.simxGetDistanceHandle(self.clientId, "distanceLFootGoal#", vrep.simx_opmode_blocking)
+        error, self.distRFootToGoalHandle = vrep.simxGetDistanceHandle(self.clientId, "distanceRFootGoal#", vrep.simx_opmode_blocking)
 
+        self.getDistanceToSceneGoal() #to fix the first invocation
+        self.getUpDistance()
 
     def getClientId(self):
         return self.clientId
@@ -235,11 +236,13 @@ class Simulator:
 
     def getDistanceToSceneGoal(self):
         if self.getDistanceToGoalFirstTime:
-            error, distance = vrep.simxReadDistance(self.clientId, self.distToGoalHandle, vrep.simx_opmode_streaming)
+            errorL, distanceL = vrep.simxReadDistance(self.clientId, self.distLFootToGoalHandle, vrep.simx_opmode_streaming)
+            errorR, distanceR = vrep.simxReadDistance(self.clientId, self.distRFootToGoalHandle, vrep.simx_opmode_streaming)
             self.getDistanceToGoalFirstTime = False
         else:
-            error, distance = vrep.simxReadDistance(self.clientId, self.distToGoalHandle, vrep.simx_opmode_buffer)
-        return error, distance
+            errorL, distanceL = vrep.simxReadDistance(self.clientId, self.distLFootToGoalHandle, vrep.simx_opmode_buffer)
+            errorR, distanceR = vrep.simxReadDistance(self.clientId, self.distRFootToGoalHandle, vrep.simx_opmode_buffer)
+        return errorL or errorR, (distanceL + distanceR)*0.5
 
     def getUpDistance(self):
         if self.getUpDistanceFirstTime:
