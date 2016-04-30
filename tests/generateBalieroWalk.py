@@ -20,11 +20,13 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
+import xml.etree.cElementTree as ET
+
 from simulator.SimLucy    import SimLucy
+
 from Pose                 import Pose
 from simulator.AXAngle    import AXAngle
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
-import xml.etree.cElementTree as ET
 
 posesVect = {}
 angle = AXAngle()
