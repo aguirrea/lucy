@@ -23,8 +23,9 @@
 from random import randint as rand_randint, gauss as rand_gauss
 from random import random as rand_random
 
-import configuration.constants as sysConstants
 from datatypes.DTIndividualProperty import DTIndividualPropertyVanillaEvolutive
+
+import configuration.constants as sysConstants
 from genetic_operators.DTGenomeFunctions import DTGenomeFunctions
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
@@ -124,7 +125,7 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
                         foundFrameDifferentThanSentinel = True
                         offset = rand_gauss(mu, sigma)
                         final_value = genome[which_y][which_x] + offset
-                        print "OFFSET: ", offset, "joint: ", which_x, "frame: ", which_y
+                        #print "OFFSET: ", offset, "joint: ", which_x, "frame: ", which_y
 
                         # to be sure that the value is less than the rangemax and more than the rangemin value
                         final_value = min(final_value, genome.getParam("rangemax", CDefRangeMax))

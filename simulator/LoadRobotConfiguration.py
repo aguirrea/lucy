@@ -18,8 +18,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from xml.dom import minidom
 import os
+from xml.dom import minidom
+
 confFile = os.getcwd()+"/configuration/RobotConf.xml"
 
 #TODO move this to configuration folder?
@@ -41,7 +42,11 @@ class LoadRobotConfiguration:
     def getJointsName(self):
         return sorted(self.jointAngleMapping.keys())
 
+    def getJointQuantity(self):
+        return len(self.jointAngleMapping)
+
     
 #conf = LoadRobotConfiguration()
 #for joint in conf.getJointsName():
 #    print conf.loadJointId(joint)
+#print conf.getJointQuantity()
