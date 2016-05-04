@@ -3,7 +3,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 #
-# Execution of individuals resulted from the evolution experiment
+# Execution of individuals resulted from the Baliero and Pias work
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,36 +25,28 @@ import time
 
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
-from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive, DTIndividualPropertyPhysicalBioloid
+from datatypes.DTIndividualProperty             import DTIndividualPropertyBaliero, DTIndividualPropertyPhysicalBioloid
 
 from Individual                                 import Individual
 
-propCMUDaz = DTIndividualPropertyCMUDaz()
-propVanilla = DTIndividualPropertyVanilla()
 balieroProp = DTIndividualPropertyBaliero()
 physicalProp = DTIndividualPropertyPhysicalBioloid()
-geneticVanillaProp = DTIndividualPropertyVanillaEvolutive()
+
 
 conf = LoadSystemConfiguration()
 
-CMUxmlDir = os.getcwd()+conf.getDirectory("Transformed CMU mocap Files")
-GAwalkDir = os.getcwd()+conf.getDirectory("GAWalk Files")
-UIBLHDir = os.getcwd()+conf.getDirectory("UIBLH mocap Files")
 BalieroDir = os.getcwd()+conf.getDirectory("Baliero transformed walk Files")
-ADHOCDir = os.getcwd()+conf.getDirectory("ADHOC Files")
-geneticPoolDir = os.pardir+conf.getDirectory("Genetic Pool")
 
 arguments = len(sys.argv)
 
 def createIndividual(filename):
     if int(conf.getProperty("Lucy simulated?"))==1:
-        walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
-        #walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFileMakeWalkCycle(os.getcwd()+"/"+filename))
+        walk = Individual(balieroProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
     else:
-        walk = Individual(physicalProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))    
+        walk = Individual(physicalProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
     return walk
 
-walk = Individual(geneticVanillaProp, DTIndividualGeneticMatrix()) #dummy individual to initialise the simulator and enable the time step configuration
+walk = Individual(balieroProp, DTIndividualGeneticMatrix()) #dummy individual to initialise the simulator and enable the time step configuration
 walk.execute()
 print "please set the proper time step in vrep"
 time.sleep(5)
@@ -65,8 +57,8 @@ if arguments > 1:
         walk = createIndividual(filename)
         walk.execute()
 else:
-    for filename in glob.glob(os.path.join(geneticPoolDir, '*.xml')):
+    for filename in glob.glob(os.path.join(BalieroDir, '*.xml')):
         print 'executing individual: ' + filename
-        walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(filename))
+        walk = createIndividual(filename)
         walk.execute()
 

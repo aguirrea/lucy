@@ -18,22 +18,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from simulator.SimLucy   import SimLucy
-from simulator.AXAngle   import AXAngle
-from parser.LoadPoses    import LoadPoses
-from Pose                import Pose
-from simulator.LoadRobotConfiguration import LoadRobotConfiguration
-from errors.VrepException import VrepException
-
-
+import math
 import xml.etree.cElementTree as ET
 
-import math
-import os
-import time
+from Pose                import Pose
+from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from simulator.Lucy      import SimulatedLucy
 
-
-print 'Program started' 
+print 'Program started'
 
 
 #Create Oscillator Parameters
@@ -67,7 +59,7 @@ root = ET.Element("root")
 lucyPersistence = ET.SubElement(root, "Lucy")
 
 try:
-    lucy = SimLucy(True)
+    lucy = SimulatedLucy(True)
     pose = {}
     poses = {}
     poseNumber = 0

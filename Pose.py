@@ -19,10 +19,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import math
-import configuration.constants as constants
-from simulator.LoadRobotConfiguration import LoadRobotConfiguration
-from datatypes.DTModelRepose import DTModelRepose, DTModelVrepReda
 
+from datatypes.DTModelRepose import DTModelVrepReda
+from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 
 class Pose:
@@ -34,6 +33,7 @@ class Pose:
         for joint in configuration.getJointsName():
             if joint not in self.value.keys():
                 self.value[joint]=self.modelReposeValue.getReposeValue(joint)
+                #print "default value for joint: ", joint, " is: ", self.value[joint]
 
     def setValue(self, key, value):
         self.value[key] = value

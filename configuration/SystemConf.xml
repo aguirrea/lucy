@@ -1,5 +1,7 @@
 <System>
+
 <!-- System paths-->
+
 <Directory>
     <Name>GAWalk Files</Name> 
     <Value>/mocap/gawalk/xml</Value>
@@ -31,9 +33,12 @@
 <File>
     <Name>Lucy vrep model</Name>
     <!-- <Value>/simulator/models/genetic_bioloid.ttt</Value>-->
+    <!-- <Value>/simulator/models/genetic_bioloid_without_texture_baliero.ttt</Value>-->
     <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
 </File>
+
 <!-- Vrep connection parameters -->
+
 <Property>
     <Name>Vrep IP</Name>
     <Value>127.0.0.1</Value>    
@@ -61,8 +66,7 @@
 </Property>
 <Property>
     <Name>Vrep not implemented joints</Name>
-    <Value> </Value>
-    <!--<Value>R_Elbow_Yaw L_Elbow_Yaw L_Shoulder_Yaw R_Shoulder_Yaw</Value>-->
+    <Value>R_Elbow_Yaw L_Elbow_Yaw L_Shoulder_Yaw R_Shoulder_Yaw</Value>
 </Property>
 <Property>
     <Name>Lucy render enable</Name>
@@ -92,15 +96,19 @@
     <Name>re-evaluate fittest?</Name>
     <Value>1</Value>
 </Property>
+
 <!-- Parser options -->
+
 <Property>
     <Name>number of frames to skip</Name>
     <Value>4</Value>
 </Property>
+
 <!-- GA parameters -->
+
 <Property>
     <Name>Population size</Name>
-    <Value>15</Value>
+    <Value>5</Value>
 </Property>
 <Property>
     <Name>Number of generations</Name>
@@ -116,7 +124,8 @@
 </Property>
 <Property>
     <Name>Selection operator</Name>
-    <Value>Selectors.Selectors.GUniformSelector</Value>
+    <Value>Selectors.GUniformSelector</Value>
+    <!--<Value>Selectors.GRankSelector</Value>-->
 </Property>
 <Property>
     <Name>CrossoverRate</Name>

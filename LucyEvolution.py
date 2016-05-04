@@ -245,13 +245,17 @@ def run_main():
     ga.setMutationRate(float(conf.getProperty("MutationRate")))
     
     if conf.getProperty("Selection operator") == "Selectors.GRankSelector" :
-        ga.selector.set(Selectors.GRankSelector) 
+        ga.selector.set(Selectors.GRankSelector)
+        print "rank"
     elif conf.getProperty("Selection operator") == "Selectors.GTournamentSelector" :
         ga.selector.set(Selectors.GTournamentSelector)
+        print "tournament"
     elif conf.getProperty("Selection operator") == "Selectors.GRouletteWheel" :
         ga.selector.set(Selectors.GRouletteWheel)
+        print "roulettewheel"
     elif conf.getProperty("Selection operator") == "Selectors.GUniformSelector" :
         ga.selector.set(Selectors.GUniformSelector)
+        print "uniform"
  
     '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation. 
     While the rest of population...maybe by previous selection or you can define it as best fit survivors'''
