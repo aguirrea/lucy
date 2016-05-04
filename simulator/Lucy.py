@@ -3,7 +3,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 # 
-# Lucy representation.
+# Lucy robot software representation.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
-import threading
 import time
-from collections import Counter
 from numpy import angle
 
 from errors.VrepException           import VrepException
@@ -32,9 +30,6 @@ from Communication                  import CommSerial
 from LoadRobotConfiguration         import LoadRobotConfiguration
 from LoadSystemConfiguration        import LoadSystemConfiguration
 from Simulator                      import Simulator
-
-X = 0
-Y = 1
 
 BALANCE_HEIGHT = 0.214 #Distance from the floor when lucy is straight up
 
@@ -49,6 +44,11 @@ class Lucy(object):
         self.distance = 0
         self.stop = False
         self.poseExecuted = 0
+        dontSupportedJoints = self.sysConf.getVrepNotImplementedBioloidJoints()
+        self.RobotImplementedJoints = []
+        for joint in self.joints:
+            if joint not in dontSupportedJoints:
+                self.RobotImplementedJoints.append(joint)
 
     def getFitness(self, secuenceLength):
         pass
@@ -99,12 +99,9 @@ class PhysicalLucy(Lucy):
 
     def executePose(self, pose):
         #set positions and wait that the actuator reaching that position
-        dontSupportedJoints = self.sysConf.getVrepNotImplementedBioloidJoints()
-        RobotImplementedJoints = []
-        for joint in self.joints:
-            if joint not in dontSupportedJoints:
-                RobotImplementedJoints.append(joint)
-        for joint in RobotImplementedJoints:
+        #TODO tener en cuenta los motores que están invertidos, creo que los únicos que están quedando son los de los hombros
+
+        for joint in self.RobotImplementedJoints:
             angle = pose.getValue(joint)
             angleAX = AXAngle()
             angleAX.setDegreeValue(angle)
@@ -156,25 +153,10 @@ class SimulatedLucy(Lucy):
         self.jointHandleCachePopulated = False
         configuration = LoadRobotConfiguration()
         self.joints = configuration.getJointsName()
-        self.startPosSetted = False
         self.firstCallGetFrame = True
-        self.angleBetweenOriginAndDestination = []
-        error, x, y = self.sim.getBioloidPlannarPosition(self.clientID)
-        error, angle = self.sim.robotOrientationToGoal()
-        if not error:
-            self.startPosSetted = True
-            self.startPos = [x,y]
-        else:
-            threading.Timer(float(self.sysConf.getProperty("threadingTime")), self.setStartPositionAsync).start()
-
-    def setStartPositionAsync(self):
-        if not self.startPosSetted:
-            error, x, y = self.sim.getBioloidPlannarPosition(self.clientID)
-            if not error:
-                self.startPosSetted = True
-                self.startPos = [x,y]
-            else:
-                threading.Timer(float(self.sysConf.getProperty("threadingTime")), self.setStartPositionAsync).start()
+        self.sim.robotOrientationToGoal()
+        self.updateLucyPosition()
+        self.posesExecutedByStepQty = self.sim.getPosesExecutedByStepQty(self.clientID)
 
     def getSimTime(self):
         if self.stop == False:
@@ -183,29 +165,12 @@ class SimulatedLucy(Lucy):
         
     def getSimDistance(self):
         return self.distance        
-    
-    def listAverage(self, l):
-        average = sum(l)/len(l) 
-        return average
-
-    def listMode(self, l):
-        data = Counter(l)
-        if len(data) > 0:
-            data.most_common()   # Returns all unique items and their counts
-            return data.most_common(1)[0][0]  # Returns the highest occurring item
-        else:
-            return 0
 
     def getFitness(self, secuenceLength):
         error, angle = self.sim.robotOrientationToGoal()
         distance = self.getSimDistance()
         error, upD = self.sim.getUpDistance()
-        mode = self.listMode(self.angleBetweenOriginAndDestination)
-        normMode = mode/180
-        #framesQty = int(self.sysConf.getProperty("Individual frames quantity"))
         framesQty = secuenceLength
-        #time = self.getSimTime()
-        #print "execution time: ", time
         print "--------------------------------------------------------------------"
         print "orientation: ", angle
         print "distance traveled: ", distance
@@ -228,7 +193,6 @@ class SimulatedLucy(Lucy):
             fitness = 0
         #fitness = 0.25 * math.sqrt(distance) + 0.3 * framesExecuted + 0.15 * normMode + 0.3 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco
         #fitness = 0.4 * framesExecuted + 0.2 * normMode + 0.4 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco
-        print "normMode: ", normMode
         print "framesExecuted: ", framesExecuted
         print "FITNESS: ", fitness
         print "upDistance: ", self.sim.getUpDistance()
@@ -237,28 +201,17 @@ class SimulatedLucy(Lucy):
         return fitness
 
     def getPosesExecutedByStepQty(self):
-        return self.sim.getPosesExecutedByStepQty(self.clientID)
+        return self.posesExecutedByStepQty
 
     def executePose(self, pose):
         error = False
-        dontSupportedJoints = self.sysConf.getVrepNotImplementedBioloidJoints()
-        RobotImplementedJoints = []
         #Above's N joints will be received and set on the V-REP side at the same time
 
-        #TODO this must be checked in the simulator class
-        if (self.jointHandleCachePopulated == False): 
-            self.sim.populateJointHandleCache(self.clientID)
-            self.jointHandleCachePopulated = True
-
-        for joint in self.joints:
-            if joint not in dontSupportedJoints:
-                RobotImplementedJoints.append(joint)
-
-        jointsQty = len(RobotImplementedJoints)
+        jointsQty = len(self.RobotImplementedJoints)
         jointExecutedCounter=0
 
         error = self.sim.pauseSim(self.clientID) or error
-        for joint in RobotImplementedJoints:
+        for joint in self.RobotImplementedJoints:
             angle = pose.getValue(joint) 
             angleAX = AXAngle()   
             angleAX.setDegreeValue(angle)
@@ -271,7 +224,6 @@ class SimulatedLucy(Lucy):
                 error = self.sim.setJointPosition(self.clientID, joint, angleAX.toVrep()) or error
 
             jointExecutedCounter = jointExecutedCounter + 1
-
         self.updateLucyPosition()
         self.poseExecuted = self.poseExecuted + self.getPosesExecutedByStepQty()
         #if error:
@@ -305,33 +257,14 @@ class SimulatedLucy(Lucy):
         return resAngle
 
     def updateLucyPosition(self):
-        if self.stop == False: 
+        if self.stop == False:
             self.time = time.time() - self.startTime
-            errorPosition, x, y = self.sim.getBioloidPlannarPosition(self.clientID)
-            #print "x_position: ", x, "y_position: ", y 
-            if self.startPosSetted and not errorPosition:
-                #self.distance = math.sqrt((x-self.startPos[X])**2 + (y-self.startPos[Y])**2)
-                #distToGoal = math.sqrt((x-1)**2 + (y-0)**2)
-                error, distToGoal = self.sim.getDistanceToSceneGoal()
-                distTravelToGoal = 1.0 - distToGoal
-                if distTravelToGoal < 0 :
-                    self.distance = 0
-                else: 
-                    self.distance = distTravelToGoal
-                # not used now and deprecated by a vrep function
-                # #calculates the angle in the frontal plane generated with the vectors j3 to j1 and j2 to j1 in anti clockwise
-                #
-                # x3 = 1; y3 = 0; z3 = 0;
-                # x2 = 0; y2 = 0; z2 = 0;
-                # x1 = x; y1 = y; z1 = 0;
-                # u = (x2 - x1) + 1j*(y2 - y1)
-                # v = (x3 - x1) + 1j*(y3 - y1)
-                # r = self.angle(u*conjugate(v))
-                # angle = r.real
-                # if angle > 180:
-                #     angle = 360 - angle
-                # self.angleBetweenOriginAndDestination.append(angle)
-                # #print "the angle formed by the start point, lucy and destiny is:", angle
+            error, distToGoal = self.sim.getDistanceToSceneGoal()
+            distTravelToGoal = 1.0 - distToGoal
+            if distTravelToGoal < 0 :
+                self.distance = 0
+            else:
+                self.distance = distTravelToGoal
 
     def stopLucy(self):
         self.stop = True

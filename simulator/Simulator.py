@@ -49,6 +49,7 @@ class Simulator:
        
         if int(self.sysConf.getProperty("synchronous mode?"))==1:
             self.synchronous = True
+            vrep.simxSynchronousTrigger(self.clientId)
         else:
             self.synchronous = False
         
@@ -66,9 +67,15 @@ class Simulator:
         error, self.upDistanceHandle = vrep.simxGetDistanceHandle(self.clientId, "upDistance#", vrep.simx_opmode_blocking)
         error, self.distLFootToGoalHandle = vrep.simxGetDistanceHandle(self.clientId, "distanceLFootGoal#", vrep.simx_opmode_blocking)
         error, self.distRFootToGoalHandle = vrep.simxGetDistanceHandle(self.clientId, "distanceRFootGoal#", vrep.simx_opmode_blocking)
+        error, self.bioloidHandle=vrep.simxGetObjectHandle(self.clientId,"Bioloid", vrep.simx_opmode_oneshot_wait)
+        error, self.cuboidHandle=vrep.simxGetObjectHandle(self.clientId,"Cuboid", vrep.simx_opmode_oneshot_wait)
 
+        self.populateJointHandleCache(self.clientId)
+
+        self.isRobotUpFirstCall = True
         self.getDistanceToSceneGoal() #to fix the first invocation
         self.getUpDistance()
+        self.isRobotUp(self.clientId)
 
     def getClientId(self):
         return self.clientId
@@ -77,7 +84,6 @@ class Simulator:
         self.clientId = idClient 
 
     def getObjectPositionWrapper(self, clientID, LSP_Handle):
-        error = False
         if self.getObjectPositionFirstTime:
             error, ret = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_streaming)
             self.getObjectPositionFirstTime = False
@@ -104,11 +110,15 @@ class Simulator:
             print name + ":" + str(position)
 
     def isRobotUp(self, clientID):
-        error = False
-        error, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait) or error
-        error, bioloid_position = self.getObjectPositionWrapper(clientID, LSP_Handle) or error
-        #print "bioloid position", bioloid_position[2]
-        return error, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and bioloid_position[2] < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))
+        if self.isRobotUpFirstCall:
+            error1, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait)
+            if error1 == 0:
+                self.bioloidHandle = LSP_Handle
+                self.isRobotUpFirstCall = False
+        else:
+            error2, bioloid_position = self.getObjectPositionWrapper(clientID, self.bioloidHandle)
+            #print "bioloid position", bioloid_position[2]
+            return error2, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and bioloid_position[2] < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))
 
         #error, upDistance = self.getUpDistance()
         #return error, upDistance > float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and upDistance < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))'''
@@ -179,11 +189,12 @@ class Simulator:
     def setJointPosition(self, clientID, joint, angle):
         error = False
         handle = self.jointHandleMapping[joint]
-        if (handle == 0):
+        if handle == 0:
             errorGetObjetHandle, handle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
             error = errorGetObjetHandle or error
             self.jointHandleMapping[joint]=handle
-        error = error or vrep.simxSetJointPosition(clientID,handle,angle,vrep.simx_opmode_oneshot_wait)
+        #error = error or vrep.simxSetJointPosition(clientID,handle,angle,vrep.simx_opmode_oneshot_wait)
+        error = error or vrep.simxSetJointPosition(clientID,handle,angle,vrep.simx_opmode_oneshot) #using oneshot instead of oneshot_wait make it a nonblocking call but is the only way to avoid 5 seconds wait in the execution of the individual
         if self.synchronous:
             vrep.simxSynchronousTrigger(clientID)
         return error
@@ -200,7 +211,7 @@ class Simulator:
         error = False
         value = 0
         handle = self.jointHandleMapping[joint]
-        if (handle == 0):
+        if handle == 0:
             error, handle=vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot)
             self.jointHandleMapping[joint]=handle
         if not error:
@@ -253,16 +264,12 @@ class Simulator:
         return error, distance
 
     def robotOrientationToGoal(self):
-        error = False
-        error, bioloidHandle=vrep.simxGetObjectHandle(self.clientId,"Bioloid", vrep.simx_opmode_oneshot_wait) or error
-        error, cuboidHandle=vrep.simxGetObjectHandle(self.clientId,"Cuboid", vrep.simx_opmode_oneshot_wait) or error
-        print "cubic handle: ", cuboidHandle
-        cuboidHandle = -1
+
         if self.robotOrientationFirstTime:
-            error, angle = vrep.simxGetObjectOrientation(self.clientId, bioloidHandle, cuboidHandle, vrep.simx_opmode_streaming)
+            error, angle = vrep.simxGetObjectOrientation(self.clientId, self.bioloidHandle, self.cuboidHandle, vrep.simx_opmode_streaming)
             self.robotOrientationFirstTime = False
         else:
-            error, angle = vrep.simxGetObjectOrientation(self.clientId, bioloidHandle, cuboidHandle, vrep.simx_opmode_buffer)
+            error, angle = vrep.simxGetObjectOrientation(self.clientId, self.bioloidHandle, self.cuboidHandle, vrep.simx_opmode_buffer)
         return error, angle[1]
 
         
