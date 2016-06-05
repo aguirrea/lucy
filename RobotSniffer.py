@@ -18,14 +18,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from simulator.Lucy   import SimulatedLucy
-from simulator.AXAngle   import AXAngle
+import threading
+import xml.etree.cElementTree as ET
+
 from Pose                import Pose
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
-
-import xml.etree.cElementTree as ET
-import time, threading
 
 class RobotSniffer:
 
@@ -39,7 +37,7 @@ class RobotSniffer:
     def startSniffing(self):
         error, frame = self.lucy.getFrame()
         self.poses[self.framesCapturedQty] = Pose(frame) # TODO take into account that angles are represented in simlulator encoding
-        self.framesCapturedQty = self.framesCapturedQty + 1
+        self.framesCapturedQty += 1
         if self.sniffing:
             threading.Timer(1, self.startSniffing).start()
 

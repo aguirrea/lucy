@@ -33,7 +33,7 @@ from pyevolve import Selectors
 import configuration.constants as sysConstants
 from Individual                                 import Individual
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
-from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix, DTIndividualGeneticMatrixWalk
+from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
 from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive
 from genetic_operators import crossovers, mutators
 from genetic_operators.DTGenomeFunctions import  DTGenomeFunctions
@@ -189,7 +189,8 @@ def eval_func(chromosome):
         setInitialPopulation(gaEngine)
 
     prop = DTIndividualPropertyVanillaEvolutive()
-    embryo = DTIndividualGeneticMatrixWalk(chromosomeToLucyGeneticMatrix(chromosome))
+    #embryo = DTIndividualGeneticMatrixWalk(chromosomeToLucyGeneticMatrix(chromosome))
+    embryo = DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome))
     embryoLength = embryo.getLength()
     individual = Individual(prop, embryo)
     individual.setLength(embryoLength)
@@ -246,17 +247,13 @@ def run_main():
     
     if conf.getProperty("Selection operator") == "Selectors.GRankSelector" :
         ga.selector.set(Selectors.GRankSelector)
-        print "rank"
     elif conf.getProperty("Selection operator") == "Selectors.GTournamentSelector" :
         ga.selector.set(Selectors.GTournamentSelector)
-        print "tournament"
     elif conf.getProperty("Selection operator") == "Selectors.GRouletteWheel" :
         ga.selector.set(Selectors.GRouletteWheel)
-        print "roulettewheel"
     elif conf.getProperty("Selection operator") == "Selectors.GUniformSelector" :
         ga.selector.set(Selectors.GUniformSelector)
-        print "uniform"
- 
+
     '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation. 
     While the rest of population...maybe by previous selection or you can define it as best fit survivors'''
     ga.setCrossoverRate(float(conf.getProperty("CrossoverRate"))) 

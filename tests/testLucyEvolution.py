@@ -50,6 +50,7 @@ def createIndividual(filename):
     if int(conf.getProperty("Lucy simulated?"))==1:
         walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
         #walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFileMakeWalkCycle(os.getcwd()+"/"+filename))
+
     else:
         walk = Individual(physicalProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))    
     return walk

@@ -110,15 +110,15 @@ class Simulator:
             print name + ":" + str(position)
 
     def isRobotUp(self, clientID):
+        error1 = False
         if self.isRobotUpFirstCall:
             error1, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait)
             if error1 == 0:
                 self.bioloidHandle = LSP_Handle
                 self.isRobotUpFirstCall = False
-        else:
-            error2, bioloid_position = self.getObjectPositionWrapper(clientID, self.bioloidHandle)
-            #print "bioloid position", bioloid_position[2]
-            return error2, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and bioloid_position[2] < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))
+        error2, bioloid_position = self.getObjectPositionWrapper(clientID, self.bioloidHandle)
+        #print "bioloid position", bioloid_position[2]
+        return error1 or error2, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and bioloid_position[2] < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))
 
         #error, upDistance = self.getUpDistance()
         #return error, upDistance > float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and upDistance < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))'''

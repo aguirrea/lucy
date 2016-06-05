@@ -71,10 +71,11 @@ class DTIndividualGeneticMatrix(DTIndividualGeneticMaterial):
 class DTIndividualGeneticTimeSerieFileMakeWalkCycle(DTIndividualGeneticMaterial):
 
     def __init__(self, geneticMaterial):
+        CYCLE_REPETITION = 2
         DTIndividualGeneticMaterial.__init__(self)
         lp = LoadPoses(geneticMaterial)
         robotConfig = LoadRobotConfiguration()
-        poseSize = 2*lp.getFrameQty()
+        poseSize = CYCLE_REPETITION*lp.getFrameQty()
         self.geneticMatrix = [[lp.getPose(i%lp.getFrameQty()).getValue(j) for j in robotConfig.getJointsName()] for i in xrange(poseSize)]
 
 class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):

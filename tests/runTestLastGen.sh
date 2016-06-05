@@ -1,4 +1,4 @@
-readonly EXPERIMENT_DIRECTORY=20160327-021909
+readonly EXPERIMENT_DIRECTORY=20160513-000110
  
 ./testLucyEvolution.py ../gene_pool/$EXPERIMENT_DIRECTORY/final-0*
  ./testLucyEvolution.py ../gene_pool/$EXPERIMENT_DIRECTORY/final-1*

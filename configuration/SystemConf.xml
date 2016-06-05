@@ -32,9 +32,9 @@
 </Directory>
 <File>
     <Name>Lucy vrep model</Name>
-    <!-- <Value>/simulator/models/genetic_bioloid.ttt</Value>-->
+    <Value>/simulator/models/genetic_bioloid.ttt</Value>
     <!-- <Value>/simulator/models/genetic_bioloid_without_texture_baliero.ttt</Value>-->
-    <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
+    <!-- <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>-->
 </File>
 
 <!-- Vrep connection parameters -->
@@ -70,7 +70,7 @@
 </Property>
 <Property>
     <Name>Lucy render enable</Name>
-    <Value>0</Value>
+    <Value>1</Value>
 </Property>
 <Property>
     <Name>Lucy simulated?</Name>
@@ -108,7 +108,7 @@
 
 <Property>
     <Name>Population size</Name>
-    <Value>5</Value>
+    <Value>15</Value>
 </Property>
 <Property>
     <Name>Number of generations</Name>
@@ -124,8 +124,8 @@
 </Property>
 <Property>
     <Name>Selection operator</Name>
-    <Value>Selectors.GUniformSelector</Value>
-    <!--<Value>Selectors.GRankSelector</Value>-->
+    <!--<Value>Selectors.GUniformSelector</Value>-->
+    <Value>Selectors.GRankSelector</Value>
 </Property>
 <Property>
     <Name>CrossoverRate</Name>
