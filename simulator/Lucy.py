@@ -188,7 +188,7 @@ class SimulatedLucy(Lucy):
             else:
                 framesExecuted = 0
             endCycleBalance = 0
-        fitness = 0.30 * distance**(1/4.0) + 0.30 * framesExecuted +  0.4 * endCycleBalance**6 - abs(angle)
+        fitness = 0.30 * distance**(1/4.0) + 0.30 * framesExecuted + 0.4 * endCycleBalance**6 - abs(angle)
         if fitness <= 0:
             fitness = 0
         #fitness = 0.25 * math.sqrt(distance) + 0.3 * framesExecuted + 0.15 * normMode + 0.3 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco
@@ -223,11 +223,34 @@ class SimulatedLucy(Lucy):
                 error = self.sim.resumePauseSim(self.clientID) or error
                 error = self.sim.setJointPosition(self.clientID, joint, angleAX.toVrep()) or error
 
-            jointExecutedCounter = jointExecutedCounter + 1
-        self.updateLucyPosition()
+            jointExecutedCounter += 1
+            self.updateLucyPosition()
         self.poseExecuted = self.poseExecuted + self.getPosesExecutedByStepQty()
         #if error:
         #    raise VrepException("error excecuting a pose", error)
+
+    def executeRawPose(self, pose):
+        error = False
+        #Above's N joints will be received and set on the V-REP side at the same time
+
+        jointsQty = len(self.RobotImplementedJoints)
+        jointExecutedCounter=0
+
+        error = self.sim.pauseSim(self.clientID) or error
+        for joint in self.RobotImplementedJoints:
+            angle = pose.getValue(joint)
+            #print "setting joint: ", joint, " to value: ", angle
+
+            if jointExecutedCounter < jointsQty - 1:
+                error = self.sim.setJointPositionNonBlock(self.clientID, joint, angle) or error
+            else:
+                error = self.sim.resumePauseSim(self.clientID) or error
+                error = self.sim.setJointPosition(self.clientID, joint, angle) or error
+
+            jointExecutedCounter += 1
+            self.updateLucyPosition()
+            print "distance traveled: ", self.distance
+        self.poseExecuted = self.poseExecuted + self.getPosesExecutedByStepQty()
 
     def getFrame(self):
         error = False

@@ -19,6 +19,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import math
+import time
 import xml.etree.cElementTree as ET
 
 from Pose                import Pose
@@ -30,30 +31,29 @@ print 'Program started'
 
 #Create Oscillator Parameters
 SP_C = 0
-SP_A = math.pi/18
+SP_A = math.pi/30
 SP_Phi = 0
 
 HR_C = 0
-HR_A = 0
+HR_A = math.pi/30
 HR_Phi = 0
 
-HP_C = -1*math.pi/36
-HP_A = math.pi/12
+HP_C = math.pi/60
+HP_A = -1*math.pi/30
 HP_Phi = 0
 
-K_C = -math.pi/12
-K_A = math.pi/12
-K_Phi = math.pi
+K_C = 0
+K_A = 0
+K_Phi = 0
 
-AP_C = math.pi/10
-AP_A = math.pi/60
-AP_Phi = -1*math.pi/12
+AP_C = 0
+AP_A = 0
+AP_Phi = 0
 
-AR_C = 0
-AR_A = 0
-AR_Phi = 0
 
 T = 0.5
+C_TIMESTEP = 0.05
+C_TIMEOFFSET = 10
 
 root = ET.Element("root")
 lucyPersistence = ET.SubElement(root, "Lucy")
@@ -66,34 +66,63 @@ try:
     configuration = LoadRobotConfiguration()
     simTimeMark = lucy.getSimTime()
     counter = 0
-    while  lucy.isLucyUp() and counter <= 400:
+    isUp = lucy.isLucyUp()
+    startTime = time.time()
+
+
+    '''pose["L_Shoulder_Pitch"] = 0
+    pose["R_Shoulder_Pitch"] = 0
+    #Hip Roll
+    pose["L_Hip_Roll"] = 0
+    pose["R_Hip_Roll"] = 0
+    #Hip Pitch
+    pose["L_Hip_Pitch"] = (26.5/180)*math.pi
+    pose["R_Hip_Pitch"] = (26.5/180)*math.pi
+    #Knee Pitch
+    pose["L_Knee"] = (-50.0/180)*math.pi
+    pose["R_Knee"] = (-50.0/180)*math.pi
+    #Ankle Pitch
+    pose["L_Ankle_Pitch"] = (26.5/180)*math.pi
+    pose["R_Ankle_Pitch"] = (26.5/180)*math.pi
+    #Ankle Roll
+    pose["L_Ankle_Roll"] = 0
+    pose["R_Ankle_Roll"] = 0
+
+    newPose = Pose(pose)
+    lucy.executeRawPose(newPose)'''
+
+    while isUp and counter <= 400:
         print "executin pose number: ", counter
         frame = ET.SubElement(lucyPersistence, "frame")
-        frame.set("number" , str(poseNumber))
+        frame.set("number", str(poseNumber))
 
-        simTime = lucy.getSimTime()
+        simTime = time.time() - startTime
+        t = simTime - (C_TIMESTEP * C_TIMEOFFSET)
+        print "simTime: ", simTime
         #Calculate Joint Angles
         #Shoulder Pitch
-        pose["L_Shoulder_Pitch"] = SP_C+SP_A*math.sin(2*math.pi*simTime/T+SP_Phi)
-        pose["R_Shoulder_Pitch"] = SP_C+SP_A*math.sin(2*math.pi*simTime/T+SP_Phi+math.pi)
+        pose["L_Shoulder_Pitch"] = SP_C+SP_A*math.sin(2*math.pi*t/T+SP_Phi)
+        pose["R_Shoulder_Pitch"] = SP_C+SP_A*math.sin(2*math.pi*t/T+SP_Phi+math.pi)
         #Hip Roll
-        pose["L_Hip_Roll"] = HR_C+HR_A*math.sin(2*math.pi*simTime/T+HR_Phi)
-        pose["R_Hip_Roll"] = HR_C+HR_A*math.sin(2*math.pi*simTime/T+HR_Phi+math.pi)
+        pose["L_Hip_Roll"] = HR_C+HR_A*math.sin(2*math.pi*t/T+HR_Phi)
+        pose["R_Hip_Roll"] = pose["L_Hip_Roll"]
         #Hip Pitch
-        pose["L_Hip_Pitch"] = HP_C+HP_A*math.sin(2*math.pi*simTime/T+HP_Phi)
-        pose["R_Hip_Pitch"] = HP_C+HP_A*math.sin(2*math.pi*simTime/T+HP_Phi+math.pi)
+        pose["L_Hip_Pitch"] = HP_C+HP_A*math.sin(2*math.pi*t/T+HP_Phi)
+        print pose["L_Hip_Pitch"]
+        pose["R_Hip_Pitch"] = HP_C+HP_A*math.sin(2*math.pi*t/T+HP_Phi+math.pi)
         #Knee Pitch
-        pose["L_Knee"] = K_C+K_A*math.sin(2*math.pi*simTime/T+K_Phi)
-        pose["R_Knee"] = RK_Pos=K_C+K_A*math.sin(2*math.pi*simTime/T+K_Phi+math.pi) 
+        pose["L_Knee"] = K_C+K_A*math.sin(2*math.pi*t/T+K_Phi)
+        pose["R_Knee"] = RK_Pos=K_C+K_A*math.sin(2*math.pi*t/T+K_Phi+math.pi)
         #Ankle Pitch
-        pose["L_Ankle_Pitch"] = AP_C+AP_A*math.sin(2*math.pi*simTime/T+AP_Phi)
-        pose["R_Ankle_Pitch"] = AP_C+AP_A*math.sin(2*math.pi*simTime/T+AP_Phi+math.pi)
+        pose["L_Ankle_Pitch"] = AP_C+AP_A*math.sin(2*math.pi*t/T+AP_Phi)
+        pose["R_Ankle_Pitch"] = AP_C+AP_A*math.sin(2*math.pi*t/T+AP_Phi+math.pi)
         #Ankle Roll
-        pose["L_Ankle_Roll"] = AR_C+AR_A*math.sin(2*math.pi*simTime/T+AR_Phi)
-        pose["R_Ankle_Roll"] = AR_C+AR_A*math.sin(2*math.pi*simTime/T+AR_Phi+math.pi)
+        pose["L_Ankle_Roll"] = pose["L_Hip_Roll"]
+        pose["R_Ankle_Roll"] = pose["L_Ankle_Roll"]
 
         newPose = Pose(pose)
-        lucy.executePose(newPose)
+        lucy.executeRawPose(newPose)
+        #time.sleep(0.2)
         poseNumber = poseNumber + 1
         for joint in configuration.getJointsName():
             xmlJoint = ET.SubElement(frame, joint)
@@ -103,6 +132,8 @@ try:
             xmlJointAngle = xmlJoint.set("angle" , str(degreeAngle))
 
         counter = counter + 1
+        isUp = lucy.isLucyUp()
+        print "isUp", isUp
     lucy.stopLucy()
     tree = ET.ElementTree(root)
     tree.write("moon_walk1.xml")
