@@ -3,7 +3,8 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 #
-# Backward walk implemented by https://sites.google.com/a/u.northwestern.edu/gawalker
+# Recreating the work done by Reda Al-Bahrani et al @ https://sites.google.com/a/u.northwestern.edu/gawalker
+# scene ControllerTest_bonusfs for performance comparison
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

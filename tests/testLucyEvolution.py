@@ -25,7 +25,7 @@ import time
 
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
-from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive, DTIndividualPropertyPhysicalBioloid
+from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive, DTIndividualPropertyPhysicalBioloid, DTIndividualPropertyVanillaEvolutiveNoAvoid
 
 from Individual                                 import Individual
 
@@ -34,6 +34,7 @@ propVanilla = DTIndividualPropertyVanilla()
 balieroProp = DTIndividualPropertyBaliero()
 physicalProp = DTIndividualPropertyPhysicalBioloid()
 geneticVanillaProp = DTIndividualPropertyVanillaEvolutive()
+geneticVanillaPropNothingToAvoid = DTIndividualPropertyVanillaEvolutiveNoAvoid()
 
 conf = LoadSystemConfiguration()
 
@@ -50,6 +51,7 @@ def createIndividual(filename):
     if int(conf.getProperty("Lucy simulated?"))==1:
         walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
         #walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFileMakeWalkCycle(os.getcwd()+"/"+filename))
+        #walk = Individual(geneticVanillaPropNothingToAvoid, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)) #For Reda Al-Bahrani work compability
 
     else:
         walk = Individual(physicalProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))    
