@@ -19,9 +19,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import os
-import BVHToolkit
-from cgkit.bvh import Node
-from BVHToolkit import Animation, Pose, Bone
+
+from BVHToolkit import Animation
+
 
 class BvhImport:
     def __init__(self, file):
@@ -76,14 +76,17 @@ class BvhImport:
                 frameIter = frameIter + skipping
         return result_x, result_y, result_z
 
-    def getNodePositionsFromName(self, nodeName, endFrame=None, skipping=1):
+    def getNodePositionsFromName(self, nodeName, startFrame=None, endFrame=None, skipping=1):
         result_x={}
         result_y={}
         result_z={}
         nodeIndex=self.nodeNameIndexMapping[nodeName]
         resultIter = 0
-        frameIter = resultIter
-        if endFrame!=None and len(self.animation.frames) > endFrame:
+        if startFrame != None :
+            frameIter = startFrame
+        else:
+            frameIter = resultIter
+        if endFrame != None and len(self.animation.frames) > endFrame:
             while frameIter < endFrame:
                 pose = self.animation.get_pose(frameIter)
                 node = pose.get_position(nodeIndex)
