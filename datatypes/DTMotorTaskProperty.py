@@ -148,8 +148,8 @@ class DTWalkCycleProperty(DTMotorTaskProperty):
         else:
             self.direction = sysConstants.LEFT_TO_RIGHT
 
-class DTWalkCycleStartingRightFootProperty(DTMotorTaskProperty):
 
+class DTWalkCycleStartingLeftFootProperty(DTMotorTaskProperty):
     # y1 and y2 are time serie vectors with the Y coordinate of each foot
     # the function returns the a set of indexes for which the y1 foot is over the y2 foot and the difference in the Y axis is maximum
     def findMaximunGapBetweenFoots(self, y1, y2):
@@ -181,7 +181,7 @@ class DTWalkCycleStartingRightFootProperty(DTMotorTaskProperty):
 
         return maximumFootsGapIndexes
 
-    def calculateWalkCycleStartingRightFoot(self, parser):
+    def calculateWalkCycleStartingLeftFoot(self, parser):
         y1 = []
         y2 = []
         x1 = []
@@ -202,27 +202,39 @@ class DTWalkCycleStartingRightFootProperty(DTMotorTaskProperty):
         stepsLfootIndexes = self.findMaximunGapBetweenFoots(y1, y2)
         stepsRfootIndexes = self.findMaximunGapBetweenFoots(y2, y1)
 
-        # pre-cycle a step with the left leg
-        if stepsLfootIndexes[0] < stepsRfootIndexes[0]:  # start walking with right leg
-            testPoint = stepsLfootIndexes[0]
-            while (y2[testPoint] > y1[testPoint]):       # wait while the right leg is on the air
+        # start cycle condition: left foot backward and right foot forward
+
+        leftFootPointerStepsIndex = 0
+        rightFootPointerStepsIndex = 0
+        if stepsLfootIndexes[leftFootPointerStepsIndex] < stepsRfootIndexes[rightFootPointerStepsIndex]:  # start walking with left leg
+            testPoint = stepsLfootIndexes[leftFootPointerStepsIndex]
+            leftFootPointerStepsIndex += 1
+            while (y1[testPoint] > y2[testPoint]):  # wait while the left leg is on the air
                 testPoint += 1
-            self.start = testPoint                       # end pre-cycle start cycle
-
-        else:                                            # start walking with left leg
-            testPoint = stepsLfootIndexes[0]
-            while (y1[testPoint] > y2[testPoint]):       # wait while the left leg is on the air
+            testPoint = stepsRfootIndexes[rightFootPointerStepsIndex]
+            rightFootPointerStepsIndex += 1
+            while (y2[testPoint] > y1[testPoint]):  # wait while the right leg is on the air
                 testPoint += 1
-            self.start = testPoint                       # end pre-cycle start cycle
+            self.start = testPoint  # end pre-cycle, start cycle
 
-        testPoint = stepsRfootIndexes[0]
-        while (y2[testPoint] > y1[testPoint]):       # wait while the right leg is on the air
-            testPoint += 1
-        testPoint = stepsLfootIndexes[1]
-        while (y1[testPoint] > y2[testPoint]):       # wait while the left leg is on the air
-            testPoint += 1
-        self.end = testPoint + 15                    # end of the cycle
+        else:  # start walking with right leg
+            testPoint = stepsRfootIndexes[rightFootPointerStepsIndex]
+            rightFootPointerStepsIndex += 1
+            while (y2[testPoint] > y1[testPoint]):  # wait while the right leg is on the air
+                testPoint += 1
+            self.start = testPoint  # end pre-cycle start cycle
 
+
+        # actual condition: left foot backward and right foot forward
+        testPoint = stepsLfootIndexes[leftFootPointerStepsIndex]
+        leftFootPointerStepsIndex += 1
+        while (y1[testPoint] > y2[testPoint]):  # wait while the right leg is on the air
+            testPoint += 1
+        testPoint = stepsRfootIndexes[rightFootPointerStepsIndex]
+        rightFootPointerStepsIndex+= 1
+        while (y2[testPoint] > y1[testPoint]):  # wait while the left leg is on the air
+            testPoint += 1
+        self.end = testPoint + 15  # end of the cycle
 
         absis_value = []
         absis_key = []
@@ -241,4 +253,102 @@ class DTWalkCycleStartingRightFootProperty(DTMotorTaskProperty):
         DTMotorTaskProperty.__init__(self)
         self.filename = file
         parser = BvhImport(self.filename)
-        self.calculateWalkCycleStartingRightFoot(parser)
+        self.calculateWalkCycleStartingLeftFoot(parser)
+
+class DTWalkPreCycleProperty(DTMotorTaskProperty):
+    # y1 and y2 are time serie vectors with the Y coordinate of each foot
+    # the function returns the a set of indexes for which the y1 foot is over the y2 foot and the difference in the Y axis is maximum
+    def findMaximunGapBetweenFoots(self, y1, y2):
+        maxFootIndexes = [x for x in argrelextrema(np.array(y1), np.greater)[
+            0]]  # each value of this vector corresponds to a local maximum of the y1 values
+        maximumFootsGapIndexes = []
+        y_threadhold = self.Y_THREADHOLD
+        while True:  # repeat until implementation in python
+            for i in range(len(maxFootIndexes)):
+                index = maxFootIndexes[i]
+                if y1[index] - y2[index] > y_threadhold:  # left foot is up and right foot on the floor
+                    if len(maximumFootsGapIndexes) > 0:
+                        nearestStepIndex = find_nearest(np.array(maximumFootsGapIndexes), index)
+                        if abs(index - nearestStepIndex) > self.X_THREADHOLD:  # avoid max near an existing point
+                            maximumFootsGapIndexes.append(index)
+                        else:
+                            if y1[nearestStepIndex] < y1[index]:  # check if the exiting near max is a local maximum
+                                maximumFootsGapIndexes.remove(nearestStepIndex)
+                                maximumFootsGapIndexes.append(index)
+                    else:
+                        maximumFootsGapIndexes.append(index)
+
+            if len(maximumFootsGapIndexes) > 1:
+                break
+            else:
+                if y_threadhold > Y_THREADHOLD_SECURITY:
+                    y_threadhold -= 1
+                    print "new Y_THREADHOLD: ", y_threadhold
+
+        return maximumFootsGapIndexes
+
+    def calculatePreCycle(self, parser):
+        y1 = []
+        y2 = []
+        x1 = []
+        x2 = []
+
+        x_, y_, z_ = parser.getNodePositionsFromName(
+            "lFoot")  # time series of (value, key) tuples for the lFoot node
+        for key, value in y_.iteritems():
+            y1.append(value)
+            x1.append(key)
+
+        x_, y_, z_ = parser.getNodePositionsFromName(
+            "rFoot")  # time series of (value, key) tuples for the rFoot node
+        for key, value in y_.iteritems():
+            y2.append(value)
+            x2.append(key)
+
+        stepsLfootIndexes = self.findMaximunGapBetweenFoots(y1, y2)
+        stepsRfootIndexes = self.findMaximunGapBetweenFoots(y2, y1)
+
+        # start cycle condition: left foot backward and right foot forward
+
+        leftFootPointerStepsIndex = 0
+        rightFootPointerStepsIndex = 0
+        self.start = 0
+
+        if stepsLfootIndexes[leftFootPointerStepsIndex] < stepsRfootIndexes[rightFootPointerStepsIndex]:  # start walking with left leg
+            testPoint = stepsLfootIndexes[leftFootPointerStepsIndex]
+            leftFootPointerStepsIndex += 1
+            while (y1[testPoint] > y2[testPoint]):  # wait while the left leg is on the air
+                testPoint += 1
+            testPoint = stepsRfootIndexes[rightFootPointerStepsIndex]
+            rightFootPointerStepsIndex += 1
+            while (y2[testPoint] > y1[testPoint]):  # wait while the right leg is on the air
+                testPoint += 1
+            self.end = testPoint  # end pre-cycle, start cycle
+
+        else:  # start walking with right leg
+            testPoint = stepsRfootIndexes[rightFootPointerStepsIndex]
+            rightFootPointerStepsIndex += 1
+            while (y2[testPoint] > y1[testPoint]):  # wait while the right leg is on the air
+                testPoint += 1
+            self.end = testPoint  # end pre-cycle start cycle
+
+        absis_value = []
+        absis_key = []
+
+        for key, value in z_.iteritems():
+            absis_value.append(value)
+            absis_key.append(key)
+
+        # direction of the walking cycle
+        if absis_value[0] > absis_value[self.end]:
+            self.direction = sysConstants.RIGHT_TO_LEFT
+        else:
+            self.direction = sysConstants.LEFT_TO_RIGHT
+
+    def __init__(self, file):
+        DTMotorTaskProperty.__init__(self)
+        self.filename = file
+        parser = BvhImport(self.filename)
+        self.calculatePreCycle(parser)
+
+
