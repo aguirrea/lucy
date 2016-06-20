@@ -32,14 +32,16 @@ from numpy import conjugate
 import configuration.constants as sysConstants
 from BvhImport import BvhImport
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
-from datatypes.DTMotorTaskProperty import DTWalkCycleStartingLeftFootProperty
+from datatypes.DTMotorTaskProperty import DTWalkCycleStartingRightFootProperty
 
 
 class JointCalculation:
     def __init__(self, file):
         self.parser = BvhImport(file)
-        #dtCycleProp = DTWalkPreCycleProperty(file)
-        dtCycleProp = DTWalkCycleStartingLeftFootProperty(file)
+        ##dtCycleProp = DTWalkPreCyclePropertyLR(file)
+        ##dtCycleProp = DTWalkCycleStartingLeftFootProperty(file)
+        #dtCycleProp = DTWalkPreCyclePropertyRL(file)
+        dtCycleProp = DTWalkCycleStartingRightFootProperty(file)
         self.start = dtCycleProp.getIndividualStart()
         self.end = dtCycleProp.getIndividualEnd()
         self.direction = dtCycleProp.getMoveDirection()
