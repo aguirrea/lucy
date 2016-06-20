@@ -191,8 +191,12 @@ def eval_func(chromosome):
     prop = DTIndividualPropertyVanillaEvolutive()
     #embryo = DTIndividualGeneticMatrixWalk(chromosomeToLucyGeneticMatrix(chromosome))
     embryo = DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome))
-    embryoLength = embryo.getLength()
-    individual = Individual(prop, embryo)
+    precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
+    preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
+    preCycleEmbryo.concatenate(embryo)
+    newEmbryo = preCycleEmbryo
+    embryoLength = newEmbryo.getLength()
+    individual = Individual(prop, newEmbryo)
     individual.setLength(embryoLength)
     fitness = individual.execute() #return the fitness resulting from the simulator execution
 
