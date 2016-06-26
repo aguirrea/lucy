@@ -189,8 +189,10 @@ def eval_func(chromosome):
         setInitialPopulation(gaEngine)
 
     prop = DTIndividualPropertyVanillaEvolutive()
-    embryo = DTIndividualGeneticMatrixWalk(chromosomeToLucyGeneticMatrix(chromosome))
-    #embryo = DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome))
+    if int(conf.getProperty("Concatenate walk cylcles?")):
+        embryo = DTIndividualGeneticMatrixWalk(chromosomeToLucyGeneticMatrix(chromosome))
+    else:
+        embryo = DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome))
     precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
     preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
     preCycleEmbryo.concatenate(embryo)

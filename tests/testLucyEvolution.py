@@ -24,7 +24,7 @@ import sys
 import time
 
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
-from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix
+from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix, DTIndividualGeneticTimeSerieFileMakeWalkCycle
 from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive, DTIndividualPropertyPhysicalBioloid, DTIndividualPropertyVanillaEvolutiveNoAvoid
 
 from Individual                                 import Individual
@@ -49,12 +49,20 @@ arguments = len(sys.argv)
 
 def createIndividual(filename):
     if int(conf.getProperty("Lucy simulated?"))==1:
-        walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
-        #walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFileMakeWalkCycle(os.getcwd()+"/"+filename))
+
+        if int(conf.getProperty("Concatenate walk cylcles?")):
+            walkEmbryo = DTIndividualGeneticTimeSerieFileMakeWalkCycle(os.getcwd()+"/"+filename)
+        else:
+            walkEmbryo = DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)
         #walk = Individual(geneticVanillaPropNothingToAvoid, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)) #For Reda Al-Bahrani work compability
+        precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
+        preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
+        walkEmbryo = preCycleEmbryo.concatenate(walkEmbryo)
+        walk = Individual(geneticVanillaProp, walkEmbryo)
 
     else:
-        walk = Individual(physicalProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))    
+        walk = Individual(physicalProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
+        #TODO add support for walking cycle
     return walk
 
 walk = Individual(geneticVanillaProp, DTIndividualGeneticMatrix()) #dummy individual to initialise the simulator and enable the time step configuration
