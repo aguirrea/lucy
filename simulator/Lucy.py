@@ -188,7 +188,8 @@ class SimulatedLucy(Lucy):
             else:
                 framesExecuted = 0
             endCycleBalance = 0
-        fitness = 0.30 * distance**(1/4.0) + 0.30 * framesExecuted + 0.4 * endCycleBalance**6 - abs(angle)
+        #fitness = 0.30 * distance**(1/4.0) + 0.30 * framesExecuted + 0.4 * endCycleBalance**6 - abs(angle)
+        fitness = 0.6 * distance + 0.4 * framesExecuted - abs(angle)
         if fitness <= 0:
             fitness = 0
         #fitness = 0.25 * math.sqrt(distance) + 0.3 * framesExecuted + 0.15 * normMode + 0.3 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco

@@ -57,7 +57,8 @@ def createIndividual(filename):
         #walk = Individual(geneticVanillaPropNothingToAvoid, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)) #For Reda Al-Bahrani work compability
         precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
         preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
-        walkEmbryo = preCycleEmbryo.concatenate(walkEmbryo)
+        preCycleEmbryo.concatenate(walkEmbryo)
+        walkEmbryo = preCycleEmbryo
         walk = Individual(geneticVanillaProp, walkEmbryo)
 
     else:
