@@ -52,7 +52,7 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
     print "genome mom length: ", gMomLenght
     minimalDiff = INFINITE_DISTANCE
     minimalDiffPosition = 0
-    DIFFERENCE_BETWEEN_POSES_THREADHOLD = 20
+    DIFFERENCE_BETWEEN_POSES_THREADHOLD = 1000
     MINIMAL_CROSSOVER_POINT = 0
 
     if gMomLenght > MINIMAL_CROSSOVER_POINT :
@@ -69,7 +69,7 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
             minimalDiffPosition = position
 
 
-    if minimalDiff <= DIFFERENCE_BETWEEN_POSES_THREADHOLD: #trying to preserve the walk cycle unit we use "restrictions on the cross"
+    if minimalDiff < DIFFERENCE_BETWEEN_POSES_THREADHOLD: #trying to preserve the walk cycle unit we use "restrictions on the cross"
         print "difference between poses: ", minimalDiff, "in position: ", minimalDiffPosition
 
         #TODO comment this, only here for debugging
