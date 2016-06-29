@@ -94,7 +94,7 @@
 </Property>
 <Property>
     <Name>re-evaluate fittest?</Name>
-    <Value>0</Value>
+    <Value>1</Value>
 </Property>
 
 <!-- Parser options -->
@@ -108,7 +108,7 @@
 
 <Property>
     <Name>Population size</Name>
-    <Value>15</Value>
+    <Value>32</Value>
 </Property>
 <Property>
     <Name>Number of generations</Name>
@@ -145,7 +145,7 @@
 </Property>
 <Property>
     <Name>Concatenate walk cylcles?</Name>
-    <Value>1</Value>
+    <Value>0</Value>
 </Property>
 
 </System>
