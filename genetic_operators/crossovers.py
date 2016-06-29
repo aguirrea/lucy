@@ -52,7 +52,7 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
     print "genome mom length: ", gMomLenght
     minimalDiff = INFINITE_DISTANCE
     minimalDiffPosition = 0
-    DIFFERENCE_BETWEEN_POSES_THREADHOLD = 1000
+    DIFFERENCE_BETWEEN_POSES_THREADHOLD = 1500
     MINIMAL_CROSSOVER_POINT = 0
 
     if gMomLenght > MINIMAL_CROSSOVER_POINT :
