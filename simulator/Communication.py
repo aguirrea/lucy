@@ -73,12 +73,13 @@ class CommSerial(Communication):
         self.baudrate = baudrate
 
     def connect(self):
-        print "conectado"
+        print "conecting..."
         try:
             self.client = serial.Serial()         # create a serial port object
             self.client.baudrate = self.baudrate  # baud rate, in bits/second
             self.client.port = self.tty_node      # this is whatever port your are using
             self.client.open()
+            print "connected!"
         except:
             print "error stablishing serial connection"
 

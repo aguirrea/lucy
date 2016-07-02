@@ -24,7 +24,7 @@ from numpy import angle
 
 from errors.VrepException           import VrepException
 
-import Actuator
+from Actuator                       import Actuator
 from AXAngle                        import AXAngle
 from Communication                  import CommSerial
 from LoadRobotConfiguration         import LoadRobotConfiguration
@@ -75,7 +75,7 @@ class PhysicalLucy(Lucy):
         Lucy.__init__(self)
         self.comm_tty = CommSerial()
         self.comm_tty.connect()
-        self.actuator = Actuator.Actuator(self.comm_tty)
+        self.actuator = Actuator(self.comm_tty)
         self.defaultSpeed = 600 #TODO change this, use configuration files
         self.initialPoses = {}
 
@@ -108,6 +108,7 @@ class PhysicalLucy(Lucy):
             #TODO implement method for setting position of all actuators at the same time
             self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), int(angleAX.getValue()), self.defaultSpeed)
             self.poseExecuted = self.poseExecuted + 1
+        print "pose executed!"
         time.sleep(3)
 
     def stopLucy(self):
