@@ -18,10 +18,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+
+import numpy as np
+from scipy.interpolate import UnivariateSpline
+
 import configuration.constants as sysConstants
 from parser.LoadPoses import LoadPoses
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
+SPLINE_SMOOTHING_FACTOR = 5
+INTERPOLATION_WINDOW = 5
+REFERENCE_WINDOW_RADIUS = 10
 
 class DTIndividualGeneticMaterial(object):
     def __init__(self):
@@ -47,6 +54,10 @@ class DTIndividualGeneticMaterial(object):
     def concatenate(self, individualGeneticMaterial):
         self.geneticMatrix += individualGeneticMaterial.getGeneticMatrix()
 
+    def repeat(self, times):
+        self.geneticMatrix *= times
+
+
 class DTIndividualGeneticTimeSerieFile(DTIndividualGeneticMaterial):
     def __init__(self, geneticMaterial):
         DTIndividualGeneticMaterial.__init__(self)
@@ -69,15 +80,53 @@ class DTIndividualGeneticMatrix(DTIndividualGeneticMaterial):
         self.geneticMatrix = geneticMaterial
 
 
-class DTIndividualGeneticTimeSerieFileMakeWalkCycle(DTIndividualGeneticMaterial):
+class DTIndividualGeneticTimeSerieFileWalk(DTIndividualGeneticMaterial):
     def __init__(self, geneticMaterial):
         CYCLE_REPETITION = 2
         DTIndividualGeneticMaterial.__init__(self)
         lp = LoadPoses(geneticMaterial)
         robotConfig = LoadRobotConfiguration()
-        poseSize = CYCLE_REPETITION * lp.getFrameQty()
-        self.geneticMatrix = [[lp.getPose(i % lp.getFrameQty()).getValue(j) for j in robotConfig.getJointsName()] for i
-                              in xrange(poseSize)]
+        cycleSize = lp.getFrameQty()
+        '''self.geneticMatrix = [[lp.getPose(i % cycleSize).getValue(j) for j in robotConfig.getJointsName()] for i
+                              in xrange(poseSize)]'''
+        self.geneticMatrix = [[lp.getPose(i).getValue(j) for j in robotConfig.getJointsName()] for i in
+                              xrange(cycleSize)] * CYCLE_REPETITION
+        print self.geneticMatrix
+
+        x = np.ndarray(REFERENCE_WINDOW_RADIUS * 2)
+        y = np.ndarray(REFERENCE_WINDOW_RADIUS * 2)
+
+        poseQty = len(self.geneticMatrix)
+        poseLength = len(self.geneticMatrix[0])
+        print "poseQty: ", poseQty, "poseLength: ", poseLength, "lp.getFrameQty(): ", lp.getFrameQty()
+
+
+        for joint in range(poseLength):
+            interpolationDataIter = REFERENCE_WINDOW_RADIUS
+
+            for k in xrange(REFERENCE_WINDOW_RADIUS):
+                referenceFrame= cycleSize + k
+                x[interpolationDataIter] = referenceFrame
+                y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
+                interpolationDataIter += 1
+
+            interpolationDataIter = REFERENCE_WINDOW_RADIUS - 1
+
+            for k in xrange(REFERENCE_WINDOW_RADIUS):
+                referenceFrame= cycleSize - (INTERPOLATION_WINDOW + k + 1)
+                x[interpolationDataIter] = referenceFrame
+                y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
+                interpolationDataIter -= 1
+
+            spl = UnivariateSpline(x, y, s=SPLINE_SMOOTHING_FACTOR)
+
+            print "interopArrayX: ", x, "interopArrayY: ", y
+            for k in xrange(INTERPOLATION_WINDOW):
+                smoothFrameIter = cycleSize - 1 - k
+                newValue = spl(smoothFrameIter)
+                print "joint: ", joint, "iter: ", smoothFrameIter, "old value: ", self.geneticMatrix[smoothFrameIter][joint], "new value: ", newValue
+                self.geneticMatrix[smoothFrameIter][joint] = newValue
+
 
 
 class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
