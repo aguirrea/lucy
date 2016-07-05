@@ -24,7 +24,7 @@ import sys
 import time
 
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
-from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix, DTIndividualGeneticTimeSerieFileMakeWalkCycle
+from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix, DTIndividualGeneticTimeSerieFileWalk
 from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive, DTIndividualPropertyPhysicalBioloid, DTIndividualPropertyVanillaEvolutiveNoAvoid
 
 from Individual                                 import Individual
@@ -51,7 +51,7 @@ def createIndividual(filename):
     if int(conf.getProperty("Lucy simulated?"))==1:
 
         if int(conf.getProperty("Concatenate walk cylcles?")):
-            walkEmbryo = DTIndividualGeneticTimeSerieFileMakeWalkCycle(os.getcwd()+"/"+filename)
+            walkEmbryo = DTIndividualGeneticTimeSerieFileWalk(os.getcwd()+"/"+filename)
         else:
             walkEmbryo = DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)
         #walk = Individual(geneticVanillaPropNothingToAvoid, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)) #For Reda Al-Bahrani work compability
