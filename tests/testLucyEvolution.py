@@ -21,10 +21,10 @@
 import glob
 import os
 import sys
-import time
 
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
-from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix, DTIndividualGeneticTimeSerieFileWalk
+from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, \
+    DTIndividualGeneticTimeSerieFileWalk
 from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive, DTIndividualPropertyPhysicalBioloid, DTIndividualPropertyVanillaEvolutiveNoAvoid
 
 from Individual                                 import Individual
@@ -66,10 +66,10 @@ def createIndividual(filename):
         #TODO add support for walking cycle
     return walk
 
-walk = Individual(geneticVanillaProp, DTIndividualGeneticMatrix()) #dummy individual to initialise the simulator and enable the time step configuration
+'''walk = Individual(geneticVanillaProp, DTIndividualGeneticMatrix()) #dummy individual to initialise the simulator and enable the time step configuration
 walk.execute()
 print "please set the proper time step in vrep"
-time.sleep(5)
+time.sleep(5)'''
 if arguments > 1:
     files = sys.argv[1:]
     for filename in files:

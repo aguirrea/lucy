@@ -27,7 +27,7 @@ from parser.LoadPoses import LoadPoses
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 SPLINE_SMOOTHING_FACTOR = 5
-INTERPOLATION_WINDOW = 5
+INTERPOLATION_WINDOW = 6
 REFERENCE_WINDOW_RADIUS = 10
 
 class DTIndividualGeneticMaterial(object):
@@ -87,11 +87,15 @@ class DTIndividualGeneticTimeSerieFileWalk(DTIndividualGeneticMaterial):
         lp = LoadPoses(geneticMaterial)
         robotConfig = LoadRobotConfiguration()
         cycleSize = lp.getFrameQty()
-        '''self.geneticMatrix = [[lp.getPose(i % cycleSize).getValue(j) for j in robotConfig.getJointsName()] for i
-                              in xrange(poseSize)]'''
+
+        jointNameIDMapping = {}
+        jointIDCounter = 0
+        for j in robotConfig.getJointsName():
+            jointNameIDMapping[jointIDCounter] = j
+            jointIDCounter+=1
+
         self.geneticMatrix = [[lp.getPose(i).getValue(j) for j in robotConfig.getJointsName()] for i in
                               xrange(cycleSize)] * CYCLE_REPETITION
-        print self.geneticMatrix
 
         x = np.ndarray(REFERENCE_WINDOW_RADIUS * 2)
         y = np.ndarray(REFERENCE_WINDOW_RADIUS * 2)
@@ -120,13 +124,27 @@ class DTIndividualGeneticTimeSerieFileWalk(DTIndividualGeneticMaterial):
 
             spl = UnivariateSpline(x, y, s=SPLINE_SMOOTHING_FACTOR)
 
-            print "interopArrayX: ", x, "interopArrayY: ", y
+            #uncomment this block for grahpical debugging of the interpolation process
+            '''px = linspace(x[0], x[len(x)-1], len(x))
+            py = spl(px)
+            plt.plot(x, y, '.-')
+            plt.plot(px, py)
+
+            xinter = np.ndarray(INTERPOLATION_WINDOW)
+            yinter = np.ndarray(INTERPOLATION_WINDOW)
+
             for k in xrange(INTERPOLATION_WINDOW):
                 smoothFrameIter = cycleSize - 1 - k
-                newValue = spl(smoothFrameIter)
-                print "joint: ", joint, "iter: ", smoothFrameIter, "old value: ", self.geneticMatrix[smoothFrameIter][joint], "new value: ", newValue
-                self.geneticMatrix[smoothFrameIter][joint] = newValue
+                xinter[k] = smoothFrameIter
+                yinter[k] = self.geneticMatrix[smoothFrameIter][joint]
 
+            plt.plot(xinter, yinter)
+            plt.title(jointNameIDMapping[joint])
+            plt.show()'''
+
+            for k in range(cycleSize - (INTERPOLATION_WINDOW + REFERENCE_WINDOW_RADIUS), cycleSize + REFERENCE_WINDOW_RADIUS):
+                newValue = spl(k)
+                self.geneticMatrix[k][joint] = newValue
 
 
 class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
