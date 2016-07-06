@@ -22,10 +22,11 @@ import os
 import time
 from numpy import angle
 
+from datatypes.DTIndividualProperty import DTIndividualPropertyVanillaEvolutive
 from errors.VrepException           import VrepException
 
-from Actuator                       import Actuator
 from AXAngle                        import AXAngle
+from Actuator                       import Actuator
 from Communication                  import CommSerial
 from LoadRobotConfiguration         import LoadRobotConfiguration
 from LoadSystemConfiguration        import LoadSystemConfiguration
@@ -50,7 +51,7 @@ class Lucy(object):
             if joint not in dontSupportedJoints:
                 self.RobotImplementedJoints.append(joint)
 
-    def getFitness(self, secuenceLength):
+    def getFitness(self, secuenceLength, concatenationGap):
         pass
 
     def executePose(self, pose):
@@ -123,7 +124,7 @@ class PhysicalLucy(Lucy):
             pose[joint] = value
         return error, pose
 
-    def getFitness(self, secuenceLength):
+    def getFitness(self, secuenceLength, concatenationGap):
         return 0
 
     def isLucyUp(self):
@@ -165,13 +166,30 @@ class SimulatedLucy(Lucy):
         return self.time
         
     def getSimDistance(self):
-        return self.distance        
+        return self.distance
 
-    def getFitness(self, secuenceLength):
+    def getConcatenationCycleGapNormalized(self,concatenationGap):
+        prop = DTIndividualPropertyVanillaEvolutive()
+        robotConf = LoadRobotConfiguration()
+        robotJoints = robotConf.getJointsName()
+        totalJointsQty = len(robotJoints)
+        avoidJointsQty = 0
+        maxJointDiff = 300
+        for joint in robotJoints:
+            if prop.avoidJoint(joint):
+                avoidJointsQty += 1
+        minDiff = (totalJointsQty-avoidJointsQty)*maxJointDiff
+        maxDiff = 0
+        normalizedGap = (concatenationGap - minDiff)/(maxDiff-minDiff)
+        return normalizedGap
+
+    def getFitness(self, secuenceLength, concatenationGap):
         error, angle = self.sim.robotOrientationToGoal()
         distance = self.getSimDistance()
         error, upD = self.sim.getUpDistance()
         framesQty = secuenceLength
+        concatenationGapNormalized = self.getConcatenationCycleGapNormalized(concatenationGap)
+
         print "--------------------------------------------------------------------"
         print "orientation: ", angle
         print "distance traveled: ", distance
@@ -189,7 +207,8 @@ class SimulatedLucy(Lucy):
             else:
                 framesExecuted = 0
             endCycleBalance = 0
-        fitness = 0.30 * distance**(1/4.0) + 0.30 * framesExecuted + 0.4 * endCycleBalance**6 - abs(angle)
+        #fitness = 0.30 * distance**(1/4.0) + 0.30 * framesExecuted + 0.4 * endCycleBalance**6 - abs(angle)
+        fitness = 0.40 * concatenationGapNormalized**6 + 0.30 * framesExecuted + 0.3 * endCycleBalance**6 - abs(angle)
         if fitness <= 0:
             fitness = 0
         #fitness = 0.25 * math.sqrt(distance) + 0.3 * framesExecuted + 0.15 * normMode + 0.3 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco
@@ -198,6 +217,7 @@ class SimulatedLucy(Lucy):
         print "FITNESS: ", fitness
         print "upDistance: ", self.sim.getUpDistance()
         print "endCycleBalance: ", endCycleBalance
+        print "concatenationGapNormalized: ", concatenationGapNormalized
         print "--------------------------------------------------------------------"
         return fitness
 

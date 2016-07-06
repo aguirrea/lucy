@@ -22,8 +22,8 @@ import xml.etree.cElementTree as ET
 
 from Pose                                       import Pose
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
+from datatypes.DTGenomeFunctions import DTGenomeFunctions
 from datatypes.DTModelRepose                    import DTModelVrepReda
-from genetic_operators.DTGenomeFunctions        import DTGenomeFunctions
 from simulator.LoadRobotConfiguration           import LoadRobotConfiguration
 from simulator.Lucy                             import SimulatedLucy, PhysicalLucy
 
@@ -40,6 +40,7 @@ class Individual:
         self.length = individualGeneticMaterial.getLength()
         self.genomeMatrixJointNameIDMapping = {}
         self.sysConf = LoadSystemConfiguration()
+        self.concatenationGap = individualGeneticMaterial.getConcatenationGap()
 
         i=0
         for jointName in self.robotConfig.getJointsName():
@@ -85,7 +86,7 @@ class Individual:
             i = i + self.lucy.getPosesExecutedByStepQty()
             self.lucy.executePose(Pose(poseExecute))
 
-        self.fitness = self.lucy.getFitness(self.length)
+        self.fitness = self.lucy.getFitness(self.length, self.concatenationGap)
         self.lucy.stopLucy()  #this function also updates time and distance
         return self.fitness
 

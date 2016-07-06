@@ -23,8 +23,14 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 
 import configuration.constants as sysConstants
+from datatypes.DTGenomeFunctions import DTGenomeFunctions
 from parser.LoadPoses import LoadPoses
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+
+'''
+from numpy import linspace
+import matplotlib.pyplot as plt
+'''
 
 SPLINE_SMOOTHING_FACTOR = 5
 INTERPOLATION_WINDOW = 6
@@ -57,6 +63,9 @@ class DTIndividualGeneticMaterial(object):
     def repeat(self, times):
         self.geneticMatrix *= times
 
+    def getConcatenationGap(self):
+        dtgf = DTGenomeFunctions()
+        return dtgf.rawDiff(self.geneticMatrix[0], self.geneticMatrix[self.getLength() - 1])
 
 class DTIndividualGeneticTimeSerieFile(DTIndividualGeneticMaterial):
     def __init__(self, geneticMaterial):
@@ -72,13 +81,11 @@ class DTIndividualGeneticTimeSerieFile(DTIndividualGeneticMaterial):
         self.geneticMatrix = [[lp.getPose(i).getValue(j) for j in robotConfig.getJointsName()] for i in
                               xrange(poseSize)]
 
-
 class DTIndividualGeneticMatrix(DTIndividualGeneticMaterial):
     # def __init__(self, geneticMaterial=G2DList.G2DList(1,18)):
     def __init__(self, geneticMaterial=[[0 for j in xrange(18)] for i in xrange(1)]):
         DTIndividualGeneticMaterial.__init__(self)
         self.geneticMatrix = geneticMaterial
-
 
 class DTIndividualGeneticTimeSerieFileWalk(DTIndividualGeneticMaterial):
     def __init__(self, geneticMaterial):
@@ -140,11 +147,15 @@ class DTIndividualGeneticTimeSerieFileWalk(DTIndividualGeneticMaterial):
 
             plt.plot(xinter, yinter)
             plt.title(jointNameIDMapping[joint])
-            plt.show()'''
+            plt.show()
+            print "gap between first and last: ", self.getConcatenationGap()
+            '''
 
             for k in range(cycleSize - (INTERPOLATION_WINDOW + REFERENCE_WINDOW_RADIUS), cycleSize + REFERENCE_WINDOW_RADIUS):
                 newValue = spl(k)
                 self.geneticMatrix[k][joint] = newValue
+
+
 
 
 class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
