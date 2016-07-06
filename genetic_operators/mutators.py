@@ -23,10 +23,9 @@
 from random import randint as rand_randint, gauss as rand_gauss
 from random import random as rand_random
 
-from datatypes.DTIndividualProperty import DTIndividualPropertyVanillaEvolutive
-
 import configuration.constants as sysConstants
-from genetic_operators.DTGenomeFunctions import DTGenomeFunctions
+from datatypes.DTGenomeFunctions import DTGenomeFunctions
+from datatypes.DTIndividualProperty import DTIndividualPropertyVanillaEvolutive
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 CDefG2DListMutRealMU = 0

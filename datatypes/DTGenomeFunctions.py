@@ -38,7 +38,8 @@ class DTGenomeFunctions(object):
         self.robotConfig = LoadRobotConfiguration()
 
     # returns the distance between two frame poses, if one of the poses is a sentinel pose the distance is INFINITE_DISTANCE
-    def diff(self, frame1, frame2):
+    # uses square power to make visible a change in one of the joints
+    def euclideanDiff(self, frame1, frame2):
         diff = 0
         prop = DTIndividualPropertyVanillaEvolutive()
         robotJoints = self.robotConfig.getJointsName()
@@ -51,6 +52,19 @@ class DTGenomeFunctions(object):
                 else:
                     jointDiff = (frame1[jointIndex] - frame2[jointIndex])**2
                     diff += jointDiff
+            jointIndex = jointIndex + 1
+        return diff
+
+    # returns the distance between two frame poses, if one of the poses is a sentinel pose the distance is INFINITE_DISTANCE
+    def rawDiff(self, frame1, frame2):
+        diff = 0
+        prop = DTIndividualPropertyVanillaEvolutive()
+        robotJoints = self.robotConfig.getJointsName()
+        jointIndex = 0
+        for joint in robotJoints:
+            if not prop.avoidJoint(joint):
+                jointDiff = frame1[jointIndex] - frame2[jointIndex]
+                diff += jointDiff
             jointIndex = jointIndex + 1
         return diff
 

@@ -33,10 +33,10 @@ from pyevolve import Selectors
 import configuration.constants as sysConstants
 from Individual                                 import Individual
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
+from datatypes.DTGenomeFunctions import  DTGenomeFunctions
 from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix, DTIndividualGeneticMatrixWalk
 from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive
 from genetic_operators import crossovers, mutators
-from genetic_operators.DTGenomeFunctions import  DTGenomeFunctions
 
 initialPopulationSetted = False
 gaEngine = None

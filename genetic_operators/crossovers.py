@@ -22,7 +22,7 @@ import sys
 from random import randint as rand_randint
 
 import configuration.constants as sysConstants
-from genetic_operators.DTGenomeFunctions import DTGenomeFunctions
+from datatypes.DTGenomeFunctions import DTGenomeFunctions
 
 INFINITE_DISTANCE = sys.maxint
 
@@ -63,7 +63,7 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
     frame1 = gMom[cut]
 
     for position in xrange(gDadLength):
-        frameDiff = dtgenome.diff(frame1, gDad[position])
+        frameDiff = dtgenome.euclideanDiff(frame1, gDad[position])
         if frameDiff < minimalDiff:
             minimalDiff = frameDiff
             minimalDiffPosition = position
