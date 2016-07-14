@@ -185,3 +185,58 @@ class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
                     frameIter = 0
                     break
             frameIter = frameIter + 1
+
+
+        #TODO take this in common with the others constructors
+
+        cycleSize = geneticMaterialLength
+        x = np.ndarray(REFERENCE_WINDOW_RADIUS * 2)
+        y = np.ndarray(REFERENCE_WINDOW_RADIUS * 2)
+
+        poseQty = len(self.geneticMatrix)
+        poseLength = len(self.geneticMatrix[0])
+        #print "poseQty: ", poseQty, "poseLength: ", poseLength, "lp.getFrameQty(): ", lp.getFrameQty()
+
+
+        for joint in range(poseLength):
+            interpolationDataIter = REFERENCE_WINDOW_RADIUS
+
+            for k in xrange(REFERENCE_WINDOW_RADIUS):
+                referenceFrame= cycleSize + k
+                x[interpolationDataIter] = referenceFrame
+                y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
+                interpolationDataIter += 1
+
+            interpolationDataIter = REFERENCE_WINDOW_RADIUS - 1
+
+            for k in xrange(REFERENCE_WINDOW_RADIUS):
+                referenceFrame= cycleSize - (INTERPOLATION_WINDOW + k + 1)
+                x[interpolationDataIter] = referenceFrame
+                y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
+                interpolationDataIter -= 1
+
+            spl = UnivariateSpline(x, y, s=SPLINE_SMOOTHING_FACTOR)
+
+            #uncomment this block for grahpical debugging of the interpolation process
+            '''px = linspace(x[0], x[len(x)-1], len(x))
+            py = spl(px)
+            plt.plot(x, y, '.-')
+            plt.plot(px, py)
+
+            xinter = np.ndarray(INTERPOLATION_WINDOW)
+            yinter = np.ndarray(INTERPOLATION_WINDOW)
+
+            for k in xrange(INTERPOLATION_WINDOW):
+                smoothFrameIter = cycleSize - 1 - k
+                xinter[k] = smoothFrameIter
+                yinter[k] = self.geneticMatrix[smoothFrameIter][joint]
+
+            plt.plot(xinter, yinter)
+            plt.title(jointNameIDMapping[joint])
+            plt.show()
+            print "gap between first and last: ", self.getConcatenationGap()
+            '''
+
+            for k in range(cycleSize - (INTERPOLATION_WINDOW + REFERENCE_WINDOW_RADIUS), cycleSize + REFERENCE_WINDOW_RADIUS):
+                newValue = spl(k)
+                self.geneticMatrix[k][joint] = newValue

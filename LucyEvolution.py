@@ -79,6 +79,7 @@ def setInitialPopulation(ga_engine):
 
     conf = LoadSystemConfiguration()
 
+    lucyCycles = os.getcwd()+conf.getDirectory("Lucy evolved walk cycles Files")
     CMUxmlDir = os.getcwd()+conf.getDirectory("Transformed CMU mocap Files")
     GAwalkDir = os.getcwd()+conf.getDirectory("GAWalk Files")
     UIBLHDir = os.getcwd()+conf.getDirectory("UIBLH mocap Files")
@@ -93,26 +94,10 @@ def setInitialPopulation(ga_engine):
     walk = Individual(propVanilla, DTIndividualGeneticMatrix()) #dummy individual to initialise the simulator and enable the time step configuration
     walk.execute()
     print "please set the proper time step in vrep"
-    '''
-    if individualCounter < popSize:
-        for filename in glob.glob(os.path.join(GAwalkDir, '*.xml')):
-            print individualCounter, " individuals processed!"
-            print 'inserting individual: ' + filename + " into the initial population"
-            walk = Individual(propVanilla, DTIndividualGeneticTimeSerieFile(filename))
-            geneticMatrix = walk.getGenomeMatrix()
-            if individualCounter < popSize-1:
-                adan = population[individualCounter]
-                for i in xrange(adan.getHeight()):
-                    if i == len(geneticMatrix):
-                            break
-                    for j in xrange(adan.getWidth()):
-                        adan.setItem(i,j,geneticMatrix[i][j])
-                population[individualCounter]=adan
-                individualCounter = individualCounter + 1
-            else:
-                break
-    '''    
+
+
     dtgenoma = DTGenomeFunctions()
+    '''
     #the random initia population created is replaced by the imitation motion capture database
     if individualCounter < popSize:
         for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
@@ -120,6 +105,28 @@ def setInitialPopulation(ga_engine):
                 print individualCounter, " individuals processed!"
                 print 'inserting individual: ' + filename + " into the initial population"
                 walk = Individual(propCMUDaz, DTIndividualGeneticTimeSerieFile(filename))
+                teacherGeneticMatrix = walk.getGenomeMatrix()
+                adan = population[individualCounter]
+                adanIndividualLength=dtgenoma.getIndividualLength(adan)
+                adanJointLength=dtgenoma.getIndividualFrameLength(adan)
+                for i in xrange(adanIndividualLength):
+                    for j in xrange(adanJointLength):
+                        if i < len(teacherGeneticMatrix): #if the fixed gnoma representation size is less than the teacher size
+                            adan.setItem(i,j,teacherGeneticMatrix[i][j])
+                        else:
+                            #put a sentinel joint value to mark the end of the individual
+                            adan.setItem(i,j,sysConstants.JOINT_SENTINEL)
+                population[individualCounter]=adan
+                individualCounter = individualCounter + 1
+            else:
+                break
+    '''
+    if individualCounter < popSize:
+        for filename in glob.glob(os.path.join(lucyCycles, '*.xml')):
+            if individualCounter < popSize:
+                print individualCounter, " individuals processed!"
+                print 'inserting individual: ' + filename + " into the initial population"
+                walk = Individual(propVanilla, DTIndividualGeneticTimeSerieFile(filename))
                 teacherGeneticMatrix = walk.getGenomeMatrix()
                 adan = population[individualCounter]
                 adanIndividualLength=dtgenoma.getIndividualLength(adan)
