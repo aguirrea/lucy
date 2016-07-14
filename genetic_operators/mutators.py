@@ -117,7 +117,7 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
             validIDFound = False
             while not foundFrameDifferentThanSentinel and not validIDFound:
                 which_x = rand_randint(0, genome.getWidth() - 1)  # joint to mutate
-                if which_x in validIDs: #only mutate not avoid ids
+                if which_x in validIDs: #only mutate not avoided ids
                     validIDFound = True
                     which_y = rand_randint(0, genome.getHeight() - 1)  # pose to mutate
                     if genome[which_y][which_x] != sysConstants.JOINT_SENTINEL:
