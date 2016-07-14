@@ -62,7 +62,13 @@ def createIndividual(filename):
         walk = Individual(geneticVanillaProp, walkEmbryo)
 
     else:
-        walk = Individual(physicalProp, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename))
+        #TODO restructure the precycle for the case of phyisical and simulated
+        walkEmbryo = DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)
+        precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
+        preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
+        preCycleEmbryo.concatenate(walkEmbryo)
+        walkEmbryo = preCycleEmbryo
+        walk = Individual(physicalProp, walkEmbryo)
         #TODO add support for walking cycle
     return walk
 
@@ -81,4 +87,5 @@ else:
         print 'executing individual: ' + filename
         walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(filename))
         walk.execute()
+
 
