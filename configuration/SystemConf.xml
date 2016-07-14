@@ -27,12 +27,16 @@
     <Value>/mocap/baliero/xml/</Value>
 </Directory>
 <Directory>
+    <Name>Lucy evolved walk cycles Files</Name>
+    <Value>/mocap/lucy_walk_cycles/xml/</Value>
+</Directory>
+<Directory>
     <Name>Genetic Pool</Name> 
     <Value>/gene_pool/</Value>
 </Directory>
 <File>
     <Name>Lucy vrep model</Name>
-    <!--<Value>/simulator/models/genetic_bioloid.ttt</Value>-->
+    <!-- <Value>/simulator/models/genetic_bioloid.ttt</Value>-->
     <!-- <Value>/simulator/models/genetic_bioloid_without_texture_baliero.ttt</Value>-->
     <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
 </File>
@@ -74,7 +78,7 @@
 </Property>
 <Property>
     <Name>Lucy simulated?</Name>
-    <Value>1</Value>    
+    <Value>1</Value>
 </Property>
 <Property>
     <Name>synchronous mode?</Name>
@@ -96,7 +100,10 @@
     <Name>re-evaluate fittest?</Name>
     <Value>1</Value>
 </Property>
-
+<Property>
+    <Name>Concatenate walk cylcles?</Name>
+    <Value>1</Value>
+</Property>
 <!-- Parser options -->
 
 <Property>
@@ -108,11 +115,11 @@
 
 <Property>
     <Name>Population size</Name>
-    <Value>32</Value>
+    <Value>30</Value>
 </Property>
 <Property>
     <Name>Number of generations</Name>
-    <Value>600</Value>
+    <Value>300</Value>
 </Property>
 <Property>
     <Name>Crossover operator</Name>
@@ -124,8 +131,8 @@
 </Property>
 <Property>
     <Name>Selection operator</Name>
-    <Value>Selectors.GUniformSelector</Value>
-    <!--<Value>Selectors.GRankSelector</Value>-->
+    <!--<Value>Selectors.GUniformSelector</Value>-->
+    <Value>Selectors.GRankSelector</Value>
 </Property>
 <Property>
     <Name>CrossoverRate</Name>
@@ -141,10 +148,6 @@
 </Property>
 <Property>
     <Name>Convergence criteria enable?</Name>
-    <Value>0</Value>
-</Property>
-<Property>
-    <Name>Concatenate walk cylcles?</Name>
     <Value>0</Value>
 </Property>
 
