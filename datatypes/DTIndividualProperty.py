@@ -46,26 +46,27 @@ class DTIndividualPropertyPhysicalBioloid(DTIndividualProperty):
     
     def __init__(self):
         DTIndividualProperty.__init__(self)
-        self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Ankle_Pitch", "R_Ankle_Pitch", "R_Shoulder_Pitch", "L_Shoulder_Pitch","L_Hip_Roll", "R_Hip_Roll"]    
-        self.poseFix["R_Shoulder_Yaw"] = 265
-        self.poseFix["R_Shoulder_Pitch"] = 146
-        self.poseFix["R_Hip_Yaw"] = -136
-        self.poseFix["R_Hip_Roll"] = 5
-        self.poseFix["R_Hip_Pitch"] = -8
-        self.poseFix["R_Knee"] = -46
-        self.poseFix["R_Ankle_Pitch"] = 48
-        self.poseFix["R_Elbow_Yaw"] = 50
-        self.poseFix["R_Ankle_Roll"] = 84
+        self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll"]
 
-        self.poseFix["L_Shoulder_Yaw"] = 66
-        self.poseFix["L_Shoulder_Pitch"] = 198
-        self.poseFix["L_Hip_Yaw"] = 170
-        self.poseFix["L_Hip_Roll"] = 50
-        self.poseFix["L_Hip_Pitch"] = 59
-        self.poseFix["L_Knee"] = -4
-        self.poseFix["L_Ankle_Pitch"] = 127
-        self.poseFix["L_Elbow_Yaw"] = -31
-        self.poseFix["L_Ankle_Roll"] = -55
+        self.poseFix["R_Shoulder_Yaw"] = -65
+        self.poseFix["R_Shoulder_Pitch"] = -86
+        self.poseFix["R_Hip_Yaw"] = -8
+        self.poseFix["R_Hip_Roll"] = -3
+        self.poseFix["R_Hip_Pitch"] = 36
+        self.poseFix["R_Knee"] = 92
+        self.poseFix["R_Ankle_Pitch"] = -63
+        self.poseFix["R_Elbow_Yaw"] = -150
+        self.poseFix["R_Ankle_Roll"] = -5
+
+        self.poseFix["L_Shoulder_Yaw"] = -57
+        self.poseFix["L_Shoulder_Pitch"] = -85
+        self.poseFix["L_Hip_Yaw"] = -7
+        self.poseFix["L_Hip_Roll"] = -5
+        self.poseFix["L_Hip_Pitch"] = -27
+        self.poseFix["L_Knee"] = -58
+        self.poseFix["L_Ankle_Pitch"] = 23
+        self.poseFix["L_Elbow_Yaw"] = -39
+        self.poseFix["L_Ankle_Roll"] = -5    
     
 
 class DTIndividualPropertyCMUDaz(DTIndividualProperty):
