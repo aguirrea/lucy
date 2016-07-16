@@ -26,6 +26,7 @@ import configuration.constants as sysConstants
 from datatypes.DTGenomeFunctions import DTGenomeFunctions
 from parser.LoadPoses import LoadPoses
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 
 '''
 from numpy import linspace
@@ -38,7 +39,9 @@ REFERENCE_WINDOW_RADIUS = 10
 
 class DTIndividualGeneticMaterial(object):
     def __init__(self):
+        conf = LoadSystemConfiguration()
         self.geneticMatrix = []
+        self.cyclesQty = int(conf.getProperty("Concatenate walk cycles?"))
 
     def getGeneticMatrix(self):
         return self.geneticMatrix
@@ -73,11 +76,7 @@ class DTIndividualGeneticTimeSerieFile(DTIndividualGeneticMaterial):
         lp = LoadPoses(geneticMaterial)
         robotConfig = LoadRobotConfiguration()
         poseSize = lp.getFrameQty()
-        # newGenoma = G2DList.G2DList(poseSize, 18)
-        # for i in xrange(newGenoma.getHeight()):
-        #    for j in xrange(newGenoma.getWidth()):
-        #        newGenoma.setItem(i, j, lp.getPose(i).getValue(j))
-        # self.geneticMatrix = newGenoma
+        print "poseSize: ", poseSize
         self.geneticMatrix = [[lp.getPose(i).getValue(j) for j in robotConfig.getJointsName()] for i in
                               xrange(poseSize)]
 
@@ -89,11 +88,12 @@ class DTIndividualGeneticMatrix(DTIndividualGeneticMaterial):
 
 class DTIndividualGeneticTimeSerieFileWalk(DTIndividualGeneticMaterial):
     def __init__(self, geneticMaterial):
-        CYCLE_REPETITION = 2
         DTIndividualGeneticMaterial.__init__(self)
+        
         lp = LoadPoses(geneticMaterial)
         robotConfig = LoadRobotConfiguration()
         cycleSize = lp.getFrameQty()
+        CYCLE_REPETITION = self.cyclesQty
 
         jointNameIDMapping = {}
         jointIDCounter = 0
@@ -150,42 +150,30 @@ class DTIndividualGeneticTimeSerieFileWalk(DTIndividualGeneticMaterial):
             plt.show()
             print "gap between first and last: ", self.getConcatenationGap()
             '''
-
-            for k in range(cycleSize - (INTERPOLATION_WINDOW + REFERENCE_WINDOW_RADIUS), cycleSize + REFERENCE_WINDOW_RADIUS):
-                newValue = spl(k)
-                self.geneticMatrix[k][joint] = newValue
-
-
-
+            for i in xrange(CYCLE_REPETITION - 1):
+                for k in range(cycleSize - (INTERPOLATION_WINDOW + REFERENCE_WINDOW_RADIUS), cycleSize + REFERENCE_WINDOW_RADIUS):
+                    newValue = spl(k)
+                    self.geneticMatrix[cycleSize*i + k][joint] = newValue
+                    if i == CYCLE_REPETITION - 2: #am I in the last step?
+                        if k < cycleSize:
+                            self.geneticMatrix[cycleSize * i + k][joint] = newValue
 
 class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
     def __init__(self, geneticMaterial):
         DTIndividualGeneticMaterial.__init__(self)
+        
+        self.geneticMatrix = geneticMaterial
         robotConfig = LoadRobotConfiguration()
         walkCycleCounter = 0
-        noSentinelFound = True
         geneticMaterialLength = 0
-        cycleRepetitionQuantity = 2
-        while noSentinelFound:
-            if super(DTIndividualGeneticMatrixWalk, self).equalSentinelFrame(geneticMaterial[geneticMaterialLength]):
-                noSentinelFound = False
-            else:
-                geneticMaterialLength = geneticMaterialLength + 1
+        cycleRepetitionQuantity = self.cyclesQty
+        
+        geneticMaterialLength = self.getLength()
 
-        newLength = geneticMaterialLength * cycleRepetitionQuantity + 1  # +1 for the sentinel value
-        self.geneticMatrix = [[-1 for j in xrange(robotConfig.getJointQuantity())] for i in xrange(newLength)]
-        frameIter = 0
-        while walkCycleCounter < cycleRepetitionQuantity:
-            for jointIter in range(robotConfig.getJointQuantity()):
-                data = geneticMaterial[frameIter][jointIter]
-                if data != sysConstants.JOINT_SENTINEL:
-                    self.geneticMatrix[frameIter + (geneticMaterialLength - 1) * walkCycleCounter][jointIter] = data
-                else:
-                    walkCycleCounter = walkCycleCounter + 1
-                    frameIter = 0
-                    break
-            frameIter = frameIter + 1
+        newGeneticMatrix = [[self.geneticMatrix[i][j] for j in xrange(18)] for i in
+                              xrange(geneticMaterialLength)] * cycleRepetitionQuantity 
 
+        self.geneticMatrix = newGeneticMatrix 
 
         #TODO take this in common with the others constructors
 
@@ -237,6 +225,11 @@ class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
             print "gap between first and last: ", self.getConcatenationGap()
             '''
 
-            for k in range(cycleSize - (INTERPOLATION_WINDOW + REFERENCE_WINDOW_RADIUS), cycleSize + REFERENCE_WINDOW_RADIUS):
-                newValue = spl(k)
-                self.geneticMatrix[k][joint] = newValue
+            for i in xrange(cycleRepetitionQuantity - 1):  
+                for k in range(cycleSize - (INTERPOLATION_WINDOW + REFERENCE_WINDOW_RADIUS), cycleSize + REFERENCE_WINDOW_RADIUS):
+                    newValue = spl(k)
+                    self.geneticMatrix[cycleSize*i + k][joint] = newValue
+                    if i == cycleRepetitionQuantity - 2: #am I in the last step?
+                        if k < cycleSize:
+                            self.geneticMatrix[cycleSize * i + k][joint] = newValue
+
