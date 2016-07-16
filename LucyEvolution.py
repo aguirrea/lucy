@@ -196,7 +196,7 @@ def eval_func(chromosome):
         setInitialPopulation(gaEngine)
 
     prop = DTIndividualPropertyVanillaEvolutive()
-    if int(conf.getProperty("Concatenate walk cylcles?")):
+    if int(conf.getProperty("Concatenate walk cycles?")):
         embryo = DTIndividualGeneticMatrixWalk(chromosomeToLucyGeneticMatrix(chromosome))
     else:
         embryo = DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome))
@@ -204,9 +204,9 @@ def eval_func(chromosome):
     preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
     preCycleEmbryo.concatenate(embryo)
     newEmbryo = preCycleEmbryo
-    embryoLength = newEmbryo.getLength()
+    #embryoLength = newEmbryo.getLength()
     individual = Individual(prop, newEmbryo)
-    individual.setLength(embryoLength)
+    #individual.setLength(embryoLength)
     fitness = individual.execute() #return the fitness resulting from the simulator execution
 
     if int(conf.getProperty("re-evaluate fittest?"))==True:
