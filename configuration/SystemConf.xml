@@ -101,8 +101,8 @@
     <Value>1</Value>
 </Property>
 <Property>
-    <Name>Concatenate walk cylcles?</Name>
-    <Value>1</Value>
+    <Name>Concatenate walk cycles?</Name>
+    <Value>0</Value>
 </Property>
 <!-- Parser options -->
 
@@ -119,7 +119,7 @@
 </Property>
 <Property>
     <Name>Number of generations</Name>
-    <Value>300</Value>
+    <Value>600</Value>
 </Property>
 <Property>
     <Name>Crossover operator</Name>
@@ -132,7 +132,8 @@
 <Property>
     <Name>Selection operator</Name>
     <!--<Value>Selectors.GUniformSelector</Value>-->
-    <Value>Selectors.GRankSelector</Value>
+    <!--<Value>Selectors.GRankSelector</Value>-->
+    <Value>Selectors.GTournamentSelector</Value>
 </Property>
 <Property>
     <Name>CrossoverRate</Name>
