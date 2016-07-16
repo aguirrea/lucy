@@ -97,7 +97,7 @@ def setInitialPopulation(ga_engine):
 
 
     dtgenoma = DTGenomeFunctions()
-    '''
+
     #the random initia population created is replaced by the imitation motion capture database
     if individualCounter < popSize:
         for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
@@ -142,6 +142,7 @@ def setInitialPopulation(ga_engine):
                 individualCounter = individualCounter + 1
             else:
                 break
+    '''
 
     global initialPopulationSetted
     initialPopulationSetted = True
@@ -317,6 +318,8 @@ def run_main():
     #ga.getDBAdapter().commit()
     
     shutil.copy2('pyevolve.db', experimentDir)
+
+    shutil.copy2('out.txt', experimentDir)
     
     #do the stats    
     print ga.getStatistics()
