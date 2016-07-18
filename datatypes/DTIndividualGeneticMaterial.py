@@ -20,18 +20,16 @@
 
 
 import numpy as np
+from numpy import linspace
 from scipy.interpolate import UnivariateSpline
 
+import matplotlib.pyplot as plt
+
 import configuration.constants as sysConstants
+from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 from datatypes.DTGenomeFunctions import DTGenomeFunctions
 from parser.LoadPoses import LoadPoses
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
-from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
-
-'''
-from numpy import linspace
-import matplotlib.pyplot as plt
-'''
 
 SPLINE_SMOOTHING_FACTOR = 5
 INTERPOLATION_WINDOW = 6
@@ -42,6 +40,12 @@ class DTIndividualGeneticMaterial(object):
         conf = LoadSystemConfiguration()
         self.geneticMatrix = []
         self.cyclesQty = int(conf.getProperty("Concatenate walk cycles?"))
+        self.robotConfig = LoadRobotConfiguration()
+        self.jointNameIDMapping = {}
+        jointIDCounter = 0
+        for j in self.robotConfig.getJointsName():
+            self.jointNameIDMapping[jointIDCounter] = j
+            jointIDCounter+=1
 
     def getGeneticMatrix(self):
         return self.geneticMatrix
@@ -70,13 +74,74 @@ class DTIndividualGeneticMaterial(object):
         dtgf = DTGenomeFunctions()
         return dtgf.rawDiff(self.geneticMatrix[0], self.geneticMatrix[self.getLength() - 1])
 
+    # |...........(referenceWindowsRadius)(interpolationWindow)|(referenceWindowsRadius)........|
+    #calculates the set of the last points of the cycle (of size interpolationWindow) using as refence for the spline
+    #the set of referenceWindowsRadius size points before the interpolationWindow and the referenceWindowsRadius size
+    #set of the first points of the cycle. It does this for all the cyckeRepetition gaps in the concatenation of the
+    #cycle
+    def calculateGapByInterpolation(self, referenceWindowRadius, interpolationWindow, splineSmoothingFactor, cycleSize, cycleRepetition, graphicalRepresentation=False):
+
+        x = np.ndarray(referenceWindowRadius * 2)
+        y = np.ndarray(referenceWindowRadius * 2)
+
+        poseQty = len(self.geneticMatrix)
+        poseLength = len(self.geneticMatrix[0])
+        #print "poseQty: ", poseQty, "poseLength: ", poseLength, "lp.getFrameQty(): ", lp.getFrameQty()
+
+
+        for joint in range(poseLength):
+            interpolationDataIter = referenceWindowRadius - 1
+
+            for k in xrange(referenceWindowRadius):
+                referenceFrame= cycleSize + k
+                x[interpolationDataIter] = referenceFrame
+                y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
+                interpolationDataIter += 1
+
+            interpolationDataIter = referenceWindowRadius - 2
+
+            for k in xrange(referenceWindowRadius):
+                referenceFrame= cycleSize - (interpolationWindow + k + 1)
+                x[interpolationDataIter] = referenceFrame
+                y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
+                interpolationDataIter -= 1
+
+            spl = UnivariateSpline(x, y, s=splineSmoothingFactor)
+
+            if graphicalRepresentation:
+                px = linspace(x[0], x[len(x)-1], len(x))
+                py = spl(px)
+                plt.plot(x, y, '.-')
+                plt.plot(px, py)
+
+                xinter = np.ndarray(interpolationWindow)
+                yinter = np.ndarray(interpolationWindow)
+
+                for k in xrange(interpolationWindow):
+                    smoothFrameIter = cycleSize - 1 - k
+                    xinter[k] = smoothFrameIter
+                    yinter[k] = self.geneticMatrix[smoothFrameIter][joint]
+
+                plt.plot(xinter, yinter)
+                plt.title(self.jointNameIDMapping[joint])
+                plt.show()
+                print "gap between first and last: ", self.getConcatenationGap()
+
+            for i in xrange(cycleRepetition - 1):
+                for k in range(cycleSize - (interpolationWindow + referenceWindowRadius), cycleSize + referenceWindowRadius):
+                    newValue = spl(k)
+                    self.geneticMatrix[cycleSize*i + k][joint] = newValue
+                    if i == cycleRepetition - 2: #am I in the last step?
+                        if k < cycleSize:        #if i am in the last step, is not necessary to remplace data beyond this cycle
+                            self.geneticMatrix[cycleSize * i + k][joint] = newValue
+
+
 class DTIndividualGeneticTimeSerieFile(DTIndividualGeneticMaterial):
     def __init__(self, geneticMaterial):
         DTIndividualGeneticMaterial.__init__(self)
         lp = LoadPoses(geneticMaterial)
         robotConfig = LoadRobotConfiguration()
         poseSize = lp.getFrameQty()
-        print "poseSize: ", poseSize
         self.geneticMatrix = [[lp.getPose(i).getValue(j) for j in robotConfig.getJointsName()] for i in
                               xrange(poseSize)]
 
@@ -91,145 +156,27 @@ class DTIndividualGeneticTimeSerieFileWalk(DTIndividualGeneticMaterial):
         DTIndividualGeneticMaterial.__init__(self)
         
         lp = LoadPoses(geneticMaterial)
-        robotConfig = LoadRobotConfiguration()
         cycleSize = lp.getFrameQty()
         CYCLE_REPETITION = self.cyclesQty
-
-        jointNameIDMapping = {}
-        jointIDCounter = 0
-        for j in robotConfig.getJointsName():
-            jointNameIDMapping[jointIDCounter] = j
-            jointIDCounter+=1
-
-        self.geneticMatrix = [[lp.getPose(i).getValue(j) for j in robotConfig.getJointsName()] for i in
+        print "cicleSize: ", cycleSize
+        self.geneticMatrix = [[lp.getPose(i).getValue(j) for j in self.robotConfig.getJointsName()] for i in
                               xrange(cycleSize)] * CYCLE_REPETITION
+        #for debugging info:
+        #self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION, True)
+        self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION)
 
-        x = np.ndarray(REFERENCE_WINDOW_RADIUS * 2)
-        y = np.ndarray(REFERENCE_WINDOW_RADIUS * 2)
-
-        poseQty = len(self.geneticMatrix)
-        poseLength = len(self.geneticMatrix[0])
-        print "poseQty: ", poseQty, "poseLength: ", poseLength, "lp.getFrameQty(): ", lp.getFrameQty()
-
-
-        for joint in range(poseLength):
-            interpolationDataIter = REFERENCE_WINDOW_RADIUS
-
-            for k in xrange(REFERENCE_WINDOW_RADIUS):
-                referenceFrame= cycleSize + k
-                x[interpolationDataIter] = referenceFrame
-                y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
-                interpolationDataIter += 1
-
-            interpolationDataIter = REFERENCE_WINDOW_RADIUS - 1
-
-            for k in xrange(REFERENCE_WINDOW_RADIUS):
-                referenceFrame= cycleSize - (INTERPOLATION_WINDOW + k + 1)
-                x[interpolationDataIter] = referenceFrame
-                y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
-                interpolationDataIter -= 1
-
-            spl = UnivariateSpline(x, y, s=SPLINE_SMOOTHING_FACTOR)
-
-            #uncomment this block for grahpical debugging of the interpolation process
-            '''px = linspace(x[0], x[len(x)-1], len(x))
-            py = spl(px)
-            plt.plot(x, y, '.-')
-            plt.plot(px, py)
-
-            xinter = np.ndarray(INTERPOLATION_WINDOW)
-            yinter = np.ndarray(INTERPOLATION_WINDOW)
-
-            for k in xrange(INTERPOLATION_WINDOW):
-                smoothFrameIter = cycleSize - 1 - k
-                xinter[k] = smoothFrameIter
-                yinter[k] = self.geneticMatrix[smoothFrameIter][joint]
-
-            plt.plot(xinter, yinter)
-            plt.title(jointNameIDMapping[joint])
-            plt.show()
-            print "gap between first and last: ", self.getConcatenationGap()
-            '''
-            for i in xrange(CYCLE_REPETITION - 1):
-                for k in range(cycleSize - (INTERPOLATION_WINDOW + REFERENCE_WINDOW_RADIUS), cycleSize + REFERENCE_WINDOW_RADIUS):
-                    newValue = spl(k)
-                    self.geneticMatrix[cycleSize*i + k][joint] = newValue
-                    if i == CYCLE_REPETITION - 2: #am I in the last step?
-                        if k < cycleSize:
-                            self.geneticMatrix[cycleSize * i + k][joint] = newValue
 
 class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
     def __init__(self, geneticMaterial):
         DTIndividualGeneticMaterial.__init__(self)
         
         self.geneticMatrix = geneticMaterial
-        robotConfig = LoadRobotConfiguration()
-        walkCycleCounter = 0
-        geneticMaterialLength = 0
-        cycleRepetitionQuantity = self.cyclesQty
-        
-        geneticMaterialLength = self.getLength()
-
-        newGeneticMatrix = [[self.geneticMatrix[i][j] for j in xrange(18)] for i in
-                              xrange(geneticMaterialLength)] * cycleRepetitionQuantity 
-
-        self.geneticMatrix = newGeneticMatrix 
-
-        #TODO take this in common with the others constructors
-
-        cycleSize = geneticMaterialLength
-        x = np.ndarray(REFERENCE_WINDOW_RADIUS * 2)
-        y = np.ndarray(REFERENCE_WINDOW_RADIUS * 2)
-
-        poseQty = len(self.geneticMatrix)
-        poseLength = len(self.geneticMatrix[0])
-        #print "poseQty: ", poseQty, "poseLength: ", poseLength, "lp.getFrameQty(): ", lp.getFrameQty()
-
-
-        for joint in range(poseLength):
-            interpolationDataIter = REFERENCE_WINDOW_RADIUS
-
-            for k in xrange(REFERENCE_WINDOW_RADIUS):
-                referenceFrame= cycleSize + k
-                x[interpolationDataIter] = referenceFrame
-                y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
-                interpolationDataIter += 1
-
-            interpolationDataIter = REFERENCE_WINDOW_RADIUS - 1
-
-            for k in xrange(REFERENCE_WINDOW_RADIUS):
-                referenceFrame= cycleSize - (INTERPOLATION_WINDOW + k + 1)
-                x[interpolationDataIter] = referenceFrame
-                y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
-                interpolationDataIter -= 1
-
-            spl = UnivariateSpline(x, y, s=SPLINE_SMOOTHING_FACTOR)
-
-            #uncomment this block for grahpical debugging of the interpolation process
-            '''px = linspace(x[0], x[len(x)-1], len(x))
-            py = spl(px)
-            plt.plot(x, y, '.-')
-            plt.plot(px, py)
-
-            xinter = np.ndarray(INTERPOLATION_WINDOW)
-            yinter = np.ndarray(INTERPOLATION_WINDOW)
-
-            for k in xrange(INTERPOLATION_WINDOW):
-                smoothFrameIter = cycleSize - 1 - k
-                xinter[k] = smoothFrameIter
-                yinter[k] = self.geneticMatrix[smoothFrameIter][joint]
-
-            plt.plot(xinter, yinter)
-            plt.title(jointNameIDMapping[joint])
-            plt.show()
-            print "gap between first and last: ", self.getConcatenationGap()
-            '''
-
-            for i in xrange(cycleRepetitionQuantity - 1):  
-                for k in range(cycleSize - (INTERPOLATION_WINDOW + REFERENCE_WINDOW_RADIUS), cycleSize + REFERENCE_WINDOW_RADIUS):
-                    newValue = spl(k)
-                    self.geneticMatrix[cycleSize*i + k][joint] = newValue
-                    if i == cycleRepetitionQuantity - 2: #am I in the last step?
-                        if k < cycleSize:
-                            self.geneticMatrix[cycleSize * i + k][joint] = newValue
+        CYCLE_REPETITION = self.cyclesQty
+        cycleSize = self.getLength()
+        print "cicleSize: ", cycleSize
+        self.geneticMatrix = [[self.geneticMatrix[i][j] for j in xrange(len(self.jointNameIDMapping))] for i in
+                              xrange(cycleSize)] * CYCLE_REPETITION
+        #for debugging info:
+        #self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION, True)
+        self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION)
 
