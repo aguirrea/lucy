@@ -17,12 +17,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+import serial
 import socket
-import string
-import time
-
-import serial         
-import sys
 
 SIM_HOST = 'localhost'
 SIM_PORT = 7777
@@ -39,7 +35,7 @@ class Communication(object):
         pass
 
 
-
+# this class was for the bioloid control simulator
 class CommSimulator(Communication):
 
     def __init__(self, simulator_port = SIM_PORT, simulator_address = SIM_HOST):

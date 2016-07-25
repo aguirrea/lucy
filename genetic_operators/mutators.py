@@ -108,7 +108,7 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
                     final_value = max(final_value, genome.getParam("rangemin", CDefRangeMin))
 
                     genome.setItem(i, j, final_value)
-                    dtgenome.interpolate(genome, j, i, offset)
+                    dtgenome.smooth(genome, j, i, offset)
                     ##pca.poseInterpolationWithPCA(chromosomeToLucyGeneticMatrix(genome), j)
                     mutations += 1
     else:
@@ -132,7 +132,7 @@ def G2DListMutatorRealGaussianSpline(genome, **args):
 
                         # valueBeforeMutation = genome[which_y][which_x]
                         genome.setItem(which_y, which_x, final_value)
-                        dtgenome.interpolate(genome, which_x, which_y)
+                        dtgenome.smooth(genome, which_x, which_y)
                         ##pca.poseInterpolationWithPCA(chromosomeToLucyGeneticMatrix(genome), which_x)
 
 
