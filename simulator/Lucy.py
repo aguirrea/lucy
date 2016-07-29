@@ -22,12 +22,13 @@ import os
 import time
 from numpy import angle
 
-from datatypes.DTIndividualProperty import DTIndividualPropertyVanillaEvolutive
+from datatypes.DTFitness            import DTFitness
 from errors.VrepException           import VrepException
 
 from AXAngle                        import AXAngle
 from Actuator                       import Actuator
 from Communication                  import CommSerial
+from FitnessFunctionFactory                import NormdistanceConcatenationgapFramesexecutedNormAngle
 from LoadRobotConfiguration         import LoadRobotConfiguration
 from LoadSystemConfiguration        import LoadSystemConfiguration
 from Simulator                      import Simulator
@@ -171,27 +172,12 @@ class SimulatedLucy(Lucy):
     def getSimDistance(self):
         return self.distance
 
-    def getConcatenationCycleGapNormalized(self,concatenationGap):
-        prop = DTIndividualPropertyVanillaEvolutive()
-        robotConf = LoadRobotConfiguration()
-        robotJoints = robotConf.getJointsName()
-        totalJointsQty = len(robotJoints)
-        avoidJointsQty = 0
-        maxJointDiff = 300
-        for joint in robotJoints:
-            if prop.avoidJoint(joint):
-                avoidJointsQty += 1
-        minDiff = (totalJointsQty-avoidJointsQty)*maxJointDiff
-        maxDiff = 0
-        normalizedGap = (concatenationGap - minDiff)/(maxDiff-minDiff)
-        return normalizedGap
-
     def getFitness(self, secuenceLength, concatenationGap):
         error, angle = self.sim.robotOrientationToGoal()
         distance = self.getSimDistance()
         error, upD = self.sim.getUpDistance()
         framesQty = secuenceLength
-        concatenationGapNormalized = self.getConcatenationCycleGapNormalized(concatenationGap)
+        cycleEnded = 0
 
         print "--------------------------------------------------------------------"
         print "orientation: ", angle
@@ -199,6 +185,7 @@ class SimulatedLucy(Lucy):
         print "poses executed/total poses: ",  self.poseExecuted, "/", framesQty
         if self.isLucyUp():
             print "isRobotUp?: True"
+            cycleEnded = 1
             framesExecuted = 1
             endCycleBalance = upD/BALANCE_HEIGHT
             if endCycleBalance > 1:
@@ -210,18 +197,18 @@ class SimulatedLucy(Lucy):
             else:
                 framesExecuted = 0
             endCycleBalance = 0
-        #fitness = 0.30 * distance**(1/4.0) + 0.30 * framesExecuted + 0.4 * endCycleBalance**6 - abs(angle)
-        fitness = 0.20 * distance**(1/4.0) + 0.20 * concatenationGapNormalized**6 + 0.30 * framesExecuted + 0.30 * endCycleBalance**6 - abs(angle)
-        #fitness = 0.20 * distance**(1/4.0) + 0.20 * concatenationGapNormalized**6 + 0.30 * framesExecuted + 0.30 * endCycleBalance**6
-        if fitness <= 0:
-            fitness = 0
-        #fitness = 0.25 * math.sqrt(distance) + 0.3 * framesExecuted + 0.15 * normMode + 0.3 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco
-        #fitness = 0.4 * framesExecuted + 0.2 * normMode + 0.4 * endCycleBalance**4 evoluciona a estar érgido y caminar moviendo las piernas muy poco
+
+        #dtFitness = DTFitness(distance, concatenationGapNormalized, framesExecuted, endCycleBalance, angle)
+        #fitnessFunction = DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle(dtFitness)
+        dtFitness = DTFitness(distance=distance, concatenationGap=concatenationGap, framesExecuted=framesExecuted, angle=angle, cycleEnded=cycleEnded)
+        fitnessFunction = NormdistanceConcatenationgapFramesexecutedNormAngle(dtFitness)
+        fitness = fitnessFunction.getFitness()
+
         print "framesExecuted: ", framesExecuted
         print "FITNESS: ", fitness
         print "upDistance: ", self.sim.getUpDistance()
         print "endCycleBalance: ", endCycleBalance
-        print "concatenationGapNormalized: ", concatenationGapNormalized
+
         print "--------------------------------------------------------------------"
         return fitness
 
