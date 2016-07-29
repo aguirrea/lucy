@@ -36,9 +36,9 @@
 </Directory>
 <File>
     <Name>Lucy vrep model</Name>
-    <!-- <Value>/simulator/models/genetic_bioloid.ttt</Value>-->
+    <Value>/simulator/models/genetic_bioloid.ttt</Value>
     <!-- <Value>/simulator/models/genetic_bioloid_without_texture_baliero.ttt</Value>-->
-    <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
+    <!-- <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>-->
 </File>
 
 <!-- Vrep connection parameters -->
@@ -74,7 +74,7 @@
 </Property>
 <Property>
     <Name>Lucy render enable</Name>
-    <Value>0</Value>
+    <Value>1</Value>
 </Property>
 <Property>
     <Name>Lucy simulated?</Name>
@@ -94,7 +94,7 @@
 </Property>
 <Property>
     <Name>physics enable?</Name>
-    <Value>1</Value>
+    <Value>0    </Value>
 </Property>
 <Property>
     <Name>re-evaluate fittest?</Name>
@@ -134,6 +134,7 @@
     <!--<Value>Selectors.GUniformSelector</Value>-->
     <!--<Value>Selectors.GRankSelector</Value>-->
     <Value>Selectors.GTournamentSelector</Value>
+    <!--<Value>Selectors.GRouletteWheel</Value>-->
 </Property>
 <Property>
     <Name>CrossoverRate</Name>
@@ -145,7 +146,7 @@
 </Property>
 <Property>
     <Name>Elitism replacement percentage</Name>
-    <Value>0.3</Value>
+    <Value>0.6</Value>
 </Property>
 <Property>
     <Name>Convergence criteria enable?</Name>
