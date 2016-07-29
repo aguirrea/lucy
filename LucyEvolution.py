@@ -273,14 +273,14 @@ def run_main():
     ga.setCrossoverRate(float(conf.getProperty("CrossoverRate"))) 
     
     elitism = float(conf.getProperty("Elitism replacement percentage")) > 0
-    ga.setElitism(elitism)
+    ga.setElitism(True)
     '''Set the number of best individuals to copy to the next generation on the elitism'''
     if elitism:
-        ga.setElitismReplacement(int(initialPopulationSize*float(conf.getProperty("Elitism replacement percentage"))))
-
+        numberIndividualsForNextGen = int(initialPopulationSize*float(conf.getProperty("Elitism replacement percentage")))
+        ga.setElitismReplacement(numberIndividualsForNextGen)
 
     if int(conf.getProperty("Convergence criteria enable?"))==True:
-        ga.terminationCriteria.set(ConvergenceCriteria) #TODO use configuration.xml for this
+        ga.terminationCriteria.set(ConvergenceCriteria)
 
     # Create DB Adapter and set as adapter
     sqlite_adapter = DBAdapters.DBSQLite(identify="Lucy walk", resetDB=True)
