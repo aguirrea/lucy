@@ -97,7 +97,8 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
                     break
             #apply spline smoothing for the new child
             for joint in xrange(sister.getWidth()):
-                dtgenome.smooth(sister, joint, cut)
+                #dtgenome.smooth(sister, joint, cut)
+                dtgenome.interpolate(sister, joint, cut)
             print "gSisterLength: ", gSisterLength
 
         if args["count"] == 2:
@@ -112,6 +113,7 @@ def G2DListCrossoverSingleNearHPoint(genome, **args):
                     break
             #apply spline smoothing for the new child
             for joint in xrange(brother.getWidth()):
+                #dtgenome.smooth(brother, joint, minimalDiffPosition)
                 dtgenome.interpolate(brother, joint, minimalDiffPosition)
             print "gBrotherLength: ", gBrotherLength
 

@@ -24,8 +24,9 @@ import numpy as np
 import sys
 from scipy.interpolate import UnivariateSpline
 
-import configuration.constants as sysConstants
 from datatypes.DTIndividualProperty import DTIndividualPropertyVanillaEvolutive
+
+import configuration.constants as sysConstants
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 INFINITE_DISTANCE = sys.maxint
@@ -45,8 +46,7 @@ class DTGenomeFunctions(object):
         jointIndex = 0
         for joint in robotJoints:
             if not prop.avoidJoint(joint):
-                if frame1[jointIndex] == sysConstants.JOINT_SENTINEL or frame2[
-                    jointIndex] == sysConstants.JOINT_SENTINEL:
+                if frame1[jointIndex] == sysConstants.JOINT_SENTINEL or frame2[jointIndex] == sysConstants.JOINT_SENTINEL:
                     diff = INFINITE_DISTANCE
                     break
                 else:

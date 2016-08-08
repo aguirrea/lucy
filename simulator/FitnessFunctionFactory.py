@@ -48,7 +48,7 @@ class FitnessFunction(object):
         minDiff = (totalJointsQty - avoidJointsQty) * maxJointDiff
         maxDiff = 0
         normalizedGap = (concatenationGap - minDiff) / (maxDiff - minDiff)
-        return normalizedGap
+        return abs(normalizedGap)
 
     def normaliseDistance(self, rawDistance):
         return rawDistance / ORACLE_DISTANCE
@@ -67,7 +67,7 @@ class DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle(FitnessFunction
         self.framesExecutedWeight = 0.30
         self.endCycleBalanceWeight = 0.30
         self.fitness = self.distanceWeight * self.parameters.getDistance()**(1/4.0) + self.concatenationGapNormalizedWeight * self.normaliseConcatenationGap(self.parameters.getConcatenationGap()) ** 6 + self.framesExecutedWeight * self.parameters.getFramesExecuted() + self.endCycleBalanceWeight * self.parameters.getEndCycleBalance() ** 6 - abs(self.parameters.getAngle())
-        print "concatenationGapNormalized: ", self.normaliseConcatenationGap(self.parameters.getEndCycleBalance())
+        print "concatenationGapNormalized: ", self.normaliseConcatenationGap(self.parameters.getConcatenationGap())
 
 class NormdistanceConcatenationgapFramesexecutedNormAngle(FitnessFunction):
     def __init__(self, dtFitness):
@@ -77,4 +77,4 @@ class NormdistanceConcatenationgapFramesexecutedNormAngle(FitnessFunction):
         self.framesExecutedWeight = 0.35
         self.normAngleWeight = 0.20
         self.fitness = self.distanceWeight * self.normaliseDistance(self.parameters.getDistance()) + self.concatenationGapNormalizedWeight * self.normaliseConcatenationGap(self.parameters.getConcatenationGap()) ** 6 + self.framesExecutedWeight * self.parameters.getFramesExecuted() + self.normAngleWeight * self.normaliseAngle(self.parameters.getAngle())
-        print "concatenationGapNormalized: ", self.normaliseConcatenationGap(self.parameters.getEndCycleBalance())
+        print "concatenationGapNormalized: ", self.normaliseConcatenationGap(self.parameters.getConcatenationGap())

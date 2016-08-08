@@ -72,7 +72,11 @@ class DTIndividualGeneticMaterial(object):
 
     def getConcatenationGap(self):
         dtgf = DTGenomeFunctions()
-        return dtgf.rawDiff(self.geneticMatrix[0], self.geneticMatrix[self.getLength() - 1])
+        if self.getLength() > 0:
+            return dtgf.rawDiff(self.geneticMatrix[0], self.geneticMatrix[self.getLength() - 1])
+            #return dtgf.euclideanDiff(self.geneticMatrix[0], self.geneticMatrix[self.getLength() - 1])
+        else:
+            return 0
 
     # |...........(referenceWindowsRadius)(interpolationWindow)|(referenceWindowsRadius)........|
     #calculates the set of the last points of the cycle (of size interpolationWindow) using as refence for the spline
