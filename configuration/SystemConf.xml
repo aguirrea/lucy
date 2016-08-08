@@ -36,9 +36,9 @@
 </Directory>
 <File>
     <Name>Lucy vrep model</Name>
-    <Value>/simulator/models/genetic_bioloid.ttt</Value>
+    <!-- <Value>/simulator/models/genetic_bioloid.ttt</Value>-->
     <!-- <Value>/simulator/models/genetic_bioloid_without_texture_baliero.ttt</Value>-->
-    <!-- <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>-->
+    <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
 </File>
 
 <!-- Vrep connection parameters -->
@@ -74,7 +74,7 @@
 </Property>
 <Property>
     <Name>Lucy render enable</Name>
-    <Value>1</Value>
+    <Value>0</Value>
 </Property>
 <Property>
     <Name>Lucy simulated?</Name>
@@ -94,7 +94,7 @@
 </Property>
 <Property>
     <Name>physics enable?</Name>
-    <Value>0    </Value>
+    <Value>1</Value>
 </Property>
 <Property>
     <Name>re-evaluate fittest?</Name>
@@ -102,7 +102,8 @@
 </Property>
 <Property>
     <Name>Concatenate walk cycles?</Name>
-    <Value>0</Value>
+    <!-- 0 means not concatenate cycles, n > 1; means that the cycle will be concatenated n times-->
+    <Value>2</Value>
 </Property>
 <!-- Parser options -->
 
@@ -115,7 +116,7 @@
 
 <Property>
     <Name>Population size</Name>
-    <Value>30</Value>
+    <Value>39</Value>
 </Property>
 <Property>
     <Name>Number of generations</Name>
