@@ -22,13 +22,17 @@ from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 class DTIndividualProperty(object):
     def __init__(self):
-        self.poseFix={}
-        self.avoidJoints=[]
+        self.poseFix = {}
+        self.avoidJoints = []
+        self.diffAvoidJoints = []
         self.robotConfiguration = LoadRobotConfiguration()
         self.joints = self.robotConfiguration.getJointsName()
 
     def avoidJoint(self, joint):
         return joint in self.avoidJoints
+
+    def diffAvoidJoint(self, joint):
+        return joint in self.diffAvoidJoints
 
     def getPoseFix(self, joint):
         if joint in self.poseFix.keys():
@@ -47,7 +51,7 @@ class DTIndividualPropertyPhysicalBioloid(DTIndividualProperty):
     def __init__(self):
         DTIndividualProperty.__init__(self)
         self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll"]
-
+        self.diffAvoidJoints = self.avoidJoints
         self.poseFix["R_Shoulder_Yaw"] = -65
         self.poseFix["R_Shoulder_Pitch"] = -86
         self.poseFix["R_Hip_Yaw"] = -8
@@ -73,8 +77,9 @@ class DTIndividualPropertyCMUDaz(DTIndividualProperty):
 
     def __init__(self):
         DTIndividualProperty.__init__(self)
-        self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll" "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll", "L_Ankle_Pitch", "R_Ankle_Pitch"]
+        self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll", "L_Ankle_Pitch", "R_Ankle_Pitch"]
         #self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll"]
+        self.diffAvoidJoints = self.avoidJoints
         self.poseFix["R_Shoulder_Yaw"] = -101
         self.poseFix["R_Shoulder_Pitch"] = -22.6
         self.poseFix["R_Hip_Yaw"] = -202
@@ -103,8 +108,9 @@ class DTIndividualPropertyVanilla(DTIndividualProperty):
 
     def __init__(self):
         DTIndividualProperty.__init__(self)
-        self.avoidJoints = [ ]
-        
+        self.avoidJoints = []
+        self.diffAvoidJoints = self.avoidJoints
+
         self.poseFix["R_Shoulder_Yaw"] = 0
         self.poseFix["R_Shoulder_Pitch"] = 0
         self.poseFix["R_Hip_Yaw"] = 0
@@ -131,6 +137,8 @@ class DTIndividualPropertyBaliero(DTIndividualProperty):
         DTIndividualProperty.__init__(self)
         #self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll", "L_Ankle_Pitch", "R_Ankle_Pitch"]
         self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll"]
+        self.diffAvoidJoints = self.avoidJoints
+
         self.poseFix["R_Shoulder_Yaw"] = 69
         self.poseFix["R_Shoulder_Pitch"] = 81
         self.poseFix["R_Hip_Yaw"] = 45
@@ -158,6 +166,7 @@ class DTIndividualPropertyVanillaEvolutive(DTIndividualProperty):
     def __init__(self):
         DTIndividualProperty.__init__(self)
         self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "L_Ankle_Roll", "R_Ankle_Roll"]
+        self.diffAvoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll", "L_Shoulder_Pitch", "R_Shoulder_Pitch"]
         
         self.poseFix["R_Shoulder_Yaw"] = 0
         self.poseFix["R_Shoulder_Pitch"] = 0
@@ -186,6 +195,7 @@ class DTIndividualPropertyVanillaEvolutiveNoAvoid(DTIndividualProperty):
     def __init__(self):
         DTIndividualProperty.__init__(self)
         self.avoidJoints = []
+        self.diffAvoidJoints = self.avoidJoints
 
         self.poseFix["R_Shoulder_Yaw"] = 0
         self.poseFix["R_Shoulder_Pitch"] = 0
