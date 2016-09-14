@@ -40,6 +40,11 @@
     <!-- <Value>/simulator/models/genetic_bioloid_without_texture_baliero.ttt</Value>-->
     <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
 </File>
+<Property>
+    <!-- see the lucy.sh file to use the same name-->
+    <Name>System Log</Name>
+    <Value>out.txt</Value>
+</Property>
 
 <!-- Vrep connection parameters -->
 
@@ -76,6 +81,10 @@
     <Name>Lucy render enable</Name>
     <Value>0</Value>
 </Property>
+    <Property>
+    <Name>blank screen?</Name>
+    <Value>0</Value>
+</Property>
 <Property>
     <Name>Lucy simulated?</Name>
     <Value>1</Value>
@@ -102,9 +111,10 @@
 </Property>
 <Property>
     <Name>Concatenate walk cycles?</Name>
-    <!-- 0 means not concatenate cycles, n > 1; means that the cycle will be concatenated n times-->
-    <Value>2</Value>
+    <!-- 0 means not concatenate cycles, n > 1; means that the cycle will be repeated n times-->
+    <Value>0</Value>
 </Property>
+
 <!-- Parser options -->
 
 <Property>
@@ -116,7 +126,7 @@
 
 <Property>
     <Name>Population size</Name>
-    <Value>39</Value>
+    <Value>30</Value>
 </Property>
 <Property>
     <Name>Number of generations</Name>
@@ -138,20 +148,22 @@
     <!--<Value>Selectors.GRouletteWheel</Value>-->
 </Property>
 <Property>
+    <!-- probability that a couple is crossed -->
     <Name>CrossoverRate</Name>
     <Value>1.0</Value>
 </Property>
 <Property>
     <Name>MutationRate</Name>
-    <Value>0.25</Value>
+    <!--value between 0 and 0.1, 0.02 represents 0.2 %-->
+    <Value>0.03</Value>
 </Property>
 <Property>
     <Name>Elitism replacement percentage</Name>
-    <Value>0.6</Value>
+    <Value>0.3</Value>
 </Property>
 <Property>
     <Name>Convergence criteria enable?</Name>
-    <Value>0</Value>
+    <Value>1</Value>
 </Property>
 
 </System>
