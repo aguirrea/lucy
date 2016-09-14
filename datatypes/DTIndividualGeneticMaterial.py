@@ -32,7 +32,7 @@ from parser.LoadPoses import LoadPoses
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 SPLINE_SMOOTHING_FACTOR = 5
-INTERPOLATION_WINDOW = 6
+INTERPOLATION_WINDOW = 5
 REFERENCE_WINDOW_RADIUS = 10
 
 class DTIndividualGeneticMaterial(object):
@@ -45,7 +45,7 @@ class DTIndividualGeneticMaterial(object):
         jointIDCounter = 0
         for j in self.robotConfig.getJointsName():
             self.jointNameIDMapping[jointIDCounter] = j
-            jointIDCounter+=1
+            jointIDCounter += 1
 
     def getGeneticMatrix(self):
         return self.geneticMatrix
@@ -65,7 +65,9 @@ class DTIndividualGeneticMaterial(object):
         return length
 
     def concatenate(self, individualGeneticMaterial):
+        beforeConcatenationLength = len(self.geneticMatrix)
         self.geneticMatrix += individualGeneticMaterial.getGeneticMatrix()
+        self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, beforeConcatenationLength - 1, 1)
 
     def repeat(self, times):
         self.geneticMatrix *= times
@@ -73,8 +75,8 @@ class DTIndividualGeneticMaterial(object):
     def getConcatenationGap(self):
         dtgf = DTGenomeFunctions()
         if self.getLength() > 0:
-            return dtgf.rawDiff(self.geneticMatrix[0], self.geneticMatrix[self.getLength() - 1])
-            #return dtgf.euclideanDiff(self.geneticMatrix[0], self.geneticMatrix[self.getLength() - 1])
+            #return dtgf.rawDiff(self.geneticMatrix[0], self.geneticMatrix[self.getLength() - 1])
+            return dtgf.euclideanDiff(self.geneticMatrix[0], self.geneticMatrix[self.getLength() - 1])
         else:
             return 0
 
@@ -83,7 +85,7 @@ class DTIndividualGeneticMaterial(object):
     #the set of referenceWindowsRadius size points before the interpolationWindow and the referenceWindowsRadius size
     #set of the first points of the cycle. It does this for all the cyckeRepetition gaps in the concatenation of the
     #cycle
-    def calculateGapByInterpolation(self, referenceWindowRadius, interpolationWindow, splineSmoothingFactor, cycleSize, cycleRepetition, graphicalRepresentation=False):
+    def  calculateGapByInterpolation(self, referenceWindowRadius, interpolationWindow, splineSmoothingFactor, cycleSize, cycleRepetition, graphicalRepresentation=False):
 
         x = np.ndarray(referenceWindowRadius * 2)
         y = np.ndarray(referenceWindowRadius * 2)
@@ -97,7 +99,7 @@ class DTIndividualGeneticMaterial(object):
             interpolationDataIter = referenceWindowRadius - 1
 
             for k in xrange(referenceWindowRadius):
-                referenceFrame= cycleSize + k
+                referenceFrame = cycleSize + k
                 x[interpolationDataIter] = referenceFrame
                 y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
                 interpolationDataIter += 1
@@ -110,7 +112,8 @@ class DTIndividualGeneticMaterial(object):
                 y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
                 interpolationDataIter -= 1
 
-            spl = UnivariateSpline(x, y, s=splineSmoothingFactor)
+            spl = UnivariateSpline(x, y)
+            spl.set_smoothing_factor(1/splineSmoothingFactor)
 
             if graphicalRepresentation:
                 px = linspace(x[0], x[len(x)-1], len(x))
@@ -125,20 +128,22 @@ class DTIndividualGeneticMaterial(object):
                     smoothFrameIter = cycleSize - 1 - k
                     xinter[k] = smoothFrameIter
                     yinter[k] = self.geneticMatrix[smoothFrameIter][joint]
+                plt.plot(xinter, yinter, '.-') #original data
 
-                plt.plot(xinter, yinter)
+                for k in xrange(interpolationWindow):
+                    smoothFrameIter = cycleSize - 1 - k
+                    xinter[k] = smoothFrameIter
+                    yinter[k] = spl(smoothFrameIter)
+                plt.plot(xinter, yinter, '*-') #interpolated data
+
                 plt.title(self.jointNameIDMapping[joint])
                 plt.show()
                 print "gap between first and last: ", self.getConcatenationGap()
 
-            for i in xrange(cycleRepetition - 1):
-                for k in range(cycleSize - (interpolationWindow + referenceWindowRadius), cycleSize + referenceWindowRadius):
+            for i in xrange(cycleRepetition):
+                for k in range(cycleSize - interpolationWindow, cycleSize):
                     newValue = spl(k)
-                    self.geneticMatrix[cycleSize*i + k][joint] = newValue
-                    if i == cycleRepetition - 2: #am I in the last step?
-                        if k < cycleSize:        #if i am in the last step, is not necessary to remplace data beyond this cycle
-                            self.geneticMatrix[cycleSize * i + k][joint] = newValue
-
+                    self.geneticMatrix[cycleSize * i + k][joint] = newValue
 
 class DTIndividualGeneticTimeSerieFile(DTIndividualGeneticMaterial):
     def __init__(self, geneticMaterial):
