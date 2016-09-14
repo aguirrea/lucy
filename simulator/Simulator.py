@@ -165,9 +165,11 @@ class Simulator:
             vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_visible_layers,2,vrep.simx_opmode_oneshot_wait)
             #vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
 
+
         #start simulation
         error=vrep.simxStartSimulation(clientID,vrep.simx_opmode_oneshot)
-
+        if int(self.sysConf.getProperty("blank screen?"))==1:
+            vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
         return error
         
     def pauseSim(self, clientID):
@@ -264,7 +266,6 @@ class Simulator:
         return error, distance
 
     def robotOrientationToGoal(self):
-
         if self.robotOrientationFirstTime:
             error, angle = vrep.simxGetObjectOrientation(self.clientId, self.bioloidHandle, self.cuboidHandle, vrep.simx_opmode_streaming)
             self.robotOrientationFirstTime = False
