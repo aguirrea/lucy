@@ -43,20 +43,27 @@ class FitnessFunction(object):
         avoidJointsQty = 0
         maxJointDiff = 300
         for joint in robotJoints:
-            if prop.avoidJoint(joint):
+            if prop.diffAvoidJoint(joint):
                 avoidJointsQty += 1
-        minDiff = (totalJointsQty - avoidJointsQty) * maxJointDiff
+        minDiff = ((totalJointsQty - avoidJointsQty) ** 2) * maxJointDiff
         maxDiff = 0
         normalizedGap = (concatenationGap - minDiff) / (maxDiff - minDiff)
         return abs(normalizedGap)
 
     def normaliseDistance(self, rawDistance):
-        return rawDistance / ORACLE_DISTANCE
+        normDistance = rawDistance / ORACLE_DISTANCE
+        if normDistance < 1:
+            return normDistance
+        else:
+            return 1
 
     def normaliseAngle(self, rawAngle):
         minAngle = 1.57
         maxAngle = 0
-        normalizedAngle = abs(rawAngle-minAngle/(maxAngle-minAngle))
+        normalizedAngle = abs((rawAngle-minAngle)/(maxAngle-minAngle))
+        if normalizedAngle > 1:
+            print "*****************************************normalizedAngle:", normalizedAngle
+            normalizedAngle = 1
         return normalizedAngle
 
 class DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle(FitnessFunction):
@@ -72,9 +79,9 @@ class DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle(FitnessFunction
 class NormdistanceConcatenationgapFramesexecutedNormAngle(FitnessFunction):
     def __init__(self, dtFitness):
         FitnessFunction.__init__(self, dtFitness)
-        self.distanceWeight = 0.25
-        self.concatenationGapNormalizedWeight = 0.20
-        self.framesExecutedWeight = 0.35
-        self.normAngleWeight = 0.20
-        self.fitness = self.distanceWeight * self.normaliseDistance(self.parameters.getDistance()) + self.concatenationGapNormalizedWeight * self.normaliseConcatenationGap(self.parameters.getConcatenationGap()) ** 6 + self.framesExecutedWeight * self.parameters.getFramesExecuted() + self.normAngleWeight * self.normaliseAngle(self.parameters.getAngle())
+        self.distanceWeight = 0
+        self.concatenationGapNormalizedWeight = 0.25
+        self.framesExecutedWeight = 0.5
+        self.normAngleWeight = 0.25
+        self.fitness = self.distanceWeight * self.normaliseDistance(self.parameters.getDistance()) + self.concatenationGapNormalizedWeight * self.normaliseConcatenationGap(self.parameters.getConcatenationGap()) ** 6 + self.framesExecutedWeight * self.parameters.getFramesExecuted() ** 6 + self.normAngleWeight * self.normaliseAngle(self.parameters.getAngle())
         print "concatenationGapNormalized: ", self.normaliseConcatenationGap(self.parameters.getConcatenationGap())
