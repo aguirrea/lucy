@@ -98,7 +98,7 @@ def setInitialPopulation(ga_engine):
 
     dtgenoma = DTGenomeFunctions()
 
-    '''
+
     #the random initia population created is replaced by the imitation motion capture database
     if individualCounter < popSize:
         for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
@@ -143,7 +143,7 @@ def setInitialPopulation(ga_engine):
                 individualCounter = individualCounter + 1
             else:
                 break
-
+    '''
 
     global initialPopulationSetted
     initialPopulationSetted = True
@@ -271,8 +271,8 @@ def run_main():
 
     '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation. 
     While the rest of population...maybe by previous selection or you can define it as best fit survivors'''
-    ga.setCrossoverRate(float(conf.getProperty("CrossoverRate"))) 
-    
+    ga.setCrossoverRate(float(conf.getProperty("CrossoverRate")))
+
     elitism = float(conf.getProperty("Elitism replacement percentage")) > 0
     ga.setElitism(True)
     '''Set the number of best individuals to copy to the next generation on the elitism'''
@@ -319,8 +319,7 @@ def run_main():
     #ga.getDBAdapter().commit()
     
     shutil.copy2('pyevolve.db', experimentDir)
-
-    shutil.copy2('out.txt', experimentDir)
+    shutil.copy2(conf.getProperty("System Log"), experimentDir)
     
     #do the stats    
     print ga.getStatistics()
