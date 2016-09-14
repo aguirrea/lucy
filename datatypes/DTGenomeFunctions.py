@@ -30,7 +30,7 @@ import configuration.constants as sysConstants
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 INFINITE_DISTANCE = sys.maxint
-SPLINE_SMOOTHING_FACTOR_INTERPOLATION = 3
+SPLINE_SMOOTHING_FACTOR_INTERPOLATION = 5
 SPLINE_SMOOTHING_FACTOR_SPLINE = 5
 SMOOTHING_WINDOW = 20 #must be multiple of 4
 

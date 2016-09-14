@@ -90,6 +90,9 @@ class CommSerial(Communication):
     def flushInput (self):
         self.client.flushInput() 
 
+    def getByte(self):
+        return self.client.read(1)
+
     def recv_msg(self):
         checksum = 0;
         dato = chr(0)

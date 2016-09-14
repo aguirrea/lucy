@@ -194,6 +194,8 @@ class SimulatedLucy(Lucy):
             print "isRobotUp?: False"
             if framesQty > 0:
                 framesExecuted = self.poseExecuted / float(framesQty)
+                if framesExecuted == 1:
+                    framesExecuted = framesExecuted - framesExecuted/10
             else:
                 framesExecuted = 0
             endCycleBalance = 0
@@ -310,5 +312,5 @@ class SimulatedLucy(Lucy):
         error, up = self.sim.isRobotUp(self.clientID)
         if error:
             #raise VrepException("error consulting if lucy is up", error)
-            return True
+            return False
         return up
