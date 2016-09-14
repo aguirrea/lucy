@@ -30,8 +30,9 @@ import configuration.constants as sysConstants
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
 
 INFINITE_DISTANCE = sys.maxint
-SPLINE_SMOOTHING_FACTOR = 5
-SMOOTHING_WINDOW = 20
+SPLINE_SMOOTHING_FACTOR_INTERPOLATION = 3
+SPLINE_SMOOTHING_FACTOR_SPLINE = 5
+SMOOTHING_WINDOW = 20 #must be multiple of 4
 
 class DTGenomeFunctions(object):
     def __init__(self):
@@ -45,13 +46,14 @@ class DTGenomeFunctions(object):
         robotJoints = self.robotConfig.getJointsName()
         jointIndex = 0
         for joint in robotJoints:
-            if not prop.avoidJoint(joint):
+            if not prop.diffAvoidJoint(joint):
                 if frame1[jointIndex] == sysConstants.JOINT_SENTINEL or frame2[jointIndex] == sysConstants.JOINT_SENTINEL:
                     diff = INFINITE_DISTANCE
                     break
                 else:
                     jointDiff = (frame1[jointIndex] - frame2[jointIndex]) ** 2
-                    diff += jointDiff
+                    diff += abs(jointDiff)
+                    #print "joint: ", joint, "diff: ", jointDiff, "frame1[jointIndex]", frame1[jointIndex], "frame2[jointIndex]", frame2[jointIndex]
             jointIndex = jointIndex + 1
         return diff
 
@@ -63,7 +65,7 @@ class DTGenomeFunctions(object):
         jointIndex = 0
         for joint in robotJoints:
             if not prop.avoidJoint(joint):
-                jointDiff = frame1[jointIndex] - frame2[jointIndex]
+                jointDiff = abs(frame1[jointIndex] - frame2[jointIndex])
                 diff += jointDiff
             jointIndex = jointIndex + 1
         return diff
@@ -90,7 +92,7 @@ class DTGenomeFunctions(object):
     def smooth(self, genome, which_x, which_y):
         interpolationPointsQty = SMOOTHING_WINDOW
         which_y_InterpolationNeighborhood = interpolationPointsQty / 2
-        minimunInterpolationNeighborhoodSize = 4
+        minimunInterpolationNeighborhoodSize = interpolationPointsQty / 4
 
         if which_y - interpolationPointsQty / 2 < 0:
             interpolationPointsQty -= abs(which_y - which_y_InterpolationNeighborhood) * 2
@@ -100,7 +102,7 @@ class DTGenomeFunctions(object):
             interpolationPointsQty -= (which_y + which_y_InterpolationNeighborhood - (genome.getHeight() - 1)) * 2
             which_y_InterpolationNeighborhood = interpolationPointsQty / 2
 
-        if which_y_InterpolationNeighborhood > minimunInterpolationNeighborhoodSize:
+        if which_y_InterpolationNeighborhood >= minimunInterpolationNeighborhoodSize:
             x = np.ndarray(interpolationPointsQty)
             y = np.ndarray(interpolationPointsQty)
 
@@ -109,26 +111,23 @@ class DTGenomeFunctions(object):
                 x[k] = poseToSmooth
                 y[k] = genome[poseToSmooth][which_x]
 
-            spl = UnivariateSpline(x, y, s=SPLINE_SMOOTHING_FACTOR)
+            spl = UnivariateSpline(x, y)
+            spl.set_smoothing_factor(1/SPLINE_SMOOTHING_FACTOR_SPLINE)
 
             for k in xrange(interpolationPointsQty):
-                # print "before ", genome[int(x[k])][which_x], "now ", spl(int(x[k])), "k ", k, "diff ", genome[int(x[k])][which_x]-spl(int(x[k])), "offset ", offset
-                # if x[k] == which_x:
-                #    print "no mutation"
-                # elif y[k]!= sysConstants.JOINT_SENTINEL:
                 if y[k] != sysConstants.JOINT_SENTINEL:
                     newValue = spl(int(x[k]))
                     genome.setItem(int(x[k]), which_x, newValue)
-                    ##print "mutating value: ", y[k], "to value: ", newValue, "difference: ", abs(y[k]-newValue)
-                    ##else:
-                    ##print "oh no!, we have a problem in mutation operator .. :S"
 
-    def interpolate(self, genome, which_x, which_y):
+    #/____A____/____B_____ /which_y/____C_____/_____D____/   B + C are the interpolationWindow, A + B + C + D  are the
+    # interpolationPointsQty. using A and D as fixed points, interpolate B and C
+    def interpolate(self, genome, which_x, which_y, wich_y_is_fixed_data=0):
         interpolationPointsQty = SMOOTHING_WINDOW
         which_y_InterpolationNeighborhood = interpolationPointsQty / 2
-        minimunInterpolationNeighborhoodSize = 4
+        minimunInterpolationNeighborhoodSize = interpolationPointsQty / 4
+        array_size = 0
 
-        if which_y - interpolationPointsQty / 2 < 0:
+        if which_y - which_y_InterpolationNeighborhood < 0:
             interpolationPointsQty -= abs(which_y - which_y_InterpolationNeighborhood) * 2
             which_y_InterpolationNeighborhood = interpolationPointsQty / 2
 
@@ -136,24 +135,41 @@ class DTGenomeFunctions(object):
             interpolationPointsQty -= (which_y + which_y_InterpolationNeighborhood - (genome.getHeight() - 1)) * 2
             which_y_InterpolationNeighborhood = interpolationPointsQty / 2
 
-        interpolationWindow = interpolationPointsQty / 5
+        interpolationWindowRadius = interpolationPointsQty / 4
 
-        if which_y_InterpolationNeighborhood > minimunInterpolationNeighborhoodSize:
-            x = np.ndarray(interpolationPointsQty - interpolationWindow * 2)
-            y = np.ndarray(interpolationPointsQty - interpolationWindow * 2)
+
+        if which_y_InterpolationNeighborhood >= minimunInterpolationNeighborhoodSize:
+            array_size = interpolationPointsQty - interpolationWindowRadius * 2
+            if wich_y_is_fixed_data:
+                array_size += 1
+
+            x = np.ndarray(array_size)
+            y = np.ndarray(array_size)
 
             splineIndexCounter = 0
             for k in xrange(interpolationPointsQty):
                 poseToSmooth = which_y - which_y_InterpolationNeighborhood + k
-                if poseToSmooth <= which_y - interpolationWindow or poseToSmooth > which_y + interpolationWindow:
+                if poseToSmooth <= which_y - interpolationWindowRadius or poseToSmooth > which_y + interpolationWindowRadius:
                     x[splineIndexCounter] = poseToSmooth
                     y[splineIndexCounter] = genome[poseToSmooth][which_x]
                     splineIndexCounter += 1
 
-            spl = UnivariateSpline(x, y, s=SPLINE_SMOOTHING_FACTOR)
+            if wich_y_is_fixed_data:
+                x[splineIndexCounter] = which_y
+                y[splineIndexCounter] = genome[which_y][which_x]
+                splineIndexCounter += 1
 
+            x_order = np.argsort(x)
+            spl = UnivariateSpline(x_order, y)
+            spl.set_smoothing_factor(1/SPLINE_SMOOTHING_FACTOR_INTERPOLATION)
             for k in xrange(interpolationPointsQty):
                 iter = which_y - which_y_InterpolationNeighborhood + k
                 if genome[iter][which_x] != sysConstants.JOINT_SENTINEL:
-                    newValue = spl(iter)
-                    genome.setItem(iter, which_x, newValue)
+                    if iter > which_y - interpolationWindowRadius and iter <= which_y + interpolationWindowRadius:
+                        if wich_y_is_fixed_data: #if fixed data do not change the which_y point
+                            if iter != which_y:
+                                newValue = spl(iter)
+                                genome.setItem(iter, which_x, newValue)
+                        else:
+                            newValue = spl(iter)
+                            genome.setItem(iter, which_x, newValue)
