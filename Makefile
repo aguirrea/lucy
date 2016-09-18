@@ -34,6 +34,7 @@ env:
 	ln -s ../vrep.py ./tests 
 	ln -s ../vrepConst.py ./tests
 	ln -s ../remoteApi.so ./tests
+	mkdir gene_pool
 	
 clean:
 	rm -rf V-REP_PRO_EDU_V*
