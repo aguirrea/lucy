@@ -36,7 +36,7 @@
 </Directory>
 <File>
     <Name>Lucy vrep model</Name>
-    <!-- <Value>/simulator/models/genetic_bioloid.ttt</Value>-->
+    <!-- <Value>/simulator/models/genetic_bioloid.ttt</Value> -->
     <!-- <Value>/simulator/models/genetic_bioloid_without_texture_baliero.ttt</Value>-->
     <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
 </File>
@@ -56,6 +56,7 @@
     <Name>Vrep port</Name>
     <Value>19997</Value>
 </Property>
+
 <!-- Lucy vrep parameters -->
 <Property>
     <Name>FALL_THRESHOLD_DOWN</Name>
@@ -114,6 +115,14 @@
     <!-- 0 means not concatenate cycles, n > 1; means that the cycle will be repeated n times-->
     <Value>0</Value>
 </Property>
+<Property>
+    <Name>concatenate external cycle file?</Name>
+    <Value>1</Value>
+</Property>
+<File>
+    <Name>external cycle file</Name>
+    <Value>/mocap/cmu_mocap/xml/util/walk_first_cycle.xml</Value>
+</File>
 
 <!-- Parser options -->
 
