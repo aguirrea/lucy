@@ -40,7 +40,7 @@ from genetic_operators import crossovers, mutators
 
 initialPopulationSetted = False
 gaEngine = None
-NUMBER_GENERATIONS_CONVERGENCE_CRITERIA = 50
+NUMBER_GENERATIONS_CONVERGENCE_CRITERIA = 25
 max_score = 0
 max_score_generation = 0
 convergenceCriteria = False
@@ -204,6 +204,12 @@ def eval_func(chromosome):
         embryo = DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome))
     precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
     preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
+
+    if int(conf.getProperty("concatenate external cycle file?")):
+        precycleFile = os.getcwd() + conf.getFile("Lucy vrep model")
+        firstCycle = DTIndividualGeneticTimeSerieFile(precycleFile)
+        preCycleEmbryo.concatenate(firstCycle)
+
     preCycleEmbryo.concatenate(embryo)
     newEmbryo = preCycleEmbryo
     #embryoLength = newEmbryo.getLength()
