@@ -28,6 +28,7 @@ from datatypes.DTIndividualProperty import DTIndividualPropertyVanillaEvolutive
 
 import configuration.constants as sysConstants
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from scipy.interpolate import interp1d
 
 INFINITE_DISTANCE = sys.maxint
 SPLINE_SMOOTHING_FACTOR_INTERPOLATION = 5
@@ -112,7 +113,7 @@ class DTGenomeFunctions(object):
                 y[k] = genome[poseToSmooth][which_x]
 
             spl = UnivariateSpline(x, y)
-            spl.set_smoothing_factor(1/SPLINE_SMOOTHING_FACTOR_SPLINE)
+            spl.set_smoothing_factor(SPLINE_SMOOTHING_FACTOR_SPLINE/10)
 
             for k in xrange(interpolationPointsQty):
                 if y[k] != sysConstants.JOINT_SENTINEL:
@@ -147,7 +148,7 @@ class DTGenomeFunctions(object):
             y = np.ndarray(array_size)
 
             splineIndexCounter = 0
-            for k in xrange(interpolationPointsQty):
+            for k in xrange(interpolationPointsQty + 1):
                 poseToSmooth = which_y - which_y_InterpolationNeighborhood + k
                 if poseToSmooth <= which_y - interpolationWindowRadius or poseToSmooth > which_y + interpolationWindowRadius:
                     x[splineIndexCounter] = poseToSmooth
@@ -159,9 +160,13 @@ class DTGenomeFunctions(object):
                 y[splineIndexCounter] = genome[which_y][which_x]
                 splineIndexCounter += 1
 
-            x_order = np.argsort(x)
-            spl = UnivariateSpline(x_order, y)
-            spl.set_smoothing_factor(1/SPLINE_SMOOTHING_FACTOR_INTERPOLATION)
+            if genome[which_y - interpolationWindowRadius][which_x] == genome[which_y + interpolationWindowRadius][wich_x]:
+                spl = interp1d(x, y)
+            else:
+                x_order = np.argsort(x)
+                spl = UnivariateSpline(x_order, y)
+                spl.set_smoothing_factor(SPLINE_SMOOTHING_FACTOR_INTERPOLATION/10)
+
             for k in xrange(interpolationPointsQty):
                 iter = which_y - which_y_InterpolationNeighborhood + k
                 if genome[iter][which_x] != sysConstants.JOINT_SENTINEL:

@@ -30,10 +30,12 @@ from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 from datatypes.DTGenomeFunctions import DTGenomeFunctions
 from parser.LoadPoses import LoadPoses
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from scipy.interpolate import interp1d
 
-SPLINE_SMOOTHING_FACTOR = 5
-INTERPOLATION_WINDOW = 5
+SPLINE_SMOOTHING_FACTOR = 3
+INTERPOLATION_WINDOW = 10
 REFERENCE_WINDOW_RADIUS = 10
+GAP_THRESHOLD = 200
 
 class DTIndividualGeneticMaterial(object):
     def __init__(self):
@@ -66,12 +68,18 @@ class DTIndividualGeneticMaterial(object):
 
     def concatenate(self, individualGeneticMaterial):
         beforeConcatenationLength = len(self.geneticMatrix)
+        dtgf = DTGenomeFunctions()
         self.geneticMatrix += individualGeneticMaterial.getGeneticMatrix()
-        self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, beforeConcatenationLength - 1, 1)
+        concatenationGap = dtgf.euclideanDiff(self.geneticMatrix[beforeConcatenationLength-1], self.geneticMatrix[beforeConcatenationLength])
+        print "--------------------------------concatenationGap: ", concatenationGap
+        #if concatenationGap < GAP_THRESHOLD :
+        #self.calculateGapByLinearInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, beforeConcatenationLength, 1, True)
+        #self.calculateGapByCubicInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, beforeConcatenationLength, 1)
 
     def repeat(self, times):
         self.geneticMatrix *= times
 
+    #calculates the gap generated when composing cyclic movements
     def getConcatenationGap(self):
         dtgf = DTGenomeFunctions()
         if self.getLength() > 0:
@@ -79,13 +87,13 @@ class DTIndividualGeneticMaterial(object):
             return dtgf.euclideanDiff(self.geneticMatrix[0], self.geneticMatrix[self.getLength() - 1])
         else:
             return 0
-
-    # |...........(referenceWindowsRadius)(interpolationWindow)|(referenceWindowsRadius)........|
-    #calculates the set of the last points of the cycle (of size interpolationWindow) using as refence for the spline
+    # the '|' represents the cycleSize - 1 position
+    # |...........[referenceWindowsRadius](interpolationWindow)|[referenceWindowsRadius]........|
+    #calculates the set of the last points of the cycle (of size interpolationWindow) using as refence for the line
     #the set of referenceWindowsRadius size points before the interpolationWindow and the referenceWindowsRadius size
     #set of the first points of the cycle. It does this for all the cyckeRepetition gaps in the concatenation of the
     #cycle
-    def  calculateGapByInterpolation(self, referenceWindowRadius, interpolationWindow, splineSmoothingFactor, cycleSize, cycleRepetition, graphicalRepresentation=False):
+    def  calculateGapByLinearInterpolation(self, referenceWindowRadius, interpolationWindow, splineSmoothingFactor, cycleSize, cycleRepetition, graphicalRepresentation=False):
 
         x = np.ndarray(referenceWindowRadius * 2)
         y = np.ndarray(referenceWindowRadius * 2)
@@ -107,13 +115,82 @@ class DTIndividualGeneticMaterial(object):
             interpolationDataIter = referenceWindowRadius - 2
 
             for k in xrange(referenceWindowRadius):
-                referenceFrame= cycleSize - (interpolationWindow + k + 1)
+                referenceFrame = cycleSize - 1 - (interpolationWindow + k)
                 x[interpolationDataIter] = referenceFrame
                 y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
                 interpolationDataIter -= 1
 
-            spl = UnivariateSpline(x, y)
-            spl.set_smoothing_factor(1/splineSmoothingFactor)
+            spl = interp1d(x, y)
+            #spl.set_smoothing_factor(splineSmoothingFactor/10.0)
+
+            if graphicalRepresentation:
+                px = linspace(x[0], x[len(x)-1], len(x))
+                py = spl(px)
+                plt.plot(x, y, '.-')
+                plt.plot(px, py)
+
+                xinter = np.ndarray(interpolationWindow)
+                yinter = np.ndarray(interpolationWindow)
+
+                for k in xrange(interpolationWindow):
+                    smoothFrameIter = cycleSize - 1 - 1 - k
+                    xinter[k] = smoothFrameIter
+                    yinter[k] = self.geneticMatrix[smoothFrameIter][joint]
+                plt.plot(xinter, yinter, '.-') #original data
+
+                for k in xrange(interpolationWindow):
+                    smoothFrameIter = cycleSize - 1 - 1 - k
+                    xinter[k] = smoothFrameIter
+                    yinter[k] = spl(smoothFrameIter)
+                plt.plot(xinter, yinter, '*-') #interpolated data
+
+                plt.title(self.jointNameIDMapping[joint])
+                plt.show()
+                print "gap between first and last: ", self.getConcatenationGap()
+
+            for i in xrange(cycleRepetition):
+                for k in range(cycleSize - 1 - interpolationWindow, cycleSize):
+                    newValue = spl(k)
+                    self.geneticMatrix[cycleSize * i + k][joint] = newValue
+
+
+    # the '|' represents the cycleSize - 1 position
+    # |...........[referenceWindowsRadius](interpolationWindow)|[referenceWindowsRadius]........|
+    #calculates the set of the last points of the cycle (of size interpolationWindow) using as refence for the spline
+    #the set of referenceWindowsRadius size points before the interpolationWindow and the referenceWindowsRadius size
+    #set of the first points of the cycle. It does this for all the cyckeRepetition gaps in the concatenation of the
+    #cycle
+    def  calculateGapByCubicInterpolation(self, referenceWindowRadius, interpolationWindow, splineSmoothingFactor, cycleSize, cycleRepetition, graphicalRepresentation=False):
+
+        x = np.ndarray(referenceWindowRadius * 2)
+        y = np.ndarray(referenceWindowRadius * 2)
+
+        poseQty = len(self.geneticMatrix)
+        poseLength = len(self.geneticMatrix[0])
+        #print "poseQty: ", poseQty, "poseLength: ", poseLength, "lp.getFrameQty(): ", lp.getFrameQty()
+
+
+        for joint in range(poseLength):
+            interpolationDataIter = referenceWindowRadius - 1
+
+            for k in xrange(referenceWindowRadius + 1):
+                referenceFrame = cycleSize + k
+                x[interpolationDataIter] = referenceFrame
+                y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
+                interpolationDataIter += 1
+
+            interpolationDataIter = referenceWindowRadius - 2
+
+            for k in xrange(referenceWindowRadius + 1):
+                referenceFrame= cycleSize -1 - (interpolationWindow + k)
+                x[interpolationDataIter] = referenceFrame
+                y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
+                interpolationDataIter -= 1
+            if abs(self.geneticMatrix[cycleSize - interpolationWindow][joint] - self.geneticMatrix[cycleSize][joint]) < 3:
+                spl = interp1d(x, y)
+            else:
+                spl = UnivariateSpline(x, y)
+                spl.set_smoothing_factor(splineSmoothingFactor/10.0)
 
             if graphicalRepresentation:
                 px = linspace(x[0], x[len(x)-1], len(x))
@@ -141,7 +218,7 @@ class DTIndividualGeneticMaterial(object):
                 print "gap between first and last: ", self.getConcatenationGap()
 
             for i in xrange(cycleRepetition):
-                for k in range(cycleSize - interpolationWindow, cycleSize):
+                for k in range(cycleSize - 1 - interpolationWindow, cycleSize):
                     newValue = spl(k)
                     self.geneticMatrix[cycleSize * i + k][joint] = newValue
 
@@ -172,7 +249,7 @@ class DTIndividualGeneticTimeSerieFileWalk(DTIndividualGeneticMaterial):
                               xrange(cycleSize)] * CYCLE_REPETITION
         #for debugging info:
         #self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION, True)
-        self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION)
+        self.calculateGapByCubicInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION)
 
 
 class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
@@ -187,5 +264,5 @@ class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
                               xrange(cycleSize)] * CYCLE_REPETITION
         #for debugging info:
         #self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION, True)
-        self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION)
+        self.calculateGapByCubicInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION)
 
