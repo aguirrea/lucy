@@ -28,7 +28,7 @@ from errors.VrepException           import VrepException
 from AXAngle                        import AXAngle
 from Actuator                       import Actuator
 from Communication                  import CommSerial
-from FitnessFunctionFactory                import NormdistanceConcatenationgapFramesexecutedNormAngle
+from FitnessFunctionFactory         import NormdistanceConcatenationgapFramesexecutedNormAngle, ConcatenationgapFramesexecutedNormAngle
 from LoadRobotConfiguration         import LoadRobotConfiguration
 from LoadSystemConfiguration        import LoadSystemConfiguration
 from Simulator                      import Simulator
@@ -204,6 +204,7 @@ class SimulatedLucy(Lucy):
         #fitnessFunction = DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle(dtFitness)
         dtFitness = DTFitness(distance=distance, concatenationGap=concatenationGap, framesExecuted=framesExecuted, angle=angle, cycleEnded=cycleEnded)
         fitnessFunction = NormdistanceConcatenationgapFramesexecutedNormAngle(dtFitness)
+        #fitnessFunction = ConcatenationgapFramesexecutedNormAngle(dtFitness)
         fitness = fitnessFunction.getFitness()
 
         print "framesExecuted: ", framesExecuted

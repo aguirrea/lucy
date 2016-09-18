@@ -45,6 +45,7 @@ class Simulator:
         self.clientId = self.connectVREP()
 
         if simulatorModel:
+            #TODO try to reutilize the same scene for the sake of performance
             self.loadscn(self.clientId, simulatorModel)
        
         if int(self.sysConf.getProperty("synchronous mode?"))==1:

@@ -76,6 +76,15 @@ class DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle(FitnessFunction
         self.fitness = self.distanceWeight * self.parameters.getDistance()**(1/4.0) + self.concatenationGapNormalizedWeight * self.normaliseConcatenationGap(self.parameters.getConcatenationGap()) ** 6 + self.framesExecutedWeight * self.parameters.getFramesExecuted() + self.endCycleBalanceWeight * self.parameters.getEndCycleBalance() ** 6 - abs(self.parameters.getAngle())
         print "concatenationGapNormalized: ", self.normaliseConcatenationGap(self.parameters.getConcatenationGap())
 
+class ConcatenationgapFramesexecutedNormAngle(FitnessFunction):
+    def __init__(self, dtFitness):
+        FitnessFunction.__init__(self, dtFitness)
+        self.concatenationGapNormalizedWeight = 0.25
+        self.framesExecutedWeight = 0.5
+        self.normAngleWeight = 0.25
+        self.fitness = self.concatenationGapNormalizedWeight * self.normaliseConcatenationGap(self.parameters.getConcatenationGap()) ** 6 + self.framesExecutedWeight * self.parameters.getFramesExecuted() ** 6 + self.normAngleWeight * self.normaliseAngle(self.parameters.getAngle())
+        print "concatenationGapNormalized: ", self.normaliseConcatenationGap(self.parameters.getConcatenationGap())
+
 class NormdistanceConcatenationgapFramesexecutedNormAngle(FitnessFunction):
     def __init__(self, dtFitness):
         FitnessFunction.__init__(self, dtFitness)
