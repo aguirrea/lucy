@@ -42,7 +42,8 @@
 </File>
 <File>
     <Name>external cycle file</Name>
-    <Value>/mocap/cmu_mocap/xml/util/walk_first_cycle.xml</Value>
+    <!-- <Value>/mocap/cmu_mocap/xml/util/walk_first_cycle.xml</Value> -->
+    <Value>/mocap/lucy_walk_cycles/xml/0.50946665991-20160711-042542-227.xml</Value>
 </File>
 <Property>
     <!-- see the lucy.sh file to use the same name-->
@@ -88,7 +89,7 @@
 </Property>
     <Property>
     <Name>blank screen?</Name>
-    <Value>0</Value>
+    <Value>1</Value>
 </Property>
 <Property>
     <Name>Lucy simulated?</Name>
@@ -120,8 +121,9 @@
     <Value>0</Value>
 </Property>
 <Property>
+    <!-- once a good wal cycle is found, is used as pre-cycle to search for the following cycle-->
     <Name>concatenate external cycle file?</Name>
-    <Value>1</Value>
+    <Value>0</Value>
 </Property>
 
 <!-- Parser options -->

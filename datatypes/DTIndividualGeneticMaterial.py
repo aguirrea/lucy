@@ -22,15 +22,15 @@
 import numpy as np
 from numpy import linspace
 from scipy.interpolate import UnivariateSpline
+from scipy.interpolate import interp1d
 
 import matplotlib.pyplot as plt
+from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 
 import configuration.constants as sysConstants
-from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 from datatypes.DTGenomeFunctions import DTGenomeFunctions
 from parser.LoadPoses import LoadPoses
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
-from scipy.interpolate import interp1d
 
 SPLINE_SMOOTHING_FACTOR = 3
 INTERPOLATION_WINDOW = 10
@@ -71,10 +71,10 @@ class DTIndividualGeneticMaterial(object):
         dtgf = DTGenomeFunctions()
         self.geneticMatrix += individualGeneticMaterial.getGeneticMatrix()
         concatenationGap = dtgf.euclideanDiff(self.geneticMatrix[beforeConcatenationLength-1], self.geneticMatrix[beforeConcatenationLength])
-        print "--------------------------------concatenationGap: ", concatenationGap
+        #print "--------------------------------concatenationGap: ", concatenationGap
         #if concatenationGap < GAP_THRESHOLD :
         #self.calculateGapByLinearInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, beforeConcatenationLength, 1, True)
-        #self.calculateGapByCubicInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, beforeConcatenationLength, 1)
+        self.calculateGapByCubicInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, beforeConcatenationLength, 1)
 
     def repeat(self, times):
         self.geneticMatrix *= times
