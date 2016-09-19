@@ -58,6 +58,12 @@ def createIndividual(filename):
         precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
         preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
         preCycleEmbryo.concatenate(walkEmbryo)
+
+        if int(conf.getProperty("concatenate external cycle file?")):
+            precycleFile = os.getcwd() + conf.getFile("external cycle file")
+            firstCycle = DTIndividualGeneticTimeSerieFile(precycleFile)
+            preCycleEmbryo.concatenate(firstCycle)
+
         walkEmbryo = preCycleEmbryo
         walk = Individual(geneticVanillaProp, walkEmbryo)
 
@@ -67,6 +73,12 @@ def createIndividual(filename):
         precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
         preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
         preCycleEmbryo.concatenate(walkEmbryo)
+
+        if int(conf.getProperty("concatenate external cycle file?")):
+            precycleFile = os.getcwd() + conf.getFile("external cycle file")
+            firstCycle = DTIndividualGeneticTimeSerieFile(precycleFile)
+            preCycleEmbryo.concatenate(firstCycle)
+
         walkEmbryo = preCycleEmbryo
         walk = Individual(physicalProp, walkEmbryo)
         #TODO add support for walking cycle

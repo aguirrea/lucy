@@ -206,7 +206,7 @@ def eval_func(chromosome):
     preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
 
     if int(conf.getProperty("concatenate external cycle file?")):
-        precycleFile = os.getcwd() + conf.getFile("Lucy vrep model")
+        precycleFile = os.getcwd() + conf.getFile("external cycle file")
         firstCycle = DTIndividualGeneticTimeSerieFile(precycleFile)
         preCycleEmbryo.concatenate(firstCycle)
 
