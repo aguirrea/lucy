@@ -40,6 +40,10 @@
     <!-- <Value>/simulator/models/genetic_bioloid_without_texture_baliero.ttt</Value>-->
     <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
 </File>
+<File>
+    <Name>external cycle file</Name>
+    <Value>/mocap/cmu_mocap/xml/util/walk_first_cycle.xml</Value>
+</File>
 <Property>
     <!-- see the lucy.sh file to use the same name-->
     <Name>System Log</Name>
@@ -119,10 +123,6 @@
     <Name>concatenate external cycle file?</Name>
     <Value>1</Value>
 </Property>
-<File>
-    <Name>external cycle file</Name>
-    <Value>/mocap/cmu_mocap/xml/util/walk_first_cycle.xml</Value>
-</File>
 
 <!-- Parser options -->
 
@@ -157,7 +157,7 @@
     <!--<Value>Selectors.GRouletteWheel</Value>-->
 </Property>
 <Property>
-    <!-- probability that a couple is crossed -->
+    <!-- probability that a couple get crossed -->
     <Name>CrossoverRate</Name>
     <Value>1.0</Value>
 </Property>

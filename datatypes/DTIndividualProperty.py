@@ -166,7 +166,7 @@ class DTIndividualPropertyVanillaEvolutive(DTIndividualProperty):
     def __init__(self):
         DTIndividualProperty.__init__(self)
         self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "L_Ankle_Roll", "R_Ankle_Roll"]
-        
+
         self.diffAvoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Hip_Yaw", "L_Hip_Yaw", "L_Ankle_Roll", "R_Ankle_Roll", "L_Hip_Roll", "R_Hip_Roll", "L_Shoulder_Pitch", "R_Shoulder_Pitch"]
         
         self.poseFix["R_Shoulder_Yaw"] = 0
