@@ -38,7 +38,7 @@ class DTFitness(object):
         return self.framesExecuted
 
     def getEndCycleBalance(self):
-        return self.getEndCycleBalance
+        return self.endCycleBalance
 
     def getAngle(self):
         return self.angle
