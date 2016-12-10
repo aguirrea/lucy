@@ -28,7 +28,7 @@ from errors.VrepException           import VrepException
 from AXAngle                        import AXAngle
 from Actuator                       import Actuator
 from Communication                  import CommSerial
-from FitnessFunctionFactory         import NormdistanceConcatenationgapFramesexecutedNormAngle, ConcatenationgapFramesexecutedNormAngle
+from FitnessFunctionFactory         import DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle
 from LoadRobotConfiguration         import LoadRobotConfiguration
 from LoadSystemConfiguration        import LoadSystemConfiguration
 from Simulator                      import Simulator
@@ -200,10 +200,12 @@ class SimulatedLucy(Lucy):
                 framesExecuted = 0
             endCycleBalance = 0
 
-        #dtFitness = DTFitness(distance, concatenationGapNormalized, framesExecuted, endCycleBalance, angle)
-        #fitnessFunction = DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle(dtFitness)
-        dtFitness = DTFitness(distance=distance, concatenationGap=concatenationGap, framesExecuted=framesExecuted, angle=angle, cycleEnded=cycleEnded)
-        fitnessFunction = NormdistanceConcatenationgapFramesexecutedNormAngle(dtFitness)
+        dtFitness = DTFitness(distance, concatenationGap, framesExecuted, endCycleBalance, angle)
+        fitnessFunction = DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle(dtFitness)
+
+
+        #dtFitness = DTFitness(distance=distance, concatenationGap=concatenationGap, framesExecuted=framesExecuted, angle=angle, cycleEnded=cycleEnded)
+        #fitnessFunction = NormdistanceConcatenationgapFramesexecutedNormAngle(dtFitness)
         #fitnessFunction = ConcatenationgapFramesexecutedNormAngle(dtFitness)
         fitness = fitnessFunction.getFitness()
 
@@ -299,7 +301,7 @@ class SimulatedLucy(Lucy):
             self.time = time.time() - self.startTime
             error, distToGoal = self.sim.getDistanceToSceneGoal()
             distTravelToGoal = 1.0 - distToGoal
-            if distTravelToGoal < 0 :
+            if distTravelToGoal < 0:
                 self.distance = 0
             else:
                 self.distance = distTravelToGoal

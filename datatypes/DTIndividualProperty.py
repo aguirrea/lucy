@@ -71,7 +71,6 @@ class DTIndividualPropertyPhysicalBioloid(DTIndividualProperty):
         self.poseFix["L_Ankle_Pitch"] = 23
         self.poseFix["L_Elbow_Yaw"] = -39
         self.poseFix["L_Ankle_Roll"] = -5    
-    
 
 class DTIndividualPropertyCMUDaz(DTIndividualProperty):
 
@@ -160,7 +159,6 @@ class DTIndividualPropertyBaliero(DTIndividualProperty):
         self.poseFix["L_Elbow_Yaw"] = -14
         self.poseFix["L_Ankle_Roll"] = 41
 
-
 class DTIndividualPropertyVanillaEvolutive(DTIndividualProperty):
 
     def __init__(self):
@@ -188,8 +186,6 @@ class DTIndividualPropertyVanillaEvolutive(DTIndividualProperty):
         self.poseFix["L_Ankle_Pitch"] = 0
         self.poseFix["L_Elbow_Yaw"] = 0
         self.poseFix["L_Ankle_Roll"] = 0
-
-
 
 class DTIndividualPropertyVanillaEvolutiveNoAvoid(DTIndividualProperty):
 
