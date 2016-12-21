@@ -44,6 +44,8 @@ class Lucy(object):
         self.time = 0
         self.startTime = time.time()
         self.distance = 0
+        self.distanceBeforMoveArmLastCall = 0
+        self.armDistance = 0
         self.stop = False
         self.poseExecuted = 0
         dontSupportedJoints = self.sysConf.getVrepNotImplementedBioloidJoints()
@@ -225,7 +227,7 @@ class SimulatedLucy(Lucy):
         #Above's N joints will be received and set on the V-REP side at the same time
 
         jointsQty = len(self.RobotImplementedJoints)
-        jointExecutedCounter=0
+        jointExecutedCounter = 0
 
         error = self.sim.pauseSim(self.clientID) or error
         for joint in self.RobotImplementedJoints:
@@ -242,6 +244,7 @@ class SimulatedLucy(Lucy):
 
             jointExecutedCounter += 1
             self.updateLucyPosition()
+
         self.poseExecuted = self.poseExecuted + self.getPosesExecutedByStepQty()
         #if error:
         #    raise VrepException("error excecuting a pose", error)
@@ -317,3 +320,16 @@ class SimulatedLucy(Lucy):
             #raise VrepException("error consulting if lucy is up", error)
             return False
         return up
+
+    def moveHelperArm(self):
+        firstTime = self.armDistance == 0
+        armDistanceStep = self.distance - self.distanceBeforMoveArmLastCall
+        #armDistanceStep = self.distance - self.armDistance #esto tiene que ser el step que hizo el robot
+        if armDistanceStep > 0:
+            self.armDistance = self.armDistance + armDistanceStep
+        error = self.sim.moveHelperArm(armDistanceStep, firstTime)
+        self.distanceBeforMoveArmLastCall = self.distance
+        print "distancia que muevo el brazo: ", armDistanceStep
+        return error
+
+

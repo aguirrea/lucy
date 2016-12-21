@@ -68,8 +68,9 @@ class Simulator:
         error, self.upDistanceHandle = vrep.simxGetDistanceHandle(self.clientId, "upDistance#", vrep.simx_opmode_blocking)
         error, self.distLFootToGoalHandle = vrep.simxGetDistanceHandle(self.clientId, "distanceLFootGoal#", vrep.simx_opmode_blocking)
         error, self.distRFootToGoalHandle = vrep.simxGetDistanceHandle(self.clientId, "distanceRFootGoal#", vrep.simx_opmode_blocking)
-        error, self.bioloidHandle=vrep.simxGetObjectHandle(self.clientId,"Bioloid", vrep.simx_opmode_oneshot_wait)
-        error, self.cuboidHandle=vrep.simxGetObjectHandle(self.clientId,"Cuboid", vrep.simx_opmode_oneshot_wait)
+        error, self.bioloidHandle = vrep.simxGetObjectHandle(self.clientId,"Bioloid", vrep.simx_opmode_oneshot_wait)
+        error, self.cuboidHandle = vrep.simxGetObjectHandle(self.clientId,"Cuboid", vrep.simx_opmode_oneshot_wait)
+        error, self.armHandler = vrep.simxGetObjectHandle(self.clientId, "Pivot", vrep.simx_opmode_oneshot_wait)
 
         self.populateJointHandleCache(self.clientId)
 
@@ -256,7 +257,7 @@ class Simulator:
         else:
             errorL, distanceL = vrep.simxReadDistance(self.clientId, self.distLFootToGoalHandle, vrep.simx_opmode_buffer)
             errorR, distanceR = vrep.simxReadDistance(self.clientId, self.distRFootToGoalHandle, vrep.simx_opmode_buffer)
-        return errorL or errorR, (distanceL + distanceR)*0.5
+        return errorL or errorR, max(distanceL, distanceR)
 
     def getUpDistance(self):
         if self.getUpDistanceFirstTime:
@@ -273,6 +274,21 @@ class Simulator:
         else:
             error, angle = vrep.simxGetObjectOrientation(self.clientId, self.bioloidHandle, self.cuboidHandle, vrep.simx_opmode_buffer)
         return error, angle[1]
+
+    def moveHelperArm(self, distTraveled, firstCall):
+        MAX_RETRY_ATTEMPTS = 100
+        if firstCall:
+            error, currentPosition = vrep.simxGetObjectPosition(self.clientId, self.armHandler, -1, vrep.simx_opmode_streaming)
+            retry = 0
+            while error and retry < MAX_RETRY_ATTEMPTS:
+                error, currentPosition = vrep.simxGetObjectPosition(self.clientId, self.armHandler, -1, vrep.simx_opmode_buffer)
+                retry =+ 1
+        else:
+            error, currentPosition = vrep.simxGetObjectPosition(self.clientId, self.armHandler, -1, vrep.simx_opmode_buffer)
+
+        newArmPosition = currentPosition[0] + distTraveled
+        vrep.simxSetObjectPosition(self.clientId, self.armHandler, -1, (newArmPosition, currentPosition[1], currentPosition[2]) , vrep.simx_opmode_oneshot)
+
 
         
 
