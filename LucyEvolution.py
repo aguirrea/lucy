@@ -200,20 +200,30 @@ def eval_func(chromosome):
     prop = DTIndividualPropertyVanillaEvolutive()
     if int(conf.getProperty("Concatenate walk cycles?")):
         embryo = DTIndividualGeneticMatrixWalk(chromosomeToLucyGeneticMatrix(chromosome))
+        ##embryoCycleLength = embryo.getLength()/int(conf.getProperty("Concatenate walk cycles?"))
+
     else:
         embryo = DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome))
+        ##embryoCycleLength = embryo.getLength()
+
     precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
     preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
+    ##preCycleLength = preCycleEmbryo.getLength()
 
     if int(conf.getProperty("concatenate external cycle file?")):
         precycleFile = os.getcwd() + conf.getFile("external cycle file")
         firstCycle = DTIndividualGeneticTimeSerieFile(precycleFile)
         preCycleEmbryo.concatenate(firstCycle)
+        #preCycleLength = preCycleLength + preCycleEmbryo.getLength()
 
     preCycleEmbryo.concatenate(embryo)
     newEmbryo = preCycleEmbryo
     #embryoLength = newEmbryo.getLength()
     individual = Individual(prop, newEmbryo)
+    ##individual.setPrecycleLength(preCycleLength)
+    ##print "precyclelength:  ", preCycleLength
+    ##print "cyclelength:  ", embryoCycleLength
+    ##individual.setCycleLength(embryoCycleLength)
     #individual.setLength(embryoLength)
     fitness = individual.execute() #return the fitness resulting from the simulator execution
 
