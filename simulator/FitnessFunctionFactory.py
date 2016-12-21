@@ -69,11 +69,11 @@ class FitnessFunction(object):
 class DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle(FitnessFunction):
     def __init__(self, dtFitness):
         FitnessFunction.__init__(self, dtFitness)
-        self.distanceWeight = 0.20
+        self.distanceWeight = 0.10
         self.concatenationGapNormalizedWeight = 0.20
         self.framesExecutedWeight = 0.30
-        self.endCycleBalanceWeight = 0.30
-        self.fitness = self.distanceWeight * self.parameters.getDistance()**(1/4.0) + self.concatenationGapNormalizedWeight * self.normaliseConcatenationGap(self.parameters.getConcatenationGap()) ** 6 + self.framesExecutedWeight * self.parameters.getFramesExecuted() + self.endCycleBalanceWeight * self.parameters.getEndCycleBalance() ** 6 - abs(self.parameters.getAngle())
+        self.endCycleBalanceWeight = 0.40
+        self.fitness = self.distanceWeight * (self.parameters.getDistance()) + self.concatenationGapNormalizedWeight * (self.normaliseConcatenationGap(self.parameters.getConcatenationGap()) ** 2) + self.framesExecutedWeight * self.parameters.getFramesExecuted() + self.endCycleBalanceWeight * (self.parameters.getEndCycleBalance() ** 2) - abs(self.parameters.getAngle())
         print "concatenationGapNormalized: ", self.normaliseConcatenationGap(self.parameters.getConcatenationGap())
 
 class ConcatenationgapFramesexecutedNormAngle(FitnessFunction):
@@ -88,9 +88,9 @@ class ConcatenationgapFramesexecutedNormAngle(FitnessFunction):
 class NormdistanceConcatenationgapFramesexecutedNormAngle(FitnessFunction):
     def __init__(self, dtFitness):
         FitnessFunction.__init__(self, dtFitness)
-        self.distanceWeight = 0
+        self.distanceWeight = 0.10
         self.concatenationGapNormalizedWeight = 0.25
-        self.framesExecutedWeight = 0.5
+        self.framesExecutedWeight = 0.4
         self.normAngleWeight = 0.25
         self.fitness = self.distanceWeight * self.normaliseDistance(self.parameters.getDistance()) + self.concatenationGapNormalizedWeight * self.normaliseConcatenationGap(self.parameters.getConcatenationGap()) ** 6 + self.framesExecutedWeight * self.parameters.getFramesExecuted() ** 6 + self.normAngleWeight * self.normaliseAngle(self.parameters.getAngle())
         print "concatenationGapNormalized: ", self.normaliseConcatenationGap(self.parameters.getConcatenationGap())
