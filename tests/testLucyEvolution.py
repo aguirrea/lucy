@@ -21,6 +21,7 @@
 import glob
 import os
 import sys
+import time
 
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, \
@@ -92,12 +93,26 @@ if arguments > 1:
     files = sys.argv[1:]
     for filename in files:
         print 'executing individual: ' + filename
+        print "generating individual"
+        time1 = time.time()
         walk = createIndividual(filename)
+        print "creation time: ", time.time() - time1
+        time1 = time.time()
+        print "executing individual!"
         walk.execute()
+        print "execution time: ", time.time() - time1
+        print "individual executed"
 else:
     for filename in glob.glob(os.path.join(geneticPoolDir, '*.xml')):
         print 'executing individual: ' + filename
+        print "generating individual"
+        time1 = time.time()
         walk = Individual(geneticVanillaProp, DTIndividualGeneticTimeSerieFile(filename))
+        print "creation time: ", time.time() - time1
+        time1 = time.time()
+        print "executing individual!"
         walk.execute()
+        print "execution time: ", time.time() - time1
+        print "individual executed"
 
 
