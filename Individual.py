@@ -41,6 +41,9 @@ class Individual:
         self.genomeMatrixJointNameIDMapping = {}
         self.sysConf = LoadSystemConfiguration()
         self.concatenationGap = individualGeneticMaterial.getConcatenationGap()
+        self.moveArmFirstTime = True
+        self.precycleLength = 0
+        self.cycleLength = 0
 
         i=0
         for jointName in self.robotConfig.getJointsName():
@@ -86,6 +89,18 @@ class Individual:
             i = i + self.lucy.getPosesExecutedByStepQty()
             self.lucy.executePose(Pose(poseExecute))
 
+            '''if self.precycleLength > 0 and i == self.precycleLength - 1:
+                self.lucy.moveHelperArm()
+
+            if self.cycleLength > 0 and i == self.cycleLength - 1:
+                self.lucy.moveHelperArm()'''
+
+            '''if i > self.precycleLength - 1:
+                if self.cycleLength > 0 and (i - self.precycleLength) % self.cycleLength == 0:
+                    self.lucy.moveHelperArm()
+                    print "---------------------------------------------------moví el brazo"'''
+            #self.lucy.moveHelperArm() obtengo peor fitness moviendo el brazo
+
         self.fitness = self.lucy.getFitness(self.length, self.concatenationGap)
         self.lucy.stopLucy()  #this function also updates time and distance
         return self.fitness
@@ -118,8 +133,20 @@ class Individual:
     def setLength(self, length):
         self.length = length
 
+    def setPrecycleLength(self, precycleLength):
+        self.precycleLength = precycleLength
+
+    def setCycleLength(self, cycleLength):
+        self.cycleLength = cycleLength
+
     def getLength(self):
         return self.length
+
+    def getPrecycleLength(self):
+        return self.precycleLength
+
+    def getCycleLength(self):
+        return self.cycleLength
 
 
 ##Test case:
