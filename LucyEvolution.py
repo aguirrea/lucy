@@ -40,7 +40,7 @@ from genetic_operators import crossovers, mutators
 
 initialPopulationSetted = False
 gaEngine = None
-NUMBER_GENERATIONS_CONVERGENCE_CRITERIA = 25
+NUMBER_GENERATIONS_CONVERGENCE_CRITERIA = 15
 max_score = 0
 max_score_generation = 0
 convergenceCriteria = False
