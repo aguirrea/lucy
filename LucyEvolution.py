@@ -211,9 +211,9 @@ def eval_func(chromosome):
     ##preCycleLength = preCycleEmbryo.getLength()
 
     if int(conf.getProperty("concatenate external cycle file?")):
-        precycleFile = os.getcwd() + conf.getFile("external cycle file")
-        firstCycle = DTIndividualGeneticTimeSerieFile(precycleFile)
-        preCycleEmbryo.concatenate(firstCycle)
+        externalFirstCycleFile = os.getcwd() + conf.getFile("external cycle file")
+        externalFirstCycle = DTIndividualGeneticTimeSerieFile(externalFirstCycleFile)
+        preCycleEmbryo.concatenate(externalFirstCycle)
         #preCycleLength = preCycleLength + preCycleEmbryo.getLength()
 
     preCycleEmbryo.concatenate(embryo)
