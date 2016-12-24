@@ -60,6 +60,9 @@ def storeExperimentGAparameters():
     file.write("selector = " + conf.getProperty("Selection operator") + "\n")
     file.write("CrossoverRate = " + conf.getProperty("CrossoverRate") + "\n")
     file.write("ElitismReplacement percentage = " + conf.getProperty("Elitism replacement percentage") + "\n")
+    file.write("Concatenate walk cycles = " + conf.getProperty("Concatenate walk cycles?") + "\n")
+    file.write("concatenate external cycle file = " + conf.getProperty("concatenate external cycle file?") + "\n")
+    file.write("Convergence criteria enable? = " + conf.getProperty("Convergence criteria enable?") + "\n")
     
     file.close()
 
