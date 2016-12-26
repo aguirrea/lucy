@@ -43,7 +43,7 @@
 </File>
 <File>
     <Name>external cycle file</Name>
-    <Value>/mocap/cmu_mocap/xml/util/final-0-20161216-090013.xml</Value>
+    <Value>/mocap/lucy_walk_cycles/xml/final-0-20161216-090013.xml</Value>
     <!-- <Value>/mocap/cmu_mocap/xml/util/walk_first_cycle.xml</Value> -->
     <!-- <Value>/gene_pool/20160919-125409/final-0-20160919-182036.xml</Value> -->
     <!-- <Value>/gene_pool/old/20160711-235134/0.765774077058-20160713-104955-225.xml</Value> -->
@@ -92,7 +92,7 @@
 </Property>
     <Property>
     <Name>blank screen?</Name>
-    <Value>1</Value>
+    <Value>0</Value>
 </Property>
 <Property>
     <Name>Lucy simulated?</Name>
@@ -145,7 +145,7 @@
 </Property>
 <Property>
     <Name>Number of generations</Name>
-    <Value>50</Value>
+    <Value>100</Value>
 </Property>
 <Property>
     <Name>Crossover operator</Name>
