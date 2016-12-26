@@ -45,10 +45,10 @@ class FitnessFunction(object):
         for joint in robotJoints:
             if prop.diffAvoidJoint(joint):
                 avoidJointsQty += 1
-        minDiff = ((totalJointsQty - avoidJointsQty) ** 2) * maxJointDiff
-        maxDiff = 0
-        normalizedGap = (concatenationGap - minDiff) / (maxDiff - minDiff)
-        return abs(normalizedGap)
+        maxDiff = (totalJointsQty - avoidJointsQty) * maxJointDiff
+        minDiff = 0
+        preNormalizedGap = (concatenationGap - minDiff) / (maxDiff - minDiff)
+        return 1 - preNormalizedGap
 
     def normaliseDistance(self, rawDistance):
         normDistance = rawDistance / ORACLE_DISTANCE
@@ -73,7 +73,7 @@ class DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle(FitnessFunction
         self.concatenationGapNormalizedWeight = 0.20
         self.framesExecutedWeight = 0.30
         self.endCycleBalanceWeight = 0.40
-        self.fitness = self.distanceWeight * (self.parameters.getDistance()) + self.concatenationGapNormalizedWeight * (self.normaliseConcatenationGap(self.parameters.getConcatenationGap()) ** 2) + self.framesExecutedWeight * self.parameters.getFramesExecuted() + self.endCycleBalanceWeight * (self.parameters.getEndCycleBalance() ** 2) - abs(self.parameters.getAngle())
+        self.fitness = self.distanceWeight * (self.parameters.getDistance()) + self.concatenationGapNormalizedWeight * (self.normaliseConcatenationGap(self.parameters.getConcatenationGap())) + self.framesExecutedWeight * self.parameters.getFramesExecuted() + self.endCycleBalanceWeight * (self.parameters.getEndCycleBalance() ** 2) - abs(self.parameters.getAngle())
         print "concatenationGapNormalized: ", self.normaliseConcatenationGap(self.parameters.getConcatenationGap())
 
 class ConcatenationgapFramesexecutedNormAngle(FitnessFunction):
