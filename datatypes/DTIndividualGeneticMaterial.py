@@ -25,9 +25,9 @@ from scipy.interpolate import UnivariateSpline
 from scipy.interpolate import interp1d
 
 import matplotlib.pyplot as plt
-from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 
 import configuration.constants as sysConstants
+from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 from datatypes.DTGenomeFunctions import DTGenomeFunctions
 from parser.LoadPoses import LoadPoses
 from simulator.LoadRobotConfiguration import LoadRobotConfiguration
@@ -80,11 +80,11 @@ class DTIndividualGeneticMaterial(object):
         self.geneticMatrix *= times
 
     #calculates the gap generated when composing cyclic movements
-    def getConcatenationGap(self):
+    def getConcatenationGap(self, startingCyclePose=0):
         dtgf = DTGenomeFunctions()
         if self.getLength() > 0:
             #return dtgf.rawDiff(self.geneticMatrix[0], self.geneticMatrix[self.getLength() - 1])
-            return dtgf.euclideanDiff(self.geneticMatrix[0], self.geneticMatrix[self.getLength() - 1])
+            return dtgf.euclideanDiff(self.geneticMatrix[startingCyclePose-1], self.geneticMatrix[self.getLength() - 1])
         else:
             return 0
     # the '|' represents the cycleSize - 1 position
