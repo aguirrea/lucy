@@ -58,17 +58,20 @@ def createIndividual(filename):
         #walk = Individual(geneticVanillaPropNothingToAvoid, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)) #For Reda Al-Bahrani work compability
         precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
         preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
+        preCycleLength = preCycleEmbryo.getLength()
 
 
         if int(conf.getProperty("concatenate external cycle file?")):
             externalFirstCycleFile = os.getcwd() + conf.getFile("external cycle file")
             externalFirstCycle = DTIndividualGeneticTimeSerieFile(externalFirstCycleFile)
             preCycleEmbryo.concatenate(externalFirstCycle)
-            #preCycleLength = preCycleLength + preCycleEmbryo.getLength()
+            preCycleLength = preCycleEmbryo.getLength()
+
 
         preCycleEmbryo.concatenate(walkEmbryo)
         walkEmbryo = preCycleEmbryo
         walk = Individual(geneticVanillaProp, walkEmbryo)
+        walk.setPrecycleLength(preCycleLength)
 
     else:
         #TODO physical stage

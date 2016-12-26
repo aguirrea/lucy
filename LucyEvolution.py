@@ -211,19 +211,19 @@ def eval_func(chromosome):
 
     precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
     preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
-    ##preCycleLength = preCycleEmbryo.getLength()
+    preCycleLength = preCycleEmbryo.getLength()
 
     if int(conf.getProperty("concatenate external cycle file?")):
         externalFirstCycleFile = os.getcwd() + conf.getFile("external cycle file")
         externalFirstCycle = DTIndividualGeneticTimeSerieFile(externalFirstCycleFile)
         preCycleEmbryo.concatenate(externalFirstCycle)
-        #preCycleLength = preCycleLength + preCycleEmbryo.getLength()
+        preCycleLength = preCycleEmbryo.getLength()
 
     preCycleEmbryo.concatenate(embryo)
     newEmbryo = preCycleEmbryo
     #embryoLength = newEmbryo.getLength()
     individual = Individual(prop, newEmbryo)
-    ##individual.setPrecycleLength(preCycleLength)
+    individual.setPrecycleLength(preCycleLength)
     ##print "precyclelength:  ", preCycleLength
     ##print "cyclelength:  ", embryoCycleLength
     ##individual.setCycleLength(embryoCycleLength)
