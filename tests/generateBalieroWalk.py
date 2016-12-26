@@ -170,7 +170,7 @@ print "program started"
 
 for i in range(len(posesVect)):
     frame = ET.SubElement(lucyPersistence,  "frame")
-    frame.set("number" ,  str(i))
+    frame.set("number", str(i))
     poseVectItem = posesVect[i]
     for key in robotConfig.getJointsName():
         xmlJoint = ET.SubElement(frame,  key)

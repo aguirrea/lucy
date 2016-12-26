@@ -3,7 +3,7 @@
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
 # 
-# Robot Sniffer, generates poses from the robot motion
+# Robot Sniffer, generates poses from the robot motion in the simulator
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
