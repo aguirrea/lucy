@@ -40,10 +40,10 @@ class Individual:
         self.length = individualGeneticMaterial.getLength()
         self.genomeMatrixJointNameIDMapping = {}
         self.sysConf = LoadSystemConfiguration()
-        self.concatenationGap = individualGeneticMaterial.getConcatenationGap()
+        self.individualGeneticMaterial = individualGeneticMaterial
         self.moveArmFirstTime = True
         self.precycleLength = 0
-        self.cycleLength = 0
+        self.cycleLength = 0 #Not used yet
 
         i=0
         for jointName in self.robotConfig.getJointsName():
@@ -101,7 +101,10 @@ class Individual:
                     print "---------------------------------------------------moví el brazo"'''
             #self.lucy.moveHelperArm() obtengo peor fitness moviendo el brazo
 
-        self.fitness = self.lucy.getFitness(self.length, self.concatenationGap)
+        startingCyclePose = self.getPrecycleLength()
+        print "*-*-**-*-*-*-----------------", startingCyclePose
+        executionConcatenationGap = self.individualGeneticMaterial.getConcatenationGap(startingCyclePose)
+        self.fitness = self.lucy.getFitness(self.length, executionConcatenationGap)
         self.lucy.stopLucy()  #this function also updates time and distance
         return self.fitness
 
