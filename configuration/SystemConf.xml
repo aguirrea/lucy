@@ -36,14 +36,15 @@
 </Directory>
 <File>
     <Name>Lucy vrep model</Name>
-    <!--    <Value>/simulator/models/genetic_bioloid.ttt</Value> -->
+    <!--  <Value>/simulator/models/genetic_bioloid.ttt</Value>-->
     <!-- <Value>/simulator/models/genetic_bioloid_without_texture_baliero.ttt</Value> -->
     <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
     <!-- <Value>/simulator/models/genetic_bioloid_avasi.ttt</Value> -->
 </File>
 <File>
     <Name>external cycle file</Name>
-    <Value>/mocap/lucy_walk_cycles/xml/final-0-20161216-090013.xml</Value>
+    <Value>/mocap/lucy_walk_cycles/xml/final-13-20161227-170739.xml</Value>
+    <!--  <Value>/mocap/lucy_walk_cycles/xml/final-0-20161216-090013.xml</Value> -->
     <!-- <Value>/mocap/cmu_mocap/xml/util/walk_first_cycle.xml</Value> -->
     <!-- <Value>/gene_pool/20160919-125409/final-0-20160919-182036.xml</Value> -->
     <!-- <Value>/gene_pool/old/20160711-235134/0.765774077058-20160713-104955-225.xml</Value> -->
@@ -68,12 +69,22 @@
 <!-- Lucy vrep parameters -->
 <Property>
     <Name>FALL_THRESHOLD_DOWN</Name>
-    <Value>0.24</Value>
+    <Value>0.18</Value>
 </Property>
 <Property>
     <Name>FALL_THRESHOLD_UP</Name>
     <Value>0.30</Value>
 </Property>
+<!-- Values for Björn P Mattsson model
+<Property>
+    <Name>FALL_THRESHOLD_DOWN</Name>
+    <Value>0.22</Value>
+</Property>
+<Property>
+    <Name>FALL_THRESHOLD_UP</Name>
+    <Value>0.40</Value>
+</Property>
+-->
 <Property>
     <Name>ConnectionTimeout</Name>
     <Value>5000</Value>    
@@ -88,7 +99,7 @@
 </Property>
 <Property>
     <Name>Lucy render enable</Name>
-    <Value>1</Value>
+    <Value>0</Value>
 </Property>
     <Property>
     <Name>blank screen?</Name>
@@ -122,7 +133,7 @@
     <Name>Concatenate walk cycles?</Name>
     <!-- 0 means not concatenate cycles, n > 1; means that the cycle will be repeated n times-->
     <!--<Value>5</Value>-->
-    <Value>0</Value>
+    <Value>4</Value>
 </Property>
 <Property>
     <!-- once a good wal cycle is found, is used as pre-cycle to search for the following cycle-->
@@ -145,7 +156,7 @@
 </Property>
 <Property>
     <Name>Number of generations</Name>
-    <Value>100</Value>
+    <Value>50</Value>
 </Property>
 <Property>
     <Name>Crossover operator</Name>
