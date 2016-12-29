@@ -19,9 +19,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 import vrep
+import time
 
-from LoadRobotConfiguration import LoadRobotConfiguration
+from LoadRobotConfiguration  import LoadRobotConfiguration
 from LoadSystemConfiguration import LoadSystemConfiguration
+from errors.VrepException    import VrepException
 from vrepConst import *
 
 bulletEngine = 0
@@ -46,7 +48,9 @@ class Simulator:
 
         if simulatorModel:
             #TODO try to reutilize the same scene for the sake of performance
-            self.loadscn(self.clientId, simulatorModel)
+            error = self.loadscn(self.clientId, simulatorModel)
+            if error:
+                 raise VrepException("error loading Vrep robot model", -1)
        
         if int(self.sysConf.getProperty("synchronous mode?"))==1:
             self.synchronous = True
@@ -112,18 +116,16 @@ class Simulator:
             print name + ":" + str(position)
 
     def isRobotUp(self, clientID):
-        error1 = False
-        if self.isRobotUpFirstCall:
-            error1, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait)
-            if error1 == 0:
-                self.bioloidHandle = LSP_Handle
-                self.isRobotUpFirstCall = False
-        error2, bioloid_position = self.getObjectPositionWrapper(clientID, self.bioloidHandle)
-        #print "bioloid position", bioloid_position[2]
-        return error1 or error2, bioloid_position[2]>float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and bioloid_position[2] < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))
+        error = 0
+        GET_DISTANCE_BUGGY_VALUE = 100000
+        error, upDistance = self.getUpDistance()
+        upDistance = float(upDistance)
+        if upDistance > GET_DISTANCE_BUGGY_VALUE: #filter for garbage return on the firsts invocations of vrep.simxReadDistance
+            return error, True
+        else:
+            return error, upDistance > float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and upDistance < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))
 
-        #error, upDistance = self.getUpDistance()
-        #return error, upDistance > float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and upDistance < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))'''
+
 
     def startSim(self, clientID, screen=True):
         #I need the simulator stopped in order to be started
@@ -262,6 +264,10 @@ class Simulator:
     def getUpDistance(self):
         if self.getUpDistanceFirstTime:
             error, distance = vrep.simxReadDistance(self.clientId, self.upDistanceHandle, vrep.simx_opmode_streaming)
+            retrys = 0
+            while error and retrys < 1000:
+                error, distance = vrep.simxReadDistance(self.clientId, self.upDistanceHandle, vrep.simx_opmode_streaming)
+                retrys += 1
             self.getUpDistanceFirstTime = False
         else:
             error, distance = vrep.simxReadDistance(self.clientId, self.upDistanceHandle, vrep.simx_opmode_buffer)
