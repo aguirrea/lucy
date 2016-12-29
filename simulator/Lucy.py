@@ -33,7 +33,8 @@ from LoadRobotConfiguration         import LoadRobotConfiguration
 from LoadSystemConfiguration        import LoadSystemConfiguration
 from Simulator                      import Simulator
 
-BALANCE_HEIGHT = 0.214 #Distance from the floor when lucy is straight up
+#BALANCE_HEIGHT = 0.214 #Distance from the floor when lucy is straight up; classical model
+BALANCE_HEIGHT = 0.325 #Distance from the floor when lucy is straight up; Björn P Mattsson model
 
 #abstract class representing lucy abstraction base class
 class Lucy(object):
