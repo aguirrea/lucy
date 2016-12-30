@@ -18,12 +18,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-import vrep
-import time
+from errors.VrepException    import VrepException
 
+import vrep
 from LoadRobotConfiguration  import LoadRobotConfiguration
 from LoadSystemConfiguration import LoadSystemConfiguration
-from errors.VrepException    import VrepException
 from vrepConst import *
 
 bulletEngine = 0
@@ -116,7 +115,6 @@ class Simulator:
             print name + ":" + str(position)
 
     def isRobotUp(self, clientID):
-        error = 0
         GET_DISTANCE_BUGGY_VALUE = 100000
         error, upDistance = self.getUpDistance()
         upDistance = float(upDistance)
