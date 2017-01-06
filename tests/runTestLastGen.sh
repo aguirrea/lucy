@@ -1,4 +1,4 @@
-EXPERIMENT_DIRECTORY=20160820-233408
+EXPERIMENT_DIRECTORY=20170105-030544
  
 ./testLucyEvolution.py ../gene_pool/$EXPERIMENT_DIRECTORY/final-0-*
 ./testLucyEvolution.py ../gene_pool/$EXPERIMENT_DIRECTORY/final-1-*
@@ -32,6 +32,4 @@ EXPERIMENT_DIRECTORY=20160820-233408
 ./testLucyEvolution.py ../gene_pool/$EXPERIMENT_DIRECTORY/final-27-*
 ./testLucyEvolution.py ../gene_pool/$EXPERIMENT_DIRECTORY/final-28-*
 ./testLucyEvolution.py ../gene_pool/$EXPERIMENT_DIRECTORY/final-29-*
-./testLucyEvolution.py ../gene_pool/$EXPERIMENT_DIRECTORY/final-30-*
-./testLucyEvolution.py ../gene_pool/$EXPERIMENT_DIRECTORY/final-31-*
 
