@@ -25,6 +25,7 @@ from numpy import angle
 from datatypes.DTFitness            import DTFitness
 from errors.VrepException           import VrepException
 
+import configuration.constants as sysConstants
 from AXAngle                        import AXAngle
 from Actuator                       import Actuator
 from Communication                  import CommSerial
@@ -33,7 +34,8 @@ from LoadRobotConfiguration         import LoadRobotConfiguration
 from LoadSystemConfiguration        import LoadSystemConfiguration
 from Simulator                      import Simulator
 
-BALANCE_HEIGHT = 0.214 #Distance from the floor when lucy is straight up; classical model
+BALANCE_HEIGHT = 0.2226 #Distance from the floor when lucy is straight up; classical model
+#BALANCE_HEIGHT = 0.214 #Distance from the floor when lucy is straight up; classical model
 #BALANCE_HEIGHT = 0.325 #Distance from the floor when lucy is straight up; Björn P Mattsson model
 
 #abstract class representing lucy abstraction base class
@@ -105,8 +107,22 @@ class PhysicalLucy(Lucy):
     def executePose(self, pose):
         #set positions and wait that the actuator reaching that position
         #TODO tener en cuenta los motores que están invertidos, creo que los únicos que están quedando son los de los hombros
-
         for joint in self.RobotImplementedJoints:
+            if joint == "L_Hip_Pitch":
+                angle = pose.getValue(joint)
+                print "el angulo es: ", angle
+                angleAX = AXAngle()
+                angleAX.setDegreeValue(300 - angle)
+                #TODO implement method for setting position of all actuators at the same time
+                self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), int(angleAX.getValue()), self.defaultSpeed)
+                self.poseExecuted = self.poseExecuted + 1
+        print "pose executed!"
+        time.sleep(0.2)
+
+
+        '''
+        for joint in self.RobotImplementedJoints:
+            print "el joint se reporta como: ", joint
             angle = pose.getValue(joint)
             angleAX = AXAngle()
             angleAX.setDegreeValue(angle)
@@ -115,6 +131,7 @@ class PhysicalLucy(Lucy):
             self.poseExecuted = self.poseExecuted + 1
         print "pose executed!"
         time.sleep(0.05)
+        '''
 
     def stopLucy(self):
         pass
@@ -148,7 +165,7 @@ class SimulatedLucy(Lucy):
         self.sim = Simulator(genetic_bioloid)
         self.clientID = self.sim.getClientId() 
         if self.clientID == -1:
-            retry_counter = 1000
+            retry_counter = sysConstants.ERROR_RETRY
             time.sleep(0.1)
             self.clientID = self.sim.getClientId()
             while self.clientID == -1 and retry_counter > 0:
@@ -240,6 +257,7 @@ class SimulatedLucy(Lucy):
             if jointExecutedCounter < jointsQty - 1:
                 error = self.sim.setJointPositionNonBlock(self.clientID, joint, angleAX.toVrep()) or error
             else:
+                ###self.moveHelperArm()
                 error = self.sim.resumePauseSim(self.clientID) or error
                 error = self.sim.setJointPosition(self.clientID, joint, angleAX.toVrep()) or error
 
@@ -304,11 +322,14 @@ class SimulatedLucy(Lucy):
         if self.stop == False:
             self.time = time.time() - self.startTime
             error, distToGoal = self.sim.getDistanceToSceneGoal()
-            distTravelToGoal = 1.0 - distToGoal
-            if distTravelToGoal < 0:
-                self.distance = 0
+            if not error:
+                distTravelToGoal = 1.0 - distToGoal
+                if distTravelToGoal < 0:
+                    self.distance = 0
+                else:
+                    self.distance = distTravelToGoal
             else:
-                self.distance = distTravelToGoal
+                print "*****************************************ERROR CALCULATING DIST TO GOAL IN Lucy:updateLucyPosition"
 
     def stopLucy(self):
         self.stop = True
@@ -323,14 +344,14 @@ class SimulatedLucy(Lucy):
         return up
 
     def moveHelperArm(self):
-        firstTime = self.armDistance == 0
+        error = False
         armDistanceStep = self.distance - self.distanceBeforMoveArmLastCall
-        #armDistanceStep = self.distance - self.armDistance #esto tiene que ser el step que hizo el robot
         if armDistanceStep > 0:
             self.armDistance = self.armDistance + armDistanceStep
-        error = self.sim.moveHelperArm(armDistanceStep, firstTime)
-        self.distanceBeforMoveArmLastCall = self.distance
-        print "distancia que muevo el brazo: ", armDistanceStep
+            #error = self.sim.pauseSim(self.clientID) or error
+            error = self.sim.moveHelperArm(armDistanceStep) or error
+            #error = self.sim.resumePauseSim(self.clientID) or error
+            self.distanceBeforMoveArmLastCall = self.distance
         return error
 
 
