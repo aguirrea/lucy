@@ -131,7 +131,7 @@ class Simulator:
         if upDistance > GET_DISTANCE_BUGGY_VALUE: #filter for garbage return on the firsts invocations of vrep.simxReadDistance
             return error, True
         else:
-            return error, upDistance > float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and upDistance < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))
+            return error, upDistance > float(self.sysConf.getProperty("FALL_THRESHOLD_DOWN")) and upDistance < float(self.sysConf.getProperty("FALL_THRESHOLD_UP"))
 
     def startSim(self, clientID, screen=True):
         #I need the simulator stopped in order to be started
