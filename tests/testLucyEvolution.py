@@ -51,14 +51,17 @@ arguments = len(sys.argv)
 def createIndividual(filename):
     if int(conf.getProperty("Lucy simulated?"))==1:
 
-        if int(conf.getProperty("Concatenate walk cycles?")):
-            walkEmbryo = DTIndividualGeneticTimeSerieFileWalk(os.getcwd()+"/"+filename)
-        else:
-            walkEmbryo = DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)
-        #walk = Individual(geneticVanillaPropNothingToAvoid, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)) #For Reda Al-Bahrani work compability
         precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
         preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
         preCycleLength = preCycleEmbryo.getLength()
+
+        if int(conf.getProperty("Concatenate walk cycles?")):
+            walkEmbryo = DTIndividualGeneticTimeSerieFileWalk(os.getcwd()+"/"+filename)
+            embryoCycleLength = (walkEmbryo.getLength() - preCycleLength) / int(conf.getProperty("Concatenate walk cycles?"))
+        else:
+            walkEmbryo = DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)
+            embryoCycleLength = walkEmbryo.getLength() - preCycleLength
+        #walk = Individual(geneticVanillaPropNothingToAvoid, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)) #For Reda Al-Bahrani work compability
 
 
         if int(conf.getProperty("concatenate external cycle file?")):
@@ -66,12 +69,14 @@ def createIndividual(filename):
             externalFirstCycle = DTIndividualGeneticTimeSerieFile(externalFirstCycleFile)
             preCycleEmbryo.concatenate(externalFirstCycle)
             preCycleLength = preCycleEmbryo.getLength()
+            embryoCycleLength = embryoCycleLength - externalFirstCycle.getLength()
 
 
         preCycleEmbryo.concatenate(walkEmbryo)
         walkEmbryo = preCycleEmbryo
         walk = Individual(geneticVanillaProp, walkEmbryo)
         walk.setPrecycleLength(preCycleLength)
+        walk.setCycleLength(embryoCycleLength)
 
     else:
         #TODO physical stage

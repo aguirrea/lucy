@@ -92,17 +92,11 @@ class Individual:
             '''if self.precycleLength > 0 and i == self.precycleLength - 1:
                 self.lucy.moveHelperArm()
 
-            if self.cycleLength > 0 and i == self.cycleLength - 1:
-                self.lucy.moveHelperArm()'''
-
-            '''if i > self.precycleLength - 1:
-                if self.cycleLength > 0 and (i - self.precycleLength) % self.cycleLength == 0:
-                    self.lucy.moveHelperArm()
-                    print "---------------------------------------------------moví el brazo"'''
-            #self.lucy.moveHelperArm() obtengo peor fitness moviendo el brazo
+            if self.precycleLength > 0 and i > self.precycleLength - 1:
+                if (i - self.precycleLength) > 0 and (i - self.precycleLength) % self.cycleLength == 0:
+                    self.lucy.moveHelperArm()'''
 
         startingCyclePose = self.getPrecycleLength()
-        print "*-*-**-*-*-*-----------------", startingCyclePose
         executionConcatenationGap = self.individualGeneticMaterial.getConcatenationGap(startingCyclePose)
         self.fitness = self.lucy.getFitness(self.length, executionConcatenationGap)
         self.lucy.stopLucy()  #this function also updates time and distance

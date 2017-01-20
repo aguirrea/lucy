@@ -18,6 +18,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+from time                    import time
+
 from errors.VrepException    import VrepException
 
 import vrep
@@ -81,6 +83,7 @@ class Simulator:
         self.getDistanceToSceneGoal() #to fix the first invocation
         self.getUpDistance()
         self.isRobotUp(self.clientId)
+        self.armPositionXAxis = -9.0000e-02
 
     def getClientId(self):
         return self.clientId
@@ -99,10 +102,17 @@ class Simulator:
     def connectVREP(self, ipAddr=LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"Vrep IP"), port=int(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"Vrep port"))):
         self.getObjectPositionFirstTime = True
         #vrep.simxFinish(-1) # just in case, close all opened connections #TODO this could be a problem when the connection pool is implemented
-        return vrep.simxStart(ipAddr,port,True,True,5000,5)
+        time1 = time()
+        clientID = vrep.simxStart(ipAddr,port,True,True,5000,5)
+        time2 = time()
+        print "LOGGING time for connecting VREP in senconds: ", time2 - time1
+        return clientID
         
     def loadscn(self, clientID, model):
-        error=vrep.simxLoadScene(clientID, model, 2, vrep.simx_opmode_oneshot_wait)
+        time1 = time()
+        error = vrep.simxLoadScene(clientID, model, 2, vrep.simx_opmode_oneshot_wait)
+        time2 = time()
+        print "LOGGING time for loading VREP scene in seconds: ", time2 - time1
         return error
 
     def printJointPositions(self, clientID):
@@ -122,8 +132,6 @@ class Simulator:
             return error, True
         else:
             return error, upDistance > float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_DOWN")) and upDistance < float(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"FALL_THRESHOLD_UP"))
-
-
 
     def startSim(self, clientID, screen=True):
         #I need the simulator stopped in order to be started
@@ -279,20 +287,19 @@ class Simulator:
             error, angle = vrep.simxGetObjectOrientation(self.clientId, self.bioloidHandle, self.cuboidHandle, vrep.simx_opmode_buffer)
         return error, angle[1]
 
-    def moveHelperArm(self, distTraveled, firstCall):
-        MAX_RETRY_ATTEMPTS = 100
-        if firstCall:
-            error, currentPosition = vrep.simxGetObjectPosition(self.clientId, self.armHandler, -1, vrep.simx_opmode_streaming)
-            retry = 0
-            while error and retry < MAX_RETRY_ATTEMPTS:
-                error, currentPosition = vrep.simxGetObjectPosition(self.clientId, self.armHandler, -1, vrep.simx_opmode_buffer)
-                retry =+ 1
+    def moveHelperArm(self, distTraveled):
+        SET_OBJECT_POSITION_ERROR_THRESHOLD = 2
+        MOVE_HELPER_ARM_ERROR = 1
+        newArmPositionX = float(distTraveled * 1.2)
+        newArmPosition = (newArmPositionX, 0, 0)
+        #vrep.simxSetBooleanParameter(self.clientId,sim_boolparam_dynamics_handling_enabled,False,vrep.simx_opmode_oneshot)
+        #moves relative to the robot itself
+        error = vrep.simxSetObjectPosition(self.clientId, self.armHandler, self.armHandler, newArmPosition, vrep.simx_opmode_oneshot)
+        #vrep.simxSetBooleanParameter(self.clientId,sim_boolparam_dynamics_handling_enabled,True,vrep.simx_opmode_oneshot)
+        if error < SET_OBJECT_POSITION_ERROR_THRESHOLD:
+            self.armPositionXAxis = newArmPosition
         else:
-            error, currentPosition = vrep.simxGetObjectPosition(self.clientId, self.armHandler, -1, vrep.simx_opmode_buffer)
-
-        newArmPosition = currentPosition[0] + distTraveled
-        vrep.simxSetObjectPosition(self.clientId, self.armHandler, -1, (newArmPosition, currentPosition[1], currentPosition[2]) , vrep.simx_opmode_oneshot)
-
+            return MOVE_HELPER_ARM_ERROR
 
         
 

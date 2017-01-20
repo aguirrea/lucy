@@ -1,4 +1,4 @@
-EXPERIMENT_DIRECTORY=20170105-030544
+EXPERIMENT_DIRECTORY=20170115-190258
  
 ./testLucyEvolution.py ../gene_pool/$EXPERIMENT_DIRECTORY/final-0-*
 ./testLucyEvolution.py ../gene_pool/$EXPERIMENT_DIRECTORY/final-1-*
