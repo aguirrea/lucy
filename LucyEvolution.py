@@ -63,7 +63,8 @@ def storeExperimentGAparameters():
     file.write("Concatenate walk cycles = " + conf.getProperty("Concatenate walk cycles?") + "\n")
     file.write("concatenate external cycle file = " + conf.getProperty("concatenate external cycle file?") + "\n")
     file.write("Convergence criteria enable? = " + conf.getProperty("Convergence criteria enable?") + "\n")
-    
+    file.write("Vrep robot model scene = " + conf.getFile("Lucy vrep model") + "\n")
+
     file.close()
 
 def getPopulationAverage(population):
