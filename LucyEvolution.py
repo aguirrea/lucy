@@ -109,7 +109,7 @@ def setInitialPopulation(ga_engine):
             if individualCounter < popSize:
                 print individualCounter, " individuals processed!"
                 print 'inserting individual: ' + filename + " into the initial population"
-                walk = Individual(propCMUDaz, DTIndividualGeneticTimeSerieFile(filename))
+                walk = Individual(propVanilla, DTIndividualGeneticTimeSerieFile(filename))
                 teacherGeneticMatrix = walk.getGenomeMatrix()
                 adan = population[individualCounter]
                 adanIndividualLength=dtgenoma.getIndividualLength(adan)
@@ -222,10 +222,8 @@ def eval_func(chromosome):
         preCycleLength = preCycleEmbryo.getLength()
         embryoCycleLength = embryoCycleLength - externalFirstCycle.getLength()
 
-    preCycleEmbryo.concatenate(embryo)
-    newEmbryo = preCycleEmbryo
     #embryoLength = newEmbryo.getLength()
-    individual = Individual(prop, newEmbryo)
+    individual = Individual(prop, embryo)
     individual.setPrecycleLength(preCycleLength)
 
     individual.setCycleLength(embryoCycleLength)
