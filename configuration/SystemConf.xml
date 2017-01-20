@@ -1,196 +1,193 @@
 <System>
-
-<!-- System paths-->
-
-<Directory>
-    <Name>GAWalk Files</Name> 
-    <Value>/mocap/gawalk/xml</Value>
-</Directory>
-<Directory>
-    <Name>ADHOC Files</Name> 
-    <Value>/mocap/tests/xml</Value>
-</Directory>
-<Directory>
-    <Name>Transformed CMU mocap Files</Name> 
-    <Value>/mocap/cmu_mocap/xml/</Value>
-</Directory>
-<Directory>
-    <Name>UIBLH mocap Files</Name> 
-    <Value>/mocap/uiblh_mocap/xml/</Value>
-</Directory>
-<Directory>
-    <Name>CMU mocap Files</Name> 
-    <Value>/mocap/cmu_mocap/bvh/</Value>
-</Directory>
-<Directory>
-    <Name>Baliero transformed walk Files</Name> 
-    <Value>/mocap/baliero/xml/</Value>
-</Directory>
-<Directory>
-    <Name>Lucy evolved walk cycles Files</Name>
-    <Value>/mocap/lucy_walk_cycles/xml/</Value>
-</Directory>
-<Directory>
-    <Name>Genetic Pool</Name> 
-    <Value>/gene_pool/</Value>
-</Directory>
-<File>
-    <Name>Lucy vrep model</Name>
-    <!--  <Value>/simulator/models/genetic_bioloid.ttt</Value>-->
-    <!-- <Value>/simulator/models/genetic_bioloid_without_texture_baliero.ttt</Value> -->
-    <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
-    <!-- <Value>/simulator/models/genetic_bioloid_avasi.ttt</Value> -->
-</File>
-<File>
-    <Name>external cycle file</Name>
-    <Value>/mocap/lucy_walk_cycles/xml/final-13-20161227-170739.xml</Value>
-    <!--  <Value>/mocap/lucy_walk_cycles/xml/final-0-20161216-090013.xml</Value> -->
-    <!-- <Value>/mocap/cmu_mocap/xml/util/walk_first_cycle.xml</Value> -->
-    <!-- <Value>/gene_pool/20160919-125409/final-0-20160919-182036.xml</Value> -->
-    <!-- <Value>/gene_pool/old/20160711-235134/0.765774077058-20160713-104955-225.xml</Value> -->
-</File>
-<Property>
-    <!-- see the lucy.sh file to use the same name-->
-    <Name>System Log</Name>
-    <Value>out.txt</Value>
-</Property>
-
-<!-- Vrep connection parameters -->
-
-<Property>
-    <Name>Vrep IP</Name>
-    <Value>127.0.0.1</Value>    
-</Property>
-<Property>
-    <Name>Vrep port</Name>
-    <Value>19997</Value>
-</Property>
-
-<!-- Lucy vrep parameters -->
-<Property>
-    <Name>FALL_THRESHOLD_DOWN</Name>
-    <Value>0.18</Value>
-</Property>
-<Property>
-    <Name>FALL_THRESHOLD_UP</Name>
-    <Value>0.30</Value>
-</Property>
-<!-- Values for Björn P Mattsson model
-<Property>
-    <Name>FALL_THRESHOLD_DOWN</Name>
-    <Value>0.22</Value>
-</Property>
-<Property>
-    <Name>FALL_THRESHOLD_UP</Name>
-    <Value>0.40</Value>
-</Property>
--->
-<Property>
-    <Name>ConnectionTimeout</Name>
-    <Value>5000</Value>    
-</Property>
-<Property>
-    <Name>threadingTime</Name>
-    <Value>0.5</Value>    
-</Property>
-<Property>
-    <Name>Vrep not implemented joints</Name>
-    <Value>R_Elbow_Yaw L_Elbow_Yaw L_Shoulder_Yaw R_Shoulder_Yaw</Value>
-</Property>
-<Property>
-    <Name>Lucy render enable</Name>
-    <Value>0</Value>
-</Property>
+    <!-- System paths-->
+    <Directory>
+        <Name>GAWalk Files</Name>
+        <Value>/mocap/gawalk/xml</Value>
+    </Directory>
+    <Directory>
+        <Name>ADHOC Files</Name>
+        <Value>/mocap/tests/xml</Value>
+    </Directory>
+    <Directory>
+        <Name>Transformed CMU mocap Files</Name>
+        <Value>/mocap/cmu_mocap/xml/</Value>
+    </Directory>
+    <Directory>
+        <Name>UIBLH mocap Files</Name>
+        <Value>/mocap/uiblh_mocap/xml/</Value>
+    </Directory>
+    <Directory>
+        <Name>CMU mocap Files</Name>
+        <Value>/mocap/cmu_mocap/bvh/</Value>
+    </Directory>
+    <Directory>
+        <Name>Baliero transformed walk Files</Name>
+        <Value>/mocap/baliero/xml/</Value>
+    </Directory>
+    <Directory>
+        <Name>Lucy evolved walk cycles Files</Name>
+        <Value>/mocap/lucy_walk_cycles/xml/</Value>
+    </Directory>
+    <Directory>
+        <Name>Genetic Pool</Name>
+        <Value>/gene_pool/</Value>
+    </Directory>
+    <File>
+        <Name>Lucy vrep model</Name>
+        <!--<Value>/simulator/models/genetic_bioloid.ttt</Value>-->
+        <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
+        <!--<Value>/simulator/models/genetic_bioloid_Bjorn_4_lucy.ttt</Value> -->
+    </File>
+    <File>
+        <Name>external cycle file</Name>
+        <Value>/mocap/lucy_walk_cycles/xml/final-13-20161227-170739.xml</Value>
+        <!--  <Value>/mocap/lucy_walk_cycles/xml/final-0-20161216-090013.xml</Value> -->
+        <!-- <Value>/mocap/cmu_mocap/xml/util/walk_first_cycle.xml</Value> -->
+        <!-- <Value>/gene_pool/20160919-125409/final-0-20160919-182036.xml</Value> -->
+        <!-- <Value>/gene_pool/old/20160711-235134/0.765774077058-20160713-104955-225.xml</Value> -->
+    </File>
     <Property>
-    <Name>blank screen?</Name>
-    <Value>0</Value>
-</Property>
-<Property>
-    <Name>Lucy simulated?</Name>
-    <Value>1</Value>
-</Property>
-<Property>
-    <Name>synchronous mode?</Name>
-    <Value>1</Value>    
-</Property>
-<Property>
-    <Name>speedmodifier</Name>
-    <Value>0</Value>    
-</Property>
-<Property>
-    <Name>simulation time step</Name>
-    <Value>0.50</Value>
-</Property>
-<Property>
-    <Name>physics enable?</Name>
-    <Value>1</Value>
-</Property>
-<Property>
-    <Name>re-evaluate fittest?</Name>
-    <Value>1</Value>
-</Property>
-<Property>
-    <Name>Concatenate walk cycles?</Name>
-    <!-- 0 means not concatenate cycles, n > 1; means that the cycle will be repeated n times-->
-    <!--<Value>5</Value>-->
-    <Value>4</Value>
-</Property>
-<Property>
-    <!-- once a good wal cycle is found, is used as pre-cycle to search for the following cycle-->
-    <Name>concatenate external cycle file?</Name>
-    <Value>0</Value>
-</Property>
+        <!-- see the lucy.sh file to use the same name-->
+        <Name>System Log</Name>
+        <Value>out.txt</Value>
+    </Property>
 
-<!-- Parser options -->
+    <!-- Vrep connection parameters -->
 
-<Property>
-    <Name>number of frames to skip</Name>
-    <Value>4</Value>
-</Property>
+    <Property>
+        <Name>Vrep IP</Name>
+        <Value>127.0.0.1</Value>
+    </Property>
+    <Property>
+        <Name>Vrep port</Name>
+        <Value>19997</Value>
+    </Property>
 
-<!-- GA parameters -->
+    <!-- Lucy vrep parameters -->
+    <Property>
+        <Name>FALL_THRESHOLD_DOWN</Name>
+        <Value>0.18</Value>
+    </Property>
+    <Property>
+        <Name>FALL_THRESHOLD_UP</Name>
+        <Value>0.30</Value>
+    </Property>
+    <!-- Values for Björn P Mattsson model
+    <Property>
+        <Name>FALL_THRESHOLD_DOWN</Name>
+        <Value>0.22</Value>
+    </Property>
+    <Property>
+        <Name>FALL_THRESHOLD_UP</Name>
+        <Value>0.40</Value>
+    </Property>
+    -->
+    <Property>
+        <Name>ConnectionTimeout</Name>
+        <Value>5000</Value>
+    </Property>
+    <Property>
+        <Name>threadingTime</Name>
+        <Value>0.5</Value>
+    </Property>
+    <Property>
+        <Name>Vrep not implemented joints</Name>
+        <Value>R_Elbow_Yaw L_Elbow_Yaw L_Shoulder_Yaw R_Shoulder_Yaw</Value>
+    </Property>
+    <Property>
+        <Name>Lucy render enable</Name>
+        <Value>1</Value>
+    </Property>
+        <Property>
+        <Name>blank screen?</Name>
+        <Value>0</Value>
+    </Property>
+    <Property>
+        <Name>Lucy simulated?</Name>
+        <Value>1</Value>
+    </Property>
+    <Property>
+        <Name>synchronous mode?</Name>
+        <Value>1</Value>
+    </Property>
+    <Property>
+        <Name>speedmodifier</Name>
+        <Value>0</Value>
+    </Property>
+    <Property>
+        <Name>simulation time step</Name>
+        <Value>0.50</Value>
+    </Property>
+    <Property>
+        <Name>physics enable?</Name>
+        <Value>1</Value>
+    </Property>
+    <Property>
+        <Name>re-evaluate fittest?</Name>
+        <Value>1</Value>
+    </Property>
+    <Property>
+        <Name>Concatenate walk cycles?</Name>
+        <!-- 0 means not concatenate cycles, n > 1; means that the cycle will be repeated n times-->
+        <!--<Value>16</Value>-->
+        <!--<Value>11</Value>-->
+        <Value>5</Value>
+    </Property>
+    <Property>
+        <!-- once a good wal cycle is found, is used as pre-cycle to search for the following cycle-->
+        <Name>concatenate external cycle file?</Name>
+        <Value>0</Value>
+    </Property>
 
-<Property>
-    <Name>Population size</Name>
-    <Value>30</Value>
-</Property>
-<Property>
-    <Name>Number of generations</Name>
-    <Value>50</Value>
-</Property>
-<Property>
-    <Name>Crossover operator</Name>
-    <Value>crossovers.G2DListCrossoverSingleNearHPoint</Value>
-</Property>
-<Property>
-    <Name>Mutator operator</Name>
-    <Value>mutators.G2DListMutatorRealGaussianSpline</Value>
-</Property>
-<Property>
-    <Name>Selection operator</Name>
-    <!--<Value>Selectors.GUniformSelector</Value>-->
-    <!--<Value>Selectors.GRankSelector</Value>-->
-    <Value>Selectors.GTournamentSelector</Value>
-    <!--<Value>Selectors.GRouletteWheel</Value>-->
-</Property>
-<Property>
-    <!-- probability that a couple get crossed -->
-    <Name>CrossoverRate</Name>
-    <Value>1.0</Value>
-</Property>
-<Property>
-    <Name>MutationRate</Name>
-    <!--value between 0 and 0.1, 0.02 represents 0.2 %-->
-    <Value>0.05</Value>
-</Property>
-<Property>
-    <!-- percentage of the best individuals that are copied to the next generation, p.e. 0.3 correspond to the 30% of the individuals-->
-    <Name>Elitism replacement percentage</Name>
-    <Value>0.3</Value>
-</Property>
-<Property>
-    <Name>Convergence criteria enable?</Name>
-    <Value>1</Value>
-</Property>
+    <!-- Parser options -->
 
+    <Property>
+        <Name>number of frames to skip</Name>
+        <Value>4</Value>
+    </Property>
+
+    <!-- GA parameters -->
+
+    <Property>
+        <Name>Population size</Name>
+        <Value>30</Value>
+    </Property>
+    <Property>
+        <Name>Number of generations</Name>
+        <Value>60</Value>
+    </Property>
+    <Property>
+        <Name>Crossover operator</Name>
+        <Value>crossovers.G2DListCrossoverSingleNearHPoint</Value>
+    </Property>
+    <Property>
+        <Name>Mutator operator</Name>
+        <Value>mutators.G2DListMutatorRealGaussianSpline</Value>
+    </Property>
+    <Property>
+        <Name>Selection operator</Name>
+        <!--<Value>Selectors.GUniformSelector</Value>-->
+        <!--<Value>Selectors.GRankSelector</Value>-->
+        <Value>Selectors.GTournamentSelector</Value>
+        <!--<Value>Selectors.GRouletteWheel</Value>-->
+    </Property>
+    <Property>
+        <!-- probability that a couple get crossed -->
+        <Name>CrossoverRate</Name>
+        <Value>1.0</Value>
+    </Property>
+    <Property>
+        <Name>MutationRate</Name>
+        <!--value between 0 and 0.1, 0.02 represents 0.2 %-->
+        <Value>0.05</Value>
+    </Property>
+    <Property>
+        <!-- percentage of the best individuals that are copied to the next generation, p.e. 0.3 correspond to the 30% of the individuals-->
+        <Name>Elitism replacement percentage</Name>
+        <Value>0.3</Value>
+    </Property>
+    <Property>
+        <Name>Convergence criteria enable?</Name>
+        <Value>0</Value>
+    </Property>
 </System>
