@@ -34,9 +34,6 @@ from LoadRobotConfiguration         import LoadRobotConfiguration
 from LoadSystemConfiguration        import LoadSystemConfiguration
 from Simulator                      import Simulator
 
-BALANCE_HEIGHT = 0.2226 #Distance from the floor when lucy is straight up; classical model
-#BALANCE_HEIGHT = 0.214 #Distance from the floor when lucy is straight up; classical model
-#BALANCE_HEIGHT = 0.325 #Distance from the floor when lucy is straight up; Björn P Mattsson model
 
 #abstract class representing lucy abstraction base class
 class Lucy(object):
@@ -56,6 +53,8 @@ class Lucy(object):
         for joint in self.joints:
             if joint not in dontSupportedJoints:
                 self.RobotImplementedJoints.append(joint)
+
+        self.balanceHeight = float(self.sysConf.getProperty("BALANCE_HEIGHT"))
 
     def getFitness(self, secuenceLength, concatenationGap):
         pass
@@ -207,7 +206,7 @@ class SimulatedLucy(Lucy):
             print "isRobotUp?: True"
             cycleEnded = 1
             framesExecuted = 1
-            endCycleBalance = upD/BALANCE_HEIGHT
+            endCycleBalance = upD/self.balanceHeight #Distance from the floor when lucy is straight up
             if endCycleBalance > 1:
                 endCycleBalance = 1
         else:

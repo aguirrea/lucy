@@ -66,6 +66,7 @@
     </Property>
 
     <!-- Lucy vrep parameters -->
+
     <Property>
         <Name>FALL_THRESHOLD_DOWN</Name>
         <Value>0.18</Value>
@@ -74,6 +75,11 @@
         <Name>FALL_THRESHOLD_UP</Name>
         <Value>0.30</Value>
     </Property>
+    <Property>
+        <Name>BALANCE_HEIGHT</Name>
+        <Value>0.2226</Value>
+    </Property> -->
+
     <!-- Values for Björn P Mattsson model
     <Property>
         <Name>FALL_THRESHOLD_DOWN</Name>
@@ -83,7 +89,12 @@
         <Name>FALL_THRESHOLD_UP</Name>
         <Value>0.40</Value>
     </Property>
+    <Property>
+        <Name>BALANCE_HEIGHT</Name>
+        <Value>0.325</Value>
+    </Property>
     -->
+
     <Property>
         <Name>ConnectionTimeout</Name>
         <Value>5000</Value>
