@@ -202,10 +202,7 @@ def eval_func(chromosome):
         setInitialPopulation(gaEngine)
 
     prop = DTIndividualPropertyVanillaEvolutive()
-
-    precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
-    preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
-    preCycleLength = preCycleEmbryo.getLength()
+    preCycleLength = 0
 
     if int(conf.getProperty("Concatenate walk cycles?")):
         embryo = DTIndividualGeneticMatrixWalk(chromosomeToLucyGeneticMatrix(chromosome))
@@ -215,12 +212,6 @@ def eval_func(chromosome):
         embryo = DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome))
         embryoCycleLength = embryo.getLength() - preCycleLength
 
-    if int(conf.getProperty("concatenate external cycle file?")):
-        externalFirstCycleFile = os.getcwd() + conf.getFile("external cycle file")
-        externalFirstCycle = DTIndividualGeneticTimeSerieFile(externalFirstCycleFile)
-        preCycleEmbryo.concatenate(externalFirstCycle)
-        preCycleLength = preCycleEmbryo.getLength()
-        embryoCycleLength = embryoCycleLength - externalFirstCycle.getLength()
 
     #embryoLength = newEmbryo.getLength()
     individual = Individual(prop, embryo)

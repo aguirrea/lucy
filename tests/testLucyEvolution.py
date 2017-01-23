@@ -51,9 +51,7 @@ arguments = len(sys.argv)
 def createIndividual(filename):
     if int(conf.getProperty("Lucy simulated?"))==1:
 
-        precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
-        preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
-        preCycleLength = preCycleEmbryo.getLength()
+        preCycleLength = 0
 
         if int(conf.getProperty("Concatenate walk cycles?")):
             walkEmbryo = DTIndividualGeneticTimeSerieFileWalk(os.getcwd()+"/"+filename)
@@ -63,17 +61,6 @@ def createIndividual(filename):
             embryoCycleLength = walkEmbryo.getLength() - preCycleLength
         #walk = Individual(geneticVanillaPropNothingToAvoid, DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)) #For Reda Al-Bahrani work compability
 
-
-        if int(conf.getProperty("concatenate external cycle file?")):
-            externalFirstCycleFile = os.getcwd() + conf.getFile("external cycle file")
-            externalFirstCycle = DTIndividualGeneticTimeSerieFile(externalFirstCycleFile)
-            preCycleEmbryo.concatenate(externalFirstCycle)
-            preCycleLength = preCycleEmbryo.getLength()
-            embryoCycleLength = embryoCycleLength - externalFirstCycle.getLength()
-
-
-        preCycleEmbryo.concatenate(walkEmbryo)
-        walkEmbryo = preCycleEmbryo
         walk = Individual(geneticVanillaProp, walkEmbryo)
         walk.setPrecycleLength(preCycleLength)
         walk.setCycleLength(embryoCycleLength)
