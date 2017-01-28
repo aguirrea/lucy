@@ -35,9 +35,9 @@
     <File>
         <Name>Lucy vrep model</Name>
         <!--<Value>/simulator/models/genetic_bioloid.ttt</Value> -->
-        <Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value>
+        <!--<Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value> -->
         <!--<Value>/simulator/models/genetic_bioloid_without_texture_with_double_floor_friction.ttt</Value> -->
-        <!--<Value>/simulator/models/genetic_bioloid_without_texture_with_triple_floor_friction.ttt</Value> -->
+        <Value>/simulator/models/genetic_bioloid_without_texture_with_triple_floor_friction.ttt</Value>
         <!--<Value>/simulator/models/genetic_bioloid_Bjorn_4_lucy.ttt</Value> -->
     </File>
     <File>
@@ -181,7 +181,7 @@
         <Name>Selection operator</Name>
         <!--<Value>Selectors.GUniformSelector</Value>-->
         <!--<Value>Selectors.GRankSelector</Value>-->
-        <Value>Selectors.GTournamentSelector</Value>
+        <Value>Selectors.GTournamentSelector</Value> <!-- pyevol uses RouletteWheel for the tournament selection-->
         <!--<Value>Selectors.GRouletteWheel</Value>-->
     </Property>
     <Property>
@@ -201,6 +201,6 @@
     </Property>
     <Property>
         <Name>Convergence criteria enable?</Name>
-        <Value>0</Value>
+        <Value>1</Value>
     </Property>
 </System>
