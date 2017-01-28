@@ -21,8 +21,8 @@
 import random
 import xml.etree.cElementTree as ET
 
-from simulator.LoadRobotConfiguration import LoadRobotConfiguration
-from simulator.Pose import Pose
+from tests.simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from tests.simulator.Pose import Pose
 
 
 class RandomIndividualGenerator:
@@ -53,5 +53,5 @@ class RandomIndividualGenerator:
         tree = ET.ElementTree(root)
         tree.write(self.file)
 
-randInd = RandomIndividualGenerator("borrame.xml")
-randInd.generateFile()
+'''randInd = RandomIndividualGenerator("borrame.xml")
+randInd.generateFile()'''
