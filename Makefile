@@ -20,7 +20,7 @@
 VREP_VERSION = V-REP_PRO_EDU_V3_3_0_64_Linux
 #VREP_VERSION = V-REP_PRO_EDU_V3_2_3_64_Linux
 #VREP_VERSION = V-REP_PRO_EDU_V3_2_2_64_Linux
-#VREP_VERSION = V-REP_PRO_EDU_V3_3_2_64_Linux
+#VREP_VERSION = V-REP_PRO_EDU_V3_3_2_64_Linux  don't use! slow simulations
 VREP_URL = http://coppeliarobotics.com/files/$(VREP_VERSION).tar.gz
 
 env: 
