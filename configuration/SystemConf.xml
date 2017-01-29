@@ -32,6 +32,10 @@
         <Name>Genetic Pool</Name>
         <Value>/gene_pool/</Value>
     </Directory>
+    <Directory>
+        <Name>Random Individual Files</Name>
+        <Value>/mocap/random/xml/</Value>
+    </Directory>
     <File>
         <Name>Lucy vrep model</Name>
         <!--<Value>/simulator/models/genetic_bioloid.ttt</Value> -->

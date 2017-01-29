@@ -90,6 +90,7 @@ def setInitialPopulation(ga_engine):
     BalieroDir = os.getcwd()+conf.getDirectory("Baliero transformed walk Files")
     ADHOCDir = os.getcwd()+conf.getDirectory("ADHOC Files")
     geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
+    randomDir = os.getcwd()+conf.getDirectory("Random Individual Files")
     
     population = ga_engine.getPopulation()
     popSize = len(population)
@@ -105,7 +106,7 @@ def setInitialPopulation(ga_engine):
 
     #the random initia population created is replaced by the imitation motion capture database
     if individualCounter < popSize:
-        for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
+        for filename in glob.glob(os.path.join(randomDir, '*.xml')):
             if individualCounter < popSize:
                 print individualCounter, " individuals processed!"
                 print 'inserting individual: ' + filename + " into the initial population"

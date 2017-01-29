@@ -25,7 +25,7 @@ from tests.configuration.LoadSystemConfiguration import LoadSystemConfiguration
 from helpers.RandomIndividualGenerator import RandomIndividualGenerator
 
 conf = LoadSystemConfiguration()
-geneticPoolDir = os.getcwd() + "/.." + conf.getDirectory("Genetic Pool")
+geneticPoolDir = os.getcwd() + "/.." + conf.getDirectory("Random Individual Files")
 #geneticPoolDirTmp = os.path.join(geneticPoolDir, "tmp")
 geneticPoolDirTmp = geneticPoolDir + "tmp/"
 print geneticPoolDirTmp
