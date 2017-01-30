@@ -181,7 +181,7 @@
         <Name>Selection operator</Name>
         <!--<Value>Selectors.GUniformSelector</Value>-->
         <!--<Value>Selectors.GRankSelector</Value>-->
-        <Value>Selectors.GTournamentSelector</Value> <!-- pyevol uses RouletteWheel for the tournament selection-->
+        <Value>Selectors.GTournamentSelector</Value> <!-- in pyevol the Tournament Selector uses the Roulette Wheel to pick individuals for the pool-->
         <!--<Value>Selectors.GRouletteWheel</Value>-->
     </Property>
     <Property>

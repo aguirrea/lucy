@@ -287,7 +287,7 @@ class SimulatedLucy(Lucy):
 
             jointExecutedCounter += 1
             self.updateLucyPosition()
-            print "distance traveled: ", self.distance
+
         self.poseExecuted = self.poseExecuted + self.getPosesExecutedByStepQty()
 
     def getFrame(self):

@@ -159,7 +159,7 @@ def chromosomeToLucyGeneticMatrix(chromosome): #TODO encapsulate this in a helpe
 def generationCallback(ga_engine):
     # persist best individual at the moment
     conf = LoadSystemConfiguration() #TODO make an object to encapsulate this kind of information
-    geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
+    geneticPoolDir = os.getcwd() + conf.getDirectory("Genetic Pool")
     gen = ga_engine.getCurrentGeneration()
     best = ga_engine.bestIndividual()
     score = best.getRawScore()
@@ -242,7 +242,7 @@ def eval_func(chromosome):
             fitness = individual.execute()
             print "candidateFitness: ", candidateFitness, "fitness: ", fitness
             while abs(candidateFitness-fitness) > 0.01:
-                candidateFitness=fitness
+                candidateFitness = fitness
                 fitness = individual.execute()
                 print "candidateFitness: ", candidateFitness, "fitness: ", fitness
             #the candidateFitness was validated!
