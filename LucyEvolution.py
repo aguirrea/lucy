@@ -49,7 +49,9 @@ experimentDir = ""
 def storeExperimentGAparameters():
     conf = LoadSystemConfiguration()
     file = open(os.path.join(experimentDir,"info.txt"),"w")
-    
+
+    file.write("RANDOM INITIAL POPULATION EXPERIMENT:" + "\n")
+
     file.write("initialPopulationSize = " + conf.getProperty("Population size") + "\n")
     file.write("generations = " + conf.getProperty("Number of generations") + "\n")
     file.write("genome.crossover = " + conf.getProperty("Crossover operator") + "\n")
