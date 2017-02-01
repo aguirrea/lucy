@@ -21,8 +21,8 @@
 import random
 import xml.etree.cElementTree as ET
 
-from tests.simulator.LoadRobotConfiguration import LoadRobotConfiguration
-from tests.simulator.Pose import Pose
+from simulator.LoadRobotConfiguration import LoadRobotConfiguration
+from simulator.Pose import Pose
 
 
 class RandomIndividualGenerator:
