@@ -108,7 +108,7 @@ def setInitialPopulation(ga_engine):
 def storeExperimentGAparameters():
     file = open(os.path.join(experimentDir,"info.txt"),"w")
 
-    file.write("FOURIER EXPERIMENT:") + "\n")
+    file.write("FOURIER EXPERIMENT:" + "\n")
 
     file.write("initialPopulationSize = " + systemConfiguration.getProperty("Population size") + "\n")
     file.write("generations = " + systemConfiguration.getProperty("Number of generations") + "\n")
@@ -369,6 +369,8 @@ def run_main():
         ga.selector.set(Selectors.GRouletteWheel)
     elif systemConfiguration.getProperty("Selection operator") == "Selectors.GUniformSelector" :
         ga.selector.set(Selectors.GUniformSelector)
+
+    ga.setMutationRate(float(systemConfiguration.getProperty("MutationRate")))
 
     '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation.
     While the rest of population...maybe by previous selection or you can define it as best fit survivors'''

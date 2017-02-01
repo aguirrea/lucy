@@ -109,7 +109,7 @@
     </Property>
     <Property>
         <Name>Lucy render enable</Name>
-        <Value>1</Value>
+        <Value>0</Value>
     </Property>
         <Property>
         <Name>blank screen?</Name>
@@ -137,7 +137,7 @@
     </Property>
     <Property>
         <Name>re-evaluate fittest?</Name>
-        <Value>1</Value>
+        <Value>0</Value>
     </Property>
     <Property>
         <Name>Concatenate walk cycles?</Name>
@@ -167,7 +167,7 @@
     </Property>
     <Property>
         <Name>Number of generations</Name>
-        <Value>60</Value>
+        <Value>40</Value>
     </Property>
     <Property>
         <Name>Crossover operator</Name>
@@ -192,7 +192,7 @@
     <Property>
         <Name>MutationRate</Name>
         <!--value between 0 and 0.1, 0.02 represents 0.2 %-->
-        <Value>0.05</Value>
+        <Value>0.06</Value>
     </Property>
     <Property>
         <!-- percentage of the best individuals that are copied to the next generation, p.e. 0.3 correspond to the 30% of the individuals-->

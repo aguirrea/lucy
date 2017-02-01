@@ -121,7 +121,7 @@ def setInitialPopulation(ga_engine):
                         else:
                             #put a sentinel joint value to mark the end of the individual
                             adan.setItem(i,j,sysConstants.JOINT_SENTINEL)
-                population[individualCounter]=adan
+                population[individualCounter]=adan #NOT NEEDED!
                 individualCounter = individualCounter + 1
             else:
                 break

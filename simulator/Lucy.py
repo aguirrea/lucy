@@ -29,7 +29,9 @@ import configuration.constants as sysConstants
 from AXAngle                        import AXAngle
 from Actuator                       import Actuator
 from Communication                  import CommSerial
-from FitnessFunctionFactory         import DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle
+
+#from FitnessFunctionFactory         import DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle
+from FitnessFunctionFactory         import DistanceFramesexecuted
 from LoadRobotConfiguration         import LoadRobotConfiguration
 from LoadSystemConfiguration        import LoadSystemConfiguration
 from Simulator                      import Simulator
@@ -220,7 +222,7 @@ class SimulatedLucy(Lucy):
             endCycleBalance = 0
 
         dtFitness = DTFitness(distance, concatenationGap, framesExecuted, endCycleBalance, angle)
-        fitnessFunction = DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle(dtFitness)
+        fitnessFunction = DistanceFramesexecuted(dtFitness)
 
 
         #dtFitness = DTFitness(distance=distance, concatenationGap=concatenationGap, framesExecuted=framesExecuted, angle=angle, cycleEnded=cycleEnded)
