@@ -21,8 +21,8 @@
 import glob, os, shutil
 import time
 
-from tests.configuration.LoadSystemConfiguration import LoadSystemConfiguration
-from helpers.RandomIndividualGenerator import RandomIndividualGenerator
+from configuration.LoadSystemConfiguration import LoadSystemConfiguration
+from RandomIndividualGenerator import RandomIndividualGenerator
 
 conf = LoadSystemConfiguration()
 geneticPoolDir = os.getcwd() + "/.." + conf.getDirectory("Random Individual Files")
