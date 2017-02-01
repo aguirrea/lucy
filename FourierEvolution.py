@@ -46,7 +46,6 @@ max_score_generation = 0
 convergenceCriteria = False
 experimentDir = ""
 FOURIER_CHROMOSOME_LENGTH = 255
-T = 0.5
 C_TIMESTEP = 0.05
 C_TIMEOFFSET = 10
 
@@ -62,15 +61,15 @@ def setInitialPopulation(ga_engine):
         adan = population[individualCounter]
         if individualCounter % 2 == 0:
             adan[0] = 0
-            adan[1] = math.pi/30
+            adan[1] = math.pi / 30
             adan[2] = 0
 
             adan[3] = 0
-            adan[4] = math.pi/30
+            adan[4] = math.pi / 30
             adan[5] = 0
 
-            adan[6] = math.pi/60
-            adan[7] = -1*math.pi/30
+            adan[6] = math.pi / 60
+            adan[7] = -1 * math.pi / 30
             adan[8] = 0
 
             adan[9] = 0
@@ -80,26 +79,31 @@ def setInitialPopulation(ga_engine):
             adan[12] = 0
             adan[13] = 0
             adan[14] = 0
+
+            adan[15] = 0.5
         else:
             adan[0] = 0
-            adan[1] = math.pi/18
+            adan[1] = math.pi / 18
             adan[2] = 0
 
             adan[3] = 0
             adan[4] = 0
             adan[5] = 0
 
-            adan[6] = -1*math.pi/36
-            adan[7] = math.pi/12
+            adan[6] = -1 * math.pi / 36
+            adan[7] = math.pi / 12
             adan[8] = 0
 
-            adan[9] = -1*math.pi/12
-            adan[10] = math.pi/12
+            adan[9] = -1 * math.pi / 12
+            adan[10] = math.pi / 12
             adan[11] = math.pi
 
-            adan[12] = math.pi/10
-            adan[13] = math.pi/60
-            adan[14] = -1*math.pi/12
+            adan[12] = math.pi / 10
+            adan[13] = math.pi / 60
+            adan[14] = -1 * math.pi / 12
+
+            adan[15] = 0.5
+
         individualCounter += 1
 
     global initialPopulationSetted
@@ -144,6 +148,8 @@ def persist_lucy_time_serie_from_chromosome(chromosome, filename, score):
     AP_A = chromosome[13]
     AP_Phi = chromosome[14]
 
+    T = chromosome[15]
+
     lucy = simulator.Lucy.SimulatedLucy(True)
     pose = {}
     poseNumber = 0
@@ -162,25 +168,25 @@ def persist_lucy_time_serie_from_chromosome(chromosome, filename, score):
         #Calculate Joint Angles
 
         #Shoulder Pitch
-        pose["L_Shoulder_Pitch"] = SP_C+SP_A*math.sin(2*math.pi*t/T+SP_Phi)
-        pose["R_Shoulder_Pitch"] = SP_C+SP_A*math.sin(2*math.pi*t/T+SP_Phi+math.pi)
+        pose["L_Shoulder_Pitch"] = SP_C + SP_A * math.sin(2 * math.pi * t / T + SP_Phi)
+        pose["R_Shoulder_Pitch"] = SP_C + SP_A * math.sin(2 * math.pi * t / T + SP_Phi + math.pi)
 
         #Hip Roll
-        pose["L_Hip_Roll"] = HR_C+HR_A*math.sin(2*math.pi*t/T+HR_Phi)
+        pose["L_Hip_Roll"] = HR_C + HR_A * math.sin(2 * math.pi * t / T + HR_Phi)
         pose["R_Hip_Roll"] = pose["L_Hip_Roll"]
 
         #Hip Pitch
-        pose["L_Hip_Pitch"] = HP_C+HP_A*math.sin(2*math.pi*t/T+HP_Phi)
-        print pose["L_Hip_Pitch"]
-        pose["R_Hip_Pitch"] = HP_C+HP_A*math.sin(2*math.pi*t/T+HP_Phi+math.pi)
+        pose["L_Hip_Pitch"] = HP_C + HP_A * math.sin(2 * math.pi * t / T + HP_Phi)
+
+        pose["R_Hip_Pitch"] = HP_C + HP_A * math.sin(2 * math.pi * t/ T + HP_Phi + math.pi)
 
         #Knee Pitch
-        pose["L_Knee"] = K_C+K_A*math.sin(2*math.pi*t/T+K_Phi)
-        pose["R_Knee"] = RK_Pos=K_C+K_A*math.sin(2*math.pi*t/T+K_Phi+math.pi)
+        pose["L_Knee"] = K_C + K_A * math.sin(2 * math.pi * t / T + K_Phi)
+        pose["R_Knee"] = K_C + K_A * math.sin(2 * math.pi * t / T + K_Phi + math.pi)
 
         #Ankle Pitch
-        pose["L_Ankle_Pitch"] = AP_C+AP_A*math.sin(2*math.pi*t/T+AP_Phi)
-        pose["R_Ankle_Pitch"] = AP_C+AP_A*math.sin(2*math.pi*t/T+AP_Phi+math.pi)
+        pose["L_Ankle_Pitch"] = AP_C + AP_A * math.sin(2 * math.pi * t / T + AP_Phi)
+        pose["R_Ankle_Pitch"] = AP_C + AP_A * math.sin(2 * math.pi * t / T + AP_Phi + math.pi)
 
         #Ankle Roll
         pose["L_Ankle_Roll"] = pose["L_Hip_Roll"]
@@ -204,27 +210,37 @@ def persist_lucy_time_serie_from_chromosome(chromosome, filename, score):
 
     lucy.stopLucy()
 
-    TFTparameters = ET.SubElement(lucyPersistence, "TFT parameters")
+    TFTparameters = ET.SubElement(root, "TFT_parameters")
+    shoulderPitch = ET.SubElement(TFTparameters, "Shoulder_Pitch")
 
-    TFTparameters.set("SP_C", str(SP_C))
-    TFTparameters.set("SP_A", str(SP_A))
-    TFTparameters.set("SP_Phi", str(SP_Phi))
+    shoulderPitch.set("SP_C", str(SP_C))
+    shoulderPitch.set("SP_A", str(SP_A))
+    shoulderPitch.set("SP_Phi", str(SP_Phi))
 
-    TFTparameters.set("HR_C", str(HR_C))
-    TFTparameters.set("HR_A", str(HR_A))
-    TFTparameters.set("HR_A", str(HR_A))
+    hipRoll = ET.SubElement(TFTparameters, "Hip_Roll")
 
-    TFTparameters.set("HP_C", str(HP_C))
-    TFTparameters.set("HP_A", str(HP_A))
-    TFTparameters.set("HP_Phi", str(HP_Phi))
+    hipRoll.set("HR_C", str(HR_C))
+    hipRoll.set("HR_A", str(HR_A))
+    hipRoll.set("HR_Phi", str(HR_Phi))
 
-    TFTparameters.set("K_C", str(K_C))
-    TFTparameters.set("K_A", str(K_A))
-    TFTparameters.set("K_Phi", str(K_Phi))
+    hipPitch = ET.SubElement(TFTparameters, "Hip_Pitch")
 
-    TFTparameters.set("AP_C", str(AP_C))
-    TFTparameters.set("AP_A", str(AP_A))
-    TFTparameters.set("AP_Phi", str(AP_Phi))
+    hipPitch.set("HP_C", str(HP_C))
+    hipPitch.set("HP_A", str(HP_A))
+    hipPitch.set("HP_Phi", str(HP_Phi))
+
+    kneePitch = ET.SubElement(TFTparameters, "Knee_Pitch")
+    kneePitch.set("K_C", str(K_C))
+    kneePitch.set("K_A", str(K_A))
+    kneePitch.set("K_Phi", str(K_Phi))
+
+    anklePitch = ET.SubElement(TFTparameters, "Ankle_Pitch")
+    anklePitch.set("AP_C", str(AP_C))
+    anklePitch.set("AP_A", str(AP_A))
+    anklePitch.set("AP_Phi", str(AP_Phi))
+
+    period = ET.SubElement(TFTparameters, "Period")
+    period.set("T", str(T))
 
     tree = ET.ElementTree(root)
     tree.write(filename)
@@ -257,6 +273,7 @@ def eval_func(chromosome):
     AP_A = chromosome[13]
     AP_Phi = chromosome[14]
 
+    T = chromosome[15]
 
     lucy = simulator.Lucy.SimulatedLucy(True)
     pose = {}
@@ -271,24 +288,24 @@ def eval_func(chromosome):
         #Calculate Joint Angles
 
         #Shoulder Pitch
-        pose["L_Shoulder_Pitch"] = SP_C+SP_A*math.sin(2*math.pi*t/T+SP_Phi)
-        pose["R_Shoulder_Pitch"] = SP_C+SP_A*math.sin(2*math.pi*t/T+SP_Phi+math.pi)
+        pose["L_Shoulder_Pitch"] = SP_C + SP_A * math.sin(2 * math.pi * t / T + SP_Phi)
+        pose["R_Shoulder_Pitch"] = SP_C + SP_A * math.sin(2 * math.pi * t / T + SP_Phi + math.pi)
 
         #Hip Roll
-        pose["L_Hip_Roll"] = HR_C+HR_A*math.sin(2*math.pi*t/T+HR_Phi)
+        pose["L_Hip_Roll"] = HR_C + HR_A * math.sin(2 * math.pi * t /T + HR_Phi)
         pose["R_Hip_Roll"] = pose["L_Hip_Roll"]
 
         #Hip Pitch
-        pose["L_Hip_Pitch"] = HP_C+HP_A*math.sin(2*math.pi*t/T+HP_Phi)
-        pose["R_Hip_Pitch"] = HP_C+HP_A*math.sin(2*math.pi*t/T+HP_Phi+math.pi)
+        pose["L_Hip_Pitch"] = HP_C + HP_A * math.sin(2 * math.pi * t / T + HP_Phi)
+        pose["R_Hip_Pitch"] = HP_C + HP_A * math.sin(2 * math.pi * t/T + HP_Phi + math.pi)
 
         #Knee Pitch
-        pose["L_Knee"] = K_C+K_A*math.sin(2*math.pi*t/T+K_Phi)
-        pose["R_Knee"] = RK_Pos=K_C+K_A*math.sin(2*math.pi*t/T+K_Phi+math.pi)
+        pose["L_Knee"] = K_C + K_A * math.sin(2 * math.pi * t / T + K_Phi)
+        pose["R_Knee"] = K_C + K_A * math.sin(2 * math.pi * t/T + K_Phi + math.pi)
 
         #Ankle Pitch
-        pose["L_Ankle_Pitch"] = AP_C+AP_A*math.sin(2*math.pi*t/T+AP_Phi)
-        pose["R_Ankle_Pitch"] = AP_C+AP_A*math.sin(2*math.pi*t/T+AP_Phi+math.pi)
+        pose["L_Ankle_Pitch"] = AP_C + AP_A * math.sin(2 * math.pi * t / T + AP_Phi)
+        pose["R_Ankle_Pitch"] = AP_C + AP_A * math.sin(2 * math.pi * t / T + AP_Phi + math.pi)
 
         #Ankle Roll
         pose["L_Ankle_Roll"] = pose["L_Hip_Roll"]
@@ -351,7 +368,7 @@ def run_main():
     generations = int(systemConfiguration.getProperty("Number of generations"))
     # Genome instance
 
-    genome = G1DList.G1DList(15)
+    genome = G1DList.G1DList(16)
     genome.setParams(rangemin=-50, rangemax=50)
     # The evaluator function (objective function)
     genome.evaluator.set(eval_func)
