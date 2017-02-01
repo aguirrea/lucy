@@ -60,25 +60,46 @@ def setInitialPopulation(ga_engine):
 
     while individualCounter < popSize:
         adan = population[individualCounter]
-        adan[0] = 0
-        adan[1] = math.pi/30
-        adan[2] = 0
+        if individualCounter % 2 == 0:
+            adan[0] = 0
+            adan[1] = math.pi/30
+            adan[2] = 0
 
-        adan[3] = 0
-        adan[4] = math.pi/30
-        adan[5] = 0
+            adan[3] = 0
+            adan[4] = math.pi/30
+            adan[5] = 0
 
-        adan[6] = math.pi/60
-        adan[7] = -1*math.pi/30
-        adan[8] = 0
+            adan[6] = math.pi/60
+            adan[7] = -1*math.pi/30
+            adan[8] = 0
 
-        adan[9] = 0
-        adan[10] = 0
-        adan[11] = 0
+            adan[9] = 0
+            adan[10] = 0
+            adan[11] = 0
 
-        adan[12] = 0
-        adan[13] = 0
-        adan[14] = 0
+            adan[12] = 0
+            adan[13] = 0
+            adan[14] = 0
+        else:
+            adan[0] = 0
+            adan[1] = math.pi/18
+            adan[2] = 0
+
+            adan[3] = 0
+            adan[4] = 0
+            adan[5] = 0
+
+            adan[6] = -1*math.pi/36
+            adan[7] = math.pi/12
+            adan[8] = 0
+
+            adan[9] = -1*math.pi/12
+            adan[10] = math.pi/12
+            adan[11] = math.pi
+
+            adan[12] = math.pi/10
+            adan[13] = math.pi/60
+            adan[14] = -1*math.pi/12
         individualCounter += 1
 
     global initialPopulationSetted
@@ -87,7 +108,7 @@ def setInitialPopulation(ga_engine):
 def storeExperimentGAparameters():
     file = open(os.path.join(experimentDir,"info.txt"),"w")
 
-    file.write("FOURIER EXPERIMENT:")
+    file.write("FOURIER EXPERIMENT:") + "\n")
 
     file.write("initialPopulationSize = " + systemConfiguration.getProperty("Population size") + "\n")
     file.write("generations = " + systemConfiguration.getProperty("Number of generations") + "\n")
@@ -126,14 +147,13 @@ def persist_lucy_time_serie_from_chromosome(chromosome, filename, score):
     lucy = simulator.Lucy.SimulatedLucy(True)
     pose = {}
     poseNumber = 0
-    counter = 0
     isUp = lucy.isLucyUp()
     startTime = time.time()
 
     root = ET.Element("root")
     lucyPersistence = ET.SubElement(root, "Lucy")
 
-    while isUp and counter <= FOURIER_CHROMOSOME_LENGTH:
+    while isUp and poseNumber < FOURIER_CHROMOSOME_LENGTH:
         frame = ET.SubElement(lucyPersistence, "frame")
         frame.set("number", str(poseNumber))
         simTime = time.time() - startTime
@@ -174,6 +194,8 @@ def persist_lucy_time_serie_from_chromosome(chromosome, filename, score):
             angle = pose[joint]
             xmlJoint.set("angle", str(angle))
 
+        poseNumber += 1
+
     fitness = lucy.getFitness(FOURIER_CHROMOSOME_LENGTH, 1)
     if fitness == score:
         print "stored fitness correspond with trained"
@@ -181,6 +203,29 @@ def persist_lucy_time_serie_from_chromosome(chromosome, filename, score):
         print "stored fitness DOESN'T correspond with trained"
 
     lucy.stopLucy()
+
+    TFTparameters = ET.SubElement(lucyPersistence, "TFT parameters")
+
+    TFTparameters.set("SP_C", str(SP_C))
+    TFTparameters.set("SP_A", str(SP_A))
+    TFTparameters.set("SP_Phi", str(SP_Phi))
+
+    TFTparameters.set("HR_C", str(HR_C))
+    TFTparameters.set("HR_A", str(HR_A))
+    TFTparameters.set("HR_A", str(HR_A))
+
+    TFTparameters.set("HP_C", str(HP_C))
+    TFTparameters.set("HP_A", str(HP_A))
+    TFTparameters.set("HP_Phi", str(HP_Phi))
+
+    TFTparameters.set("K_C", str(K_C))
+    TFTparameters.set("K_A", str(K_A))
+    TFTparameters.set("K_Phi", str(K_Phi))
+
+    TFTparameters.set("AP_C", str(AP_C))
+    TFTparameters.set("AP_A", str(AP_A))
+    TFTparameters.set("AP_Phi", str(AP_Phi))
+
     tree = ET.ElementTree(root)
     tree.write(filename)
 
