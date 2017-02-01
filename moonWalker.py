@@ -93,7 +93,7 @@ try:
     lucy.executeRawPose(newPose)'''
 
     while isUp and counter <= 400:
-        print "executin pose number: ", counter
+        print "executing pose number: ", counter
         frame = ET.SubElement(lucyPersistence, "frame")
         frame.set("number", str(poseNumber))
 
@@ -113,7 +113,7 @@ try:
         pose["R_Hip_Pitch"] = HP_C+HP_A*math.sin(2*math.pi*t/T+HP_Phi+math.pi)
         #Knee Pitch
         pose["L_Knee"] = K_C+K_A*math.sin(2*math.pi*t/T+K_Phi)
-        pose["R_Knee"] = RK_Pos=K_C+K_A*math.sin(2*math.pi*t/T+K_Phi+math.pi)
+        pose["R_Knee"] = K_C+K_A*math.sin(2*math.pi*t/T+K_Phi+math.pi)
         #Ankle Pitch
         pose["L_Ankle_Pitch"] = AP_C+AP_A*math.sin(2*math.pi*t/T+AP_Phi)
         pose["R_Ankle_Pitch"] = AP_C+AP_A*math.sin(2*math.pi*t/T+AP_Phi+math.pi)
