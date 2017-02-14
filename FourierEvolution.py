@@ -49,7 +49,7 @@ experimentDir = ""
 FOURIER_CHROMOSOME_LENGTH = 255
 C_TIMESTEP = 0.05
 C_TIMEOFFSET = 10
-T = 0.5
+T = 1.0
 
 def setInitialPopulation(ga_engine):
 
@@ -62,48 +62,48 @@ def setInitialPopulation(ga_engine):
     while individualCounter < popSize:
         adan = population[individualCounter]
         if individualCounter % 2 == 0:
-            adan[0] = 0 #SP_C
+            adan[0] = 0.0 #SP_C
             adan[1] = math.pi / 30 #SP_A 0,104719733
-            adan[2] = 0 #SP_Phi
+            adan[2] = 0.0 #SP_Phi
 
-            adan[3] = 0 #HR_C
+            adan[3] = 0.0 #HR_C
             adan[4] = math.pi / 30 #HR_A 0,104719733
-            adan[5] = 0 #HR_Phi
+            adan[5] = 0.0 #HR_Phi
 
             adan[6] = math.pi / 60 #HP_C 0,052359867
-            adan[7] = -1 * math.pi / 30 #HP_A 0,104719733
-            adan[8] = 0 #HP_Phi
+            adan[7] = -1 * math.pi / 30 #HP_A -0,104719733
+            adan[8] = 0.0 #HP_Phi
 
-            adan[9] = 0  #K_C
-            adan[10] = 0 #K_A
-            adan[11] = 0 #K_Phi
+            adan[9] = 0.0  #K_C
+            adan[10] = 0.0 #K_A
+            adan[11] = 0.0 #K_Phi
 
-            adan[12] = 0 #AP_C
-            adan[13] = 0 #AP_A
-            adan[14] = 0 #AP_Phi
+            adan[12] = 0.0 #AP_C
+            adan[13] = 0.0 #AP_A
+            adan[14] = 0.0 #AP_Phi
 
             #adan[15] = 0.5
 
         else:
-            adan[0] = 0
+            adan[0] = 0.0
             adan[1] = math.pi / 18 #0,174532889
-            adan[2] = 0
+            adan[2] = 0.0
 
-            adan[3] = 0
-            adan[4] = 0
-            adan[5] = 0
+            adan[3] = 0.0
+            adan[4] = 0.0
+            adan[5] = 0.0
 
-            adan[6] = -1 * math.pi / 36 #0,087266444
+            adan[6] = -1 * math.pi / 36 #-0,087266444
             adan[7] = math.pi / 12 #0,261799333
-            adan[8] = 0
+            adan[8] = 0.0
 
-            adan[9] = -1 * math.pi / 12 #0,261799333
+            adan[9] = -1 * math.pi / 12 #-0,261799333
             adan[10] = math.pi / 12 #0,261799333
             adan[11] = math.pi
 
             adan[12] = math.pi / 10 #0,3141592
             adan[13] = math.pi / 60 #0,052359867
-            adan[14] = -1 * math.pi / 12 #0,261799333
+            adan[14] = -1 * math.pi / 12 #-0,261799333
 
             #adan[15] = 0.5
 
@@ -374,7 +374,7 @@ def run_main():
     # Genome instance
 
     genome = G1DList.G1DList(16)
-    genome.setParams(rangemin=0.0, rangemax=0.3)
+    genome.setParams(rangemin=-0.3, rangemax=0.3)
 
     genome.initializator.set(Initializators.G1DListInitializatorReal)
 
