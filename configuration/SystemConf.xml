@@ -171,11 +171,15 @@
     </Property>
     <Property>
         <Name>Crossover operator</Name>
-        <Value>crossovers.G2DListCrossoverSingleNearHPoint</Value>
+        <!-- <Value>crossovers.G2DListCrossoverSingleNearHPoint</Value> -->
+        <Value>Crossovers.G2DListCrossoverSingleHPoint</Value>
     </Property>
     <Property>
         <Name>Mutator operator</Name>
-        <Value>mutators.G2DListMutatorRealGaussianSpline</Value>
+        <!-- <Value>mutators.G2DListMutatorRealGaussianSpline</Value> -->
+        <!-- <Value>mutators.G2DListMutatorRealGaussianSpline</Value> -->
+        <Value>Mutators.G2DListMutatorRealGaussianGradient</Value>
+
     </Property>
     <Property>
         <Name>Selection operator</Name>
@@ -201,6 +205,6 @@
     </Property>
     <Property>
         <Name>Convergence criteria enable?</Name>
-        <Value>1</Value>
+        <Value>0</Value>
     </Property>
 </System>

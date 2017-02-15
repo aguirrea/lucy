@@ -24,6 +24,7 @@ import os
 import shutil
 import time
 
+from pyevolve import Crossovers
 from pyevolve import DBAdapters
 from pyevolve import G2DList
 from pyevolve import GSimpleGA
@@ -268,6 +269,8 @@ def run_main():
     genome.evaluator.set(eval_func)
     if conf.getProperty("Crossover operator") == "crossovers.G2DListCrossoverSingleNearHPoint":
         genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPoint)
+    elif conf.getProperty("Crossover operator") == "Crossovers.G2DListCrossoverSingleHPoint":
+        genome.crossover.set(Crossovers.G2DListCrossoverSingleHPoint)
 
     #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPointImprove)
     #genome.crossover.set(crossovers.G2DListCrossoverSingleHPoint)
@@ -282,6 +285,7 @@ def run_main():
         genome.mutator.set(mutators.G2DListMutatorRealGaussianSpline)
     elif conf.getProperty("Mutator operator") == "Mutators.G2DListMutatorRealGaussianGradient":
         genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
+
     
     ga.setMutationRate(float(conf.getProperty("MutationRate")))
     
