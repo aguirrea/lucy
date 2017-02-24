@@ -1,4 +1,4 @@
 cd helpers
 ./RandomPopulationGenerator.py
 cd ..
-stdbuf -oL ./LucyEvolution.py > out.txt
+sudo nice -n-20 stdbuf -oL ./LucyEvolution.py > out.txt
