@@ -18,52 +18,52 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from xml.dom import minidom
 import os
-confFile = os.getcwd()+"/configuration/SystemConf.xml"
+from xml.dom import minidom
+
+confFile = os.getcwd() + "/configuration/SystemConf.xml"
+
 
 class LoadSystemConfiguration:
-    
     def __init__(self):
         self.directoryValueMapping = {}
         self.fileValueMapping = {}
         self.propertyValueMapping = {}
         xmldoc = minidom.parse(confFile)
-        itemlist = xmldoc.getElementsByTagName("Directory") 
+        itemlist = xmldoc.getElementsByTagName("Directory")
         for i in itemlist:
             for j in xrange(len(i.getElementsByTagName("Name"))):
                 name = i.getElementsByTagName("Name")[j]
-                id   = i.getElementsByTagName("Value")[j]
-                #print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
-                self.directoryValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml() 
-        itemlist = xmldoc.getElementsByTagName("File") 
+                id = i.getElementsByTagName("Value")[j]
+                # print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
+                self.directoryValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml()
+        itemlist = xmldoc.getElementsByTagName("File")
         for i in itemlist:
             for j in xrange(len(i.getElementsByTagName("Name"))):
                 name = i.getElementsByTagName("Name")[j]
-                id   = i.getElementsByTagName("Value")[j]
-                #print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
-                self.fileValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml() 
-        
-        itemlist = xmldoc.getElementsByTagName("Property") 
+                id = i.getElementsByTagName("Value")[j]
+                # print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
+                self.fileValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml()
+
+        itemlist = xmldoc.getElementsByTagName("Property")
         for i in itemlist:
             for j in xrange(len(i.getElementsByTagName("Name"))):
                 name = i.getElementsByTagName("Name")[j]
-                id   = i.getElementsByTagName("Value")[j]
-                #print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
-                self.propertyValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml() 
-            
+                id = i.getElementsByTagName("Value")[j]
+                # print "Name:" + name.childNodes[0].toxml() + " Id: " + id.childNodes[0].toxml()
+                self.propertyValueMapping[(name.childNodes[0].toxml())] = id.childNodes[0].toxml()
+
     def getDirectory(self, name):
-        return(self.directoryValueMapping[name])
+        return self.directoryValueMapping[name]
 
     def getFile(self, name):
-        return(self.fileValueMapping[name])
+        return self.fileValueMapping[name]
 
     def getProperty(self, name):
-        return(self.propertyValueMapping[name])
+        return self.propertyValueMapping[name]
 
     def getVrepNotImplementedBioloidJoints(self):
-        return(self.propertyValueMapping["Vrep not implemented joints"].split())
-    
-    
-#conf = LoadSystemConfiguration()
-#print conf.getDirectory("Transformed mocap Files")
+        return self.propertyValueMapping["Vrep not implemented joints"].split()
+
+# conf = LoadSystemConfiguration()
+# print conf.getDirectory("Transformed mocap Files")
