@@ -171,14 +171,14 @@
     </Property>
     <Property>
         <Name>Crossover operator</Name>
-        <!-- <Value>crossovers.G2DListCrossoverSingleNearHPoint</Value> -->
-        <Value>Crossovers.G2DListCrossoverSingleHPoint</Value>
+        <Value>crossovers.G2DListCrossoverSingleNearHPoint</Value>
+        <!-- <Value>Crossovers.G2DListCrossoverSingleHPoint</Value> -->
     </Property>
     <Property>
         <Name>Mutator operator</Name>
         <!-- <Value>mutators.G2DListMutatorRealGaussianSpline</Value> -->
-        <!-- <Value>mutators.G2DListMutatorRealGaussianSpline</Value> -->
-        <Value>Mutators.G2DListMutatorRealGaussianGradient</Value>
+        <Value>mutators.G2DListMutatorRealGaussianSpline</Value> 
+        <!-- <Value>Mutators.G2DListMutatorRealGaussianGradient</Value> -->
 
     </Property>
     <Property>
