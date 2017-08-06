@@ -349,6 +349,7 @@ def run_main():
     
     shutil.copy2('pyevolve.db', experimentDir)
     shutil.copy2(conf.getProperty("System Log"), experimentDir)
+    os.system("pyevolve_graph.py -i \"Lucy walk\" -3 -o gene_pool/experiment_img/$d -e png")
     
     #do the stats    
     print ga.getStatistics()
