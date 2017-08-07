@@ -74,7 +74,7 @@ AP_C = 0.0
 AP_Phi = 0.0860034350865
 '''
 
-T = 0.5
+T = 1.0
 C_TIMESTEP = 0.05
 C_TIMEOFFSET = 10
 
