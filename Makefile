@@ -37,6 +37,7 @@ env:
 	ln -s ../remoteApi.so ./tests
 	mkdir gene_pool
 	mkdir gene_pool/experiment_img/
+	mkdir mocap/cmu_mocap/bvh/transformed
 	
 clean:
 	rm -rf V-REP_PRO_EDU_V*
