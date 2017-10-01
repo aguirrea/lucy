@@ -126,6 +126,7 @@ def setInitialPopulation(ga_engine):
                 individualCounter = individualCounter + 1
             else:
                 break
+    #uncomment this block and comment the one above to use individuals with vainilla format
     '''
     if individualCounter < popSize:
         for filename in glob.glob(os.path.join(lucyCycles, '*.xml')):
