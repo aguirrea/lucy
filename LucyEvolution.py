@@ -46,6 +46,7 @@ max_score = 0
 max_score_generation = 0
 convergenceCriteria = False
 experimentDir = ""
+experimentTime = ""
 
 def storeExperimentGAparameters():
     conf = LoadSystemConfiguration()
@@ -127,9 +128,9 @@ def setInitialPopulation(ga_engine):
             else:
                 break
     #uncomment this block and comment the one above to use individuals with vainilla format
-    '''
-    if individualCounter < popSize:
-        for filename in glob.glob(os.path.join(lucyCycles, '*.xml')):
+
+    '''if individualCounter < popSize:
+        for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
             if individualCounter < popSize:
                 print individualCounter, " individuals processed!"
                 print 'inserting individual: ' + filename + " into the initial population"
@@ -183,6 +184,8 @@ def generationCallback(ga_engine):
     if gen == 0:
         global experimentDir
         experimentDir = geneticPoolDir + timestr
+        global experimentTime
+        experimentTime = timestr
         os.mkdir(experimentDir)
         storeExperimentGAparameters()
 
@@ -350,7 +353,7 @@ def run_main():
     
     shutil.copy2('pyevolve.db', experimentDir)
     shutil.copy2(conf.getProperty("System Log"), experimentDir)
-    os.system("pyevolve_graph.py -i \"Lucy walk\" -3 -o gene_pool/experiment_img/" + experimentDir + "_" + timestr + " -e png")
+    os.system("pyevolve_graph.py -i \"Lucy walk\" -3 -o gene_pool/experiment_img/" + experimentTime + " -e png")
     
     #do the stats    
     print ga.getStatistics()
