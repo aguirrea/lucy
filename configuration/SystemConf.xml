@@ -145,7 +145,7 @@
         <!-- 0 means not concatenate cycles, n > 1; means that the cycle will be repeated n times-->
         <!--<Value>16</Value>-->
         <!--<Value>11</Value>-->
-        <Value>5</Value>
+        <Value>4</Value>
     </Property>
     <Property>
         <!-- once a good wal cycle is found, is used as pre-cycle to search for the following cycle-->
@@ -164,11 +164,11 @@
 
     <Property>
         <Name>Population size</Name>
-        <Value>30</Value>
+        <Value>32</Value>
     </Property>
     <Property>
         <Name>Number of generations</Name>
-        <Value>60</Value>
+        <Value>200</Value>
     </Property>
     <Property>
         <Name>Crossover operator</Name>
@@ -206,6 +206,6 @@
     </Property>
     <Property>
         <Name>Convergence criteria enable?</Name>
-        <Value>0</Value>
+        <Value>1</Value>
     </Property>
 </System>
