@@ -31,19 +31,27 @@ class Actuator:
         self.communication = communication
 
     def checksum_check(self, msg):
-        checksum = 0    
+        checksum = 0
         for i in range(2, len(msg)):
             checksum = (checksum + msg[i])%256
         checksum = 255 - checksum
         return checksum
 
     def make_msg(self, id, instruction, parameters=[]):
-        msg = []    
-        length_field = len(parameters) + 2    
-        msg = [0xff, 0xff, id, length_field, instruction] + parameters 
+        msg = []
+        length_field = len(parameters) + 2
+        msg = [0xff, 0xff, id, length_field, instruction] + parameters
         checksum = self.checksum_check(msg)
         msg.append(checksum)
         return msg
+
+    def sync_write(self, joints):
+        goal_position_low = goal_position & 0xff
+        goal_position_high = (goal_position & 0xff00) >> 8
+        angular_speed_low = angular_speed & 0xff
+        angular_speed_high = (angular_speed & 0xff00) >> 8
+        msg = self.make_msg(0xfe, Instruction.SYNC_WRITE, [Register.GOAL_POSITION, goal_position_low, goal_position_high, angular_speed_low, angular_speed_high])
+        self.communication.send_msg(msg)
 
     def move_actuator(self, id, goal_position, angular_speed):
         goal_position_low = goal_position & 0xff
@@ -57,24 +65,24 @@ class Actuator:
         angular_speed_low = angular_speed & 0xff
         angular_speed_high = (angular_speed & 0xff00) >> 8
         msg = self.make_msg(id, Instruction.WRITE_DATA, [Register.MOVING_SPEED, angular_speed_low, angular_speed_high])
-        self.communication.send_msg(msg)  
+        self.communication.send_msg(msg)
 
     def led_state_change(self, id, led_state):
         msg = self.make_msg(id, Instruction.WRITE_DATA, [Register.LED, led_state])
         #print msg
         self.communication.send_msg(msg)
-        
+
     def factory_reset(self, id=BROADCAST_ID):
         msg = self.make_msg(id, Instruction.RESET, [])
-        self.communication.send_msg(msg)    
-        
+        self.communication.send_msg(msg)
+
     def ping(self, id=BROADCAST_ID):
         msg = self.make_msg(id, Instruction.PING, [])
         self.communication.send_msg(msg)
 
     def setear_id(self, newID):
         msg = self.make_msg(BROADCAST_ID, Instruction.WRITE_DATA, [Register.ID, newID])
-        self.communication.send_msg(msg) 
+        self.communication.send_msg(msg)
 
     def get_position(self, id):
         AXposition = AXAngle()
@@ -83,6 +91,9 @@ class Actuator:
         positionRequestMsg = self.make_msg(id, Instruction.READ_DATA, [Register.CURRENT_POSITION, bytesToRead])
         self.communication.send_msg(positionRequestMsg)
         ret = self.communication.recv_msg()
+        print ("*******")
+        print (ret)
+        print ("*******")
         positionHighByte = ret[4]
         positionHighByte = positionHighByte << 8
         positionLowByte  = ret[3]

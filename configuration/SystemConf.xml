@@ -38,7 +38,7 @@
         <!--<Value>/simulator/models/genetic_bioloid_without_texture.ttt</Value> -->
         <!--<Value>/simulator/models/genetic_bioloid_without_texture_with_double_floor_friction.ttt</Value> -->
         <!-- <Value>/simulator/models/genetic_bioloid_without_texture_with_triple_floor_friction.ttt</Value> -->
-        <Value>/simulator/models/genetic_bioloid_without_texture_with_ten_floor_friction.ttt</Value> 
+        <Value>/simulator/models/genetic_bioloid_without_texture_with_ten_floor_friction.ttt</Value>
         <!--<Value>/simulator/models/genetic_bioloid_Bjorn_4_lucy.ttt</Value> -->
     </File>
     <File>
@@ -118,7 +118,7 @@
     </Property>
     <Property>
         <Name>Lucy simulated?</Name>
-        <Value>1</Value>
+        <Value>0</Value>
     </Property>
     <Property>
         <Name>synchronous mode?</Name>
@@ -134,7 +134,7 @@
     </Property>
     <Property>
         <Name>physics enable?</Name>
-        <Value>1</Value>
+        <Value>0</Value>
     </Property>
     <Property>
         <Name>re-evaluate fittest?</Name>
@@ -178,7 +178,7 @@
     <Property>
         <Name>Mutator operator</Name>
         <!-- <Value>mutators.G2DListMutatorRealGaussianSpline</Value> -->
-        <Value>mutators.G2DListMutatorRealGaussianSpline</Value> 
+        <Value>mutators.G2DListMutatorRealGaussianSpline</Value>
         <!-- <Value>Mutators.G2DListMutatorRealGaussianGradient</Value> -->
 
     </Property>

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Andrés Aguirre Dorelo
 # MINA/INCO/UDELAR
-# 
+#
 # Lucy robot software representation.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -72,23 +72,27 @@ class Lucy(object):
         pass
 
     def getPosesExecutedByStepQty(self):
-        pass  
+        pass
 
 #Lucy instanciated in a Bioloid Premium robot
 class PhysicalLucy(Lucy):
 
     def __init__(self):
+
         Lucy.__init__(self)
         self.comm_tty = CommSerial()
         self.comm_tty.connect()
         self.actuator = Actuator(self.comm_tty)
         self.defaultSpeed = 600 #TODO change this, use configuration files
         self.initialPoses = {}
+        self.currentPoses = {}
 
+        '''
         #checking communication with motors
         for joint in self.joints:
             jointID = self.robotConfiguration.loadJointId(joint)
-            print jointID
+
+            print 'joint id: ' + str(jointID)
             self.initialPoses[joint] = self.actuator.get_position(jointID).toDegrees()
             print jointID, joint, self.initialPoses[joint]
             time.sleep(0.1)
@@ -99,25 +103,91 @@ class PhysicalLucy(Lucy):
 
         for joint in self.joints:
             self.actuator.led_state_change(self.robotConfiguration.loadJointId(joint), 0)
+        '''
 
     def getPosesExecutedByStepQty(self):
         return 1
 
     def executePose(self, pose):
+
+        start_pose = time.time()
         #set positions and wait that the actuator reaching that position
         #TODO tener en cuenta los motores que están invertidos, creo que los únicos que están quedando son los de los hombros
-        for joint in self.RobotImplementedJoints:
-            if joint == "L_Hip_Pitch":
-                angle = pose.getValue(joint)
-                print "el angulo es: ", angle
-                angleAX = AXAngle()
-                angleAX.setDegreeValue(300 - angle)
-                #TODO implement method for setting position of all actuators at the same time
-                self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), int(angleAX.getValue()), self.defaultSpeed)
-                self.poseExecuted = self.poseExecuted + 1
-        print "pose executed!"
-        time.sleep(0.2)
 
+        max_speed = 700
+        min_speed = 10
+
+        #Algorithm for setting speed and angles for each motor
+        max_distance = 0
+        start = time.time()
+
+        for joint in self.RobotImplementedJoints:
+            desired_angle = pose.getValue(joint)
+
+            if desired_angle > 300:
+                print "Invalid angle " + str(desired_angle)
+
+            jointID = self.robotConfiguration.loadJointId(joint)
+            self.currentPoses[joint] = self.actuator.get_position(jointID).toDegrees()
+            distance = abs(desired_angle - self.currentPoses[joint])
+            if distance > max_distance :
+                max_distance = distance
+
+        end = time.time()
+        print (end-start)
+        print "Max distance: " + str(max_distance)
+
+        for joint in self.RobotImplementedJoints:
+
+            desired_angle = pose.getValue(joint)
+
+            if desired_angle > 300:
+                desired_angle = 300
+
+            start = time.time()
+            jointID = self.robotConfiguration.loadJointId(joint)
+
+            distance = abs(desired_angle - self.currentPoses[joint])
+            speed = int((distance * max_speed) / max_distance)
+
+            if speed > max_speed:
+                speed = max_speed
+            elif speed < min_speed:
+                speed = min_speed
+
+            #self.actuator.set_speed_actuator(jointID, angular_speed)
+            end = time.time()
+            print (end-start)
+        #for joint in self.RobotImplementedJoints:
+
+            angle = int(desired_angle)
+
+            print "Joint: ", jointID
+            print "Angle: ", angle
+            print "Speed: ", speed
+
+            angleAX = AXAngle()
+
+            if (joint == "L_Ankle_Pitch" or
+                joint == "L_Knee" or
+                joint == "L_Hip_Pitch" or
+                joint == "L_Shoulder_Pitch" ):
+
+
+                angleAX.setDegreeValue(300 - angle)
+            else:
+                angleAX.setDegreeValue(angle)
+
+            #TODO implement method for setting position of all actuators at the same time
+            self.actuator.move_actuator(jointID, int(angleAX.getValue()), speed)
+
+            self.poseExecuted = self.poseExecuted + 1
+
+        print "pose executed: ", str(self.poseExecuted)
+        end_pose = time.time()
+        print "Pose execution time: "
+        print (end_pose - start_pose)
+        time.sleep(0.1)
 
         '''
         for joint in self.RobotImplementedJoints:
@@ -162,7 +232,7 @@ class SimulatedLucy(Lucy):
         self.visible = visible
         genetic_bioloid = os.getcwd() + self.sysConf.getFile("Lucy vrep model")
         self.sim = Simulator(genetic_bioloid)
-        self.clientID = self.sim.getClientId() 
+        self.clientID = self.sim.getClientId()
         if self.clientID == -1:
             retry_counter = sysConstants.ERROR_RETRY
             time.sleep(0.1)
@@ -187,7 +257,7 @@ class SimulatedLucy(Lucy):
         if self.stop == False:
             self.time = time.time() - self.startTime
         return self.time
-        
+
     def getSimDistance(self):
         return self.distance
 
@@ -240,6 +310,7 @@ class SimulatedLucy(Lucy):
         return self.posesExecutedByStepQty
 
     def executePose(self, pose):
+
         error = False
         #Above's N joints will be received and set on the V-REP side at the same time
 
@@ -248,8 +319,8 @@ class SimulatedLucy(Lucy):
 
         error = self.sim.pauseSim(self.clientID) or error
         for joint in self.RobotImplementedJoints:
-            angle = pose.getValue(joint) 
-            angleAX = AXAngle()   
+            angle = pose.getValue(joint)
+            angleAX = AXAngle()
             angleAX.setDegreeValue(angle)
             #print "setting joint: ", joint, " to value: ", angle
 
@@ -294,14 +365,14 @@ class SimulatedLucy(Lucy):
         error = False
         pose = {}
         dontSupportedJoints = self.sysConf.getVrepNotImplementedBioloidJoints()
-        if (self.jointHandleCachePopulated == False): 
+        if (self.jointHandleCachePopulated == False):
             self.sim.populateJointHandleCache(self.clientID)
             self.jointHandleCachePopulated = True
         error = self.sim.pauseSim(self.clientID) or error
         for joint in self.joints:
             if joint not in dontSupportedJoints: #actual model of vrep bioloid don't support this joints
                 errorGetJoint, value = self.sim.getJointPositionNonBlock(self.clientID, joint, self.firstCallGetFrame)
-                error = error or errorGetJoint 
+                error = error or errorGetJoint
                 pose[joint] = 150 - value * 60
 
         self.firstCallGetFrame = False
@@ -309,7 +380,7 @@ class SimulatedLucy(Lucy):
         #if error:
         #    raise VrepException("error geting a frame", error)
         return error, pose
-    
+
     def angle(self,v):
         if v.imag >=0:
             resAngle = angle(v, True) #angle second argument is for operate with degrees instead of radians
@@ -334,7 +405,7 @@ class SimulatedLucy(Lucy):
         self.stop = True
         self.updateLucyPosition()
         self.sim.finishSimulation(self.clientID)
-            
+
     def isLucyUp(self):
         error, up = self.sim.isRobotUp(self.clientID)
         if error:
@@ -352,5 +423,3 @@ class SimulatedLucy(Lucy):
             #error = self.sim.resumePauseSim(self.clientID) or error
             self.distanceBeforMoveArmLastCall = self.distance
         return error
-
-

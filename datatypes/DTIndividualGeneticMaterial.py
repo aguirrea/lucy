@@ -74,7 +74,8 @@ class DTIndividualGeneticMaterial(object):
         #print "--------------------------------concatenationGap: ", concatenationGap
         #if concatenationGap < GAP_THRESHOLD :
         #self.calculateGapByLinearInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, beforeConcatenationLength, 1, True)
-        self.calculateGapByCubicInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, beforeConcatenationLength, 1)
+        # comente aca
+        #self.calculateGapByCubicInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, beforeConcatenationLength, 1)
 
     def repeat(self, times):
         self.geneticMatrix *= times
@@ -240,7 +241,7 @@ class DTIndividualGeneticMatrix(DTIndividualGeneticMaterial):
 class DTIndividualGeneticTimeSerieFileWalk(DTIndividualGeneticMaterial):
     def __init__(self, geneticMaterial):
         DTIndividualGeneticMaterial.__init__(self)
-        
+
         lp = LoadPoses(geneticMaterial)
         cycleSize = lp.getFrameQty()
         CYCLE_REPETITION = self.cyclesQty
@@ -249,13 +250,14 @@ class DTIndividualGeneticTimeSerieFileWalk(DTIndividualGeneticMaterial):
                               xrange(cycleSize)] * CYCLE_REPETITION
         #for debugging info:
         #self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION, True)
-        self.calculateGapByCubicInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION)
+        #Comente aca
+        #self.calculateGapByCubicInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION)
 
 
 class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
     def __init__(self, geneticMaterial):
         DTIndividualGeneticMaterial.__init__(self)
-        
+
         self.geneticMatrix = geneticMaterial
         CYCLE_REPETITION = self.cyclesQty
         cycleSize = self.getLength()
@@ -265,4 +267,3 @@ class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
         #for debugging info:
         #self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION, True)
         self.calculateGapByCubicInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION)
-

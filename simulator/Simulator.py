@@ -39,29 +39,31 @@ class Simulator:
         self.getObjectPositionFirstTime = True
         self.sysConf = LoadSystemConfiguration()
         #this data structure is like a cache for the joint handles
-        self.jointHandleMapping = {} 
+        self.jointHandleMapping = {}
         robotConf = LoadRobotConfiguration()
         self.model = simulatorModel
-        self.LucyJoints = robotConf.getJointsName()            
+        self.LucyJoints = robotConf.getJointsName()
+
         for joint in self.LucyJoints:
             self.jointHandleMapping[joint]=0
+
         self.clientId = self.connectVREP()
 
         if simulatorModel:
             #TODO try to reutilize the same scene for the sake of performance
             error = self.loadscn(self.clientId, simulatorModel)
             if error:
-                 raise VrepException("error loading Vrep robot model", -1)
-       
+                 raise VrepException("error loading Vrep robot model:" + error, -1)
+
         if int(self.sysConf.getProperty("synchronous mode?"))==1:
             self.synchronous = True
             vrep.simxSynchronousTrigger(self.clientId)
         else:
             self.synchronous = False
-        
+
         self.speedmodifier = int(self.sysConf.getProperty("speedmodifier"))
 
-        #setting the simulation time step                           
+        #setting the simulation time step
         self.simulationTimeStepDT = float(self.sysConf.getProperty("simulation time step"))
 
         '''#testing printing in vrep
@@ -89,17 +91,18 @@ class Simulator:
         return self.clientId
 
     def setClientId(self, idClient):
-        self.clientId = idClient 
+        self.clientId = idClient
 
     def getObjectPositionWrapper(self, clientID, LSP_Handle):
         if self.getObjectPositionFirstTime:
             error, ret = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_streaming)
             self.getObjectPositionFirstTime = False
         else:
-            error, ret = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_buffer) 
+            error, ret = vrep.simxGetObjectPosition(clientID, LSP_Handle, -1, vrep.simx_opmode_buffer)
         return error, ret
 
     def connectVREP(self, ipAddr=LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"Vrep IP"), port=int(LoadSystemConfiguration.getProperty(LoadSystemConfiguration(),"Vrep port"))):
+
         self.getObjectPositionFirstTime = True
         #vrep.simxFinish(-1) # just in case, close all opened connections #TODO this could be a problem when the connection pool is implemented
         time1 = time()
@@ -107,8 +110,9 @@ class Simulator:
         time2 = time()
         print "LOGGING time for connecting VREP in senconds: ", time2 - time1
         return clientID
-        
+
     def loadscn(self, clientID, model):
+
         time1 = time()
         error = vrep.simxLoadScene(clientID, model, 2, vrep.simx_opmode_oneshot_wait)
         time2 = time()
@@ -116,6 +120,7 @@ class Simulator:
         return error
 
     def printJointPositions(self, clientID):
+
         error, handlers, intData, floatData, stringData=vrep.simxGetObjectGroupData(clientID,vrep.sim_appobj_object_type,0,vrep.simx_opmode_oneshot_wait)
         itemHandle=0
         print stringData
@@ -181,23 +186,23 @@ class Simulator:
         if int(self.sysConf.getProperty("blank screen?"))==1:
             vrep.simxSetBooleanParameter(clientID,vrep.sim_boolparam_display_enabled,0,vrep.simx_opmode_oneshot_wait)
         return error
-        
+
     def pauseSim(self, clientID):
         return vrep.simxPauseCommunication(clientID,True)
-         
+
     def resumePauseSim(self, clientID):
         ret=vrep.simxPauseCommunication(clientID,False)
         if self.speedmodifier > 0:
-            vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_speedmodifier, self.speedmodifier, vrep.simx_opmode_oneshot_wait) 
+            vrep.simxSetIntegerParameter(clientID,vrep.sim_intparam_speedmodifier, self.speedmodifier, vrep.simx_opmode_oneshot_wait)
         return ret
 
-    #when the simulator is paused the call to simxGetObjectHandle returns error    
+    #when the simulator is paused the call to simxGetObjectHandle returns error
     def populateJointHandleCache(self, clientID):
         for joint in self.LucyJoints:
             error, handle = vrep.simxGetObjectHandle(clientID,joint,vrep.simx_opmode_oneshot_wait)
-            self.jointHandleMapping[joint]=handle 
+            self.jointHandleMapping[joint]=handle
         pass
-                
+
     def setJointPosition(self, clientID, joint, angle):
         error = False
         handle = self.jointHandleMapping[joint]
@@ -243,13 +248,13 @@ class Simulator:
         if self.synchronous:
             vrep.simxSynchronous(clientID,False)
         return error
-        
+
     def getBioloidPlannarPosition(self, clientID):
         errorHandler, LSP_Handle=vrep.simxGetObjectHandle(clientID,"Bioloid", vrep.simx_opmode_oneshot_wait)
         errorObjectPosition = True
         if not errorHandler:
             errorObjectPosition, bioloid_position = self.getObjectPositionWrapper(clientID, LSP_Handle)
-            #print "error handler: ", errorHandler, " error object position: ", errorObjectPosition 
+            #print "error handler: ", errorHandler, " error object position: ", errorObjectPosition
             if not errorHandler or errorObjectPosition:
                 return False, bioloid_position[0], bioloid_position[1]
         return True, None, None
@@ -300,12 +305,3 @@ class Simulator:
             self.armPositionXAxis = newArmPosition
         else:
             return MOVE_HELPER_ARM_ERROR
-
-        
-
-
-
-
-
-
-

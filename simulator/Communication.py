@@ -39,23 +39,23 @@ class Communication(object):
 class CommSimulator(Communication):
 
     def __init__(self, simulator_port = SIM_PORT, simulator_address = SIM_HOST):
-        Communication.__init__(self)	
+        Communication.__init__(self)
         self.port = simulator_port
         self.address = simulator_address
 
     def connect(self):
         client = socket.socket()
-        client.connect((SIM_HOST, SIM_PORT))  
+        client.connect((SIM_HOST, SIM_PORT))
         try:
             self.client = socket.socket()
-            self.client.connect((SIM_HOST, SIM_PORT))  
+            self.client.connect((SIM_HOST, SIM_PORT))
         except:
             print "error stablishing network connection"
 
     def send_msg(self, msg):
         #print "mando sim"
         try:
-            for val in msg:    
+            for val in msg:
                 self.client.send(chr(val))
         except:
             print "problems sending package"
@@ -63,7 +63,7 @@ class CommSimulator(Communication):
 
 class CommSerial(Communication):
 
-    def __init__(self, tty_node = "/dev/ttyUSB0", baudrate=1000000):
+    def __init__(self, tty_node = "/dev/tty.usbserial-A900fDga", baudrate=1000000):
         Communication.__init__(self)
         self.tty_node = tty_node
         self.baudrate = baudrate
@@ -82,13 +82,13 @@ class CommSerial(Communication):
     def send_msg(self, msg):
         #print "mando serial"
         try:
-            for val in msg:    
+            for val in msg:
                 self.client.write(chr(val))
         except:
             print "problems sending package"
-            
+
     def flushInput (self):
-        self.client.flushInput() 
+        self.client.flushInput()
 
     def getByte(self):
         return self.client.read(1)
@@ -96,10 +96,10 @@ class CommSerial(Communication):
     def recv_msg(self):
         checksum = 0;
         dato = chr(0)
-        packet = []     
+        packet = []
 
-        while (dato != chr(0xFF) and dato != ""):        
-            dato = self.client.read(1)       
+        while (dato != chr(0xFF) and dato != ""):
+            dato = self.client.read(1)
             #print "first read", hex(ord(dato))
         if (dato == ""):
             return 0
@@ -117,7 +117,7 @@ class CommSerial(Communication):
                 data = self.client.read(1)
                 packet.append(ord(data)) #packet[3]
 
-            data = self.client.read(1)        
+            data = self.client.read(1)
             checksum = ord(data)
         packet.append(checksum)
         return packet

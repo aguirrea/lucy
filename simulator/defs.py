@@ -62,6 +62,8 @@ class Instruction:
     REG_WRITE = 4
     ACTION = 5
     RESET = 6
-    SYNC_WRITE = 0X83 
-    
+    SYNC_READ = 0X82
+    SYNC_WRITE = 0X83
+
+
 # Fin
