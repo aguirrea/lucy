@@ -107,6 +107,9 @@
     <Property>
         <Name>Vrep not implemented joints</Name>
         <Value>R_Elbow_Yaw L_Elbow_Yaw L_Shoulder_Yaw R_Shoulder_Yaw</Value>
+
+      <!--  L_Shoulder_Pitch R_Shoulder_Pitch -->
+      <!--  <Value>L_Shoulder_Yaw R_Shoulder_Yaw L_Elbow_Yaw R_Elbow_Yaw L_Hip_Yaw R_Hip_Yaw L_Hip_Roll R_Hip_Roll L_Hip_Pitch R_Hip_Pitch L_Knee R_Knee L_Ankle_Pitch R_Ankle_Pitch L_Ankle_Roll R_Ankle_Roll</Value> -->
     </Property>
     <Property>
         <Name>Lucy render enable</Name>
@@ -138,7 +141,7 @@
     </Property>
     <Property>
         <Name>re-evaluate fittest?</Name>
-        <Value>1</Value>
+        <Value>0</Value>
     </Property>
     <Property>
         <Name>Concatenate walk cycles?</Name>
@@ -164,11 +167,11 @@
 
     <Property>
         <Name>Population size</Name>
-        <Value>30</Value>
+        <Value>5</Value>
     </Property>
     <Property>
         <Name>Number of generations</Name>
-        <Value>60</Value>
+        <Value>10</Value>
     </Property>
     <Property>
         <Name>Crossover operator</Name>

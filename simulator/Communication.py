@@ -63,6 +63,7 @@ class CommSimulator(Communication):
 
 class CommSerial(Communication):
 
+    #def __init__(self, tty_node = "/dev/tty.usbserial-A7005LBF", baudrate=1000000):
     def __init__(self, tty_node = "/dev/tty.usbserial-A900fDga", baudrate=1000000):
         Communication.__init__(self)
         self.tty_node = tty_node

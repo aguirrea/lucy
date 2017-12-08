@@ -20,6 +20,7 @@
 
 import os
 import time
+import datetime
 from numpy import angle
 
 from datatypes.DTFitness            import DTFitness
@@ -28,6 +29,7 @@ from errors.VrepException           import VrepException
 import configuration.constants as sysConstants
 from AXAngle                        import AXAngle
 from Actuator                       import Actuator
+#from DynamixelActuator              import DynamixelActuator
 from Communication                  import CommSerial
 from FitnessFunctionFactory         import DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle
 from LoadRobotConfiguration         import LoadRobotConfiguration
@@ -35,8 +37,13 @@ from LoadSystemConfiguration        import LoadSystemConfiguration
 from Simulator                      import Simulator
 
 
+MAX_SPEED = 500
+DEFAULT_SPEED = 250
+MIN_SPEED = 10
+
 #abstract class representing lucy abstraction base class
 class Lucy(object):
+
     def __init__(self):
         self.sysConf = LoadSystemConfiguration()
         self.robotConfiguration = LoadRobotConfiguration()
@@ -83,9 +90,18 @@ class PhysicalLucy(Lucy):
         self.comm_tty = CommSerial()
         self.comm_tty.connect()
         self.actuator = Actuator(self.comm_tty)
-        self.defaultSpeed = 600 #TODO change this, use configuration files
+        #self.defaultSpeed = 500 #TODO change this, use configuration files
         self.initialPoses = {}
-        self.currentPoses = {}
+
+        self.currentAngle = {}
+        self.targetAngle = {}
+        self.max_distance_joint = -1
+
+        self.syncSpeeds = {}
+        self.syncPositions = {}
+
+        self.minAngle = {1:0 , 2:0 , 3:45 , 4:55 , 5:46 , 6:50 , 7:140 , 8:110 , 9:110 , 10:140 , 11:35 , 12:125 , 13:55 , 14:145 , 15:125 , 16:50 , 17:110 , 18:100}
+        self.maxAngle = {1:300 , 2:300 , 3:245 , 4:255 , 5:250 , 6:254 , 7:190 , 8:160 , 9:160 , 10:190 , 11:175 , 12:265 , 13:155 , 14:245 , 15:250 , 16:175 , 17:200 , 18:190}
 
         '''
         #checking communication with motors
@@ -108,86 +124,231 @@ class PhysicalLucy(Lucy):
     def getPosesExecutedByStepQty(self):
         return 1
 
-    def executePose(self, pose):
 
-        start_pose = time.time()
-        #set positions and wait that the actuator reaching that position
-        #TODO tener en cuenta los motores que están invertidos, creo que los únicos que están quedando son los de los hombros
-
-        max_speed = 700
-        min_speed = 10
+    def findMaxDistance(self, pose):
 
         #Algorithm for setting speed and angles for each motor
         max_distance = 0
-        start = time.time()
+        max_distance_joint = -1
 
         for joint in self.RobotImplementedJoints:
-            desired_angle = pose.getValue(joint)
+            target_angle = pose.getValue(joint)
 
-            if desired_angle > 300:
-                print "Invalid angle " + str(desired_angle)
+            if (joint == "R_Ankle_Pitch" or joint == "R_Knee" or
+                joint == "L_Hip_Pitch" or joint == "L_Shoulder_Pitch" ):
+                target_angle = 300 - target_angle
+            else:
+                target_angle = target_angle
+
+            if target_angle > 300:
+                print "Invalid angle " + str(target_angle)
 
             jointID = self.robotConfiguration.loadJointId(joint)
-            self.currentPoses[joint] = self.actuator.get_position(jointID).toDegrees()
-            distance = abs(desired_angle - self.currentPoses[joint])
+            #self.currentAngle[joint] = self.actuator.get_position(jointID).toDegrees()
+            distance = abs(target_angle - self.currentAngle[joint])
             if distance > max_distance :
                 max_distance = distance
+                max_distance_joint = jointID
 
-        end = time.time()
-        print (end-start)
-        print "Max distance: " + str(max_distance)
+        return max_distance_joint, max_distance
+
+
+    def waitForCompletion(self, pose, timeout):
+
+        margin = 2
+        ended = False;
+        start_time = datetime.datetime.now()
+
+        while (not ended):
+
+            '''
+            for joint in self.RobotImplementedJoints:
+                jointID = self.robotConfiguration.loadJointId(joint)
+                self.currentAngle[joint] = self.actuator.get_position(jointID).toDegrees()
+                time.sleep(0.01)
+            '''
+            real_angle = self.actuator.get_position(self.max_distance_joint).toDegrees()
+
+            ended = True
+            #for joint in self.RobotImplementedJoints:
+            #if (not ((self.targetAngle[joint] - margin <= self.currentAngle[joint]) and (self.currentAngle[joint] < self.targetAngle[joint] + margin)) ):
+            if (not ((self.targetAngle[self.max_distance_joint] - margin <= real_angle) and (real_angle < self.targetAngle[self.max_distance_joint] + margin)) ):
+                ended = False
+                print ("False")
+                print "Real angle: ", real_angle
+                time.sleep(0.01)
+
+            '''
+            if ( (datetime.datetime.now()-start_time).microseconds >= timeout):
+                print (str(datetime.datetime.now()-start_time).microseconds))
+                print ("Timeout!")
+                ended = True;
+            '''
+
+        print ("llego el motor")
+
+
+    def idlePosition(self):
+
+        angleAX = AXAngle()
+
+        #Seteo brazos
+        angleAX.setDegreeValue(230)
+        self.actuator.move_actuator(4, int(angleAX.getValue()), DEFAULT_SPEED)
+        self.currentAngle[4] = 230
+        angleAX.setDegreeValue(70)
+        self.actuator.move_actuator(3, int(angleAX.getValue()), DEFAULT_SPEED)
+        self.currentAngle[3] = 70
+
+        angleAX.setDegreeValue(150)
+        self.actuator.move_actuator(5, int(angleAX.getValue()), DEFAULT_SPEED)
+        self.currentAngle[5] = 150
+        angleAX.setDegreeValue(150)
+        self.actuator.move_actuator(6, int(angleAX.getValue()), DEFAULT_SPEED)
+        self.currentAngle[6] = 150
+
+        #Seteo resto del cuerpo
 
         for joint in self.RobotImplementedJoints:
 
-            desired_angle = pose.getValue(joint)
 
-            if desired_angle > 300:
-                desired_angle = 300
-
-            start = time.time()
             jointID = self.robotConfiguration.loadJointId(joint)
 
-            distance = abs(desired_angle - self.currentPoses[joint])
-            speed = int((distance * max_speed) / max_distance)
+            if joint == 'L_Shoulder_Pitch':
+                self.syncPositions[jointID] = 230
+            elif joint == 'R_Shoulder_Pitch':
+                self.syncPositions[jointID] = 70
+            else:
+                self.syncPositions[jointID] = 150
 
-            if speed > max_speed:
-                speed = max_speed
-            elif speed < min_speed:
-                speed = min_speed
+            self.syncSpeeds[jointID] = DEFAULT_SPEED
 
-            #self.actuator.set_speed_actuator(jointID, angular_speed)
-            end = time.time()
-            print (end-start)
-        #for joint in self.RobotImplementedJoints:
+            #real_angle = self.actuator.get_position(jointID).toDegrees()
+            self.currentAngle[joint] = 150
+            time.sleep(0.02)
 
-            angle = int(desired_angle)
+        #self.actuator.sync_move(self.syncPositions, self.syncSpeeds)
 
+
+        '''
+        jointID = 2
+        speed = 100
+        angleAX = AXAngle()
+        angleAX.setDegreeValue(150)
+        print (self.actuator.get_position(jointID).toDegrees())
+        self.actuator.move_actuator(jointID, int(angleAX.getValue()), speed)
+        '''
+
+
+    def executePose(self, pose):
+
+        start_pose = time.time()
+
+        #set positions and wait that the actuator reaching that position
+
+        #max_speed = 500
+        #min_speed = 10
+        timeout = 2000
+
+        #start = time.time()
+        self.max_distance_joint, max_distance = self.findMaxDistance(pose)
+        #max_distance = 150
+        print "-------------------------"
+        print "Max distance: " + str(max_distance)
+        print "Max distance jointID: " + str(self.max_distance_joint)
+        #end = time.time()
+        #print (end-start)
+
+        jointIDs = []
+        for joint in self.RobotImplementedJoints:
+            jointID = self.robotConfiguration.loadJointId(joint)
+            jointIDs.append(jointID)
+            #self.currentAngle[joint] = 150
+
+            '''
+            self.currentAngle[joint] = self.actuator.get_position(jointID).toDegrees()
+            print self.currentAngle[joint]
+            time.sleep(0.01)
+            '''
+
+        for joint in self.RobotImplementedJoints:
+
+            #start = time.time()
+            jointID = self.robotConfiguration.loadJointId(joint)
             print "Joint: ", jointID
-            print "Angle: ", angle
+
+            target_angle = pose.getValue(joint)
+            print "Target Angle: ", target_angle
+
+            '''
+            if target_angle > 300:
+                target_angle = 300
+            '''
+
+            #end = time.time()
+            #print (end-start)
+
+            if (joint == "R_Ankle_Pitch" or joint == "R_Knee" or
+                joint == "L_Hip_Pitch" or joint == "L_Shoulder_Pitch" ):
+                angle = int(300 - target_angle)
+            else:
+                angle = int(target_angle)
+
+            #correct angle
+            if angle < self.minAngle[jointID]:
+                print (str(jointID) + ': Angle out of min range - ' + str(self.minAngle[jointID]-angle) )
+                angle = self.minAngle[jointID]
+
+            elif angle > self.maxAngle[jointID]:
+                print (str(jointID) + ': Angle out of max range - ' + str(angle-self.maxAngle[jointID]) )
+                angle = self.maxAngle[jointID]
+
+            print "Fixed Angle: ", angle
+
+
+            speed = DEFAULT_SPEED
+
+            distance = abs(angle - self.currentAngle[joint])
+            #speed = int((distance * MAX_SPEED) / max_distance)
+
+            print "Distance: ", distance
+
+            #speed = 300
+            if speed > MAX_SPEED:
+                speed = MAX_SPEED
+            elif speed < MIN_SPEED:
+                speed = MIN_SPEED
+
             print "Speed: ", speed
 
+
             angleAX = AXAngle()
+            angleAX.setDegreeValue(angle)
 
-            if (joint == "L_Ankle_Pitch" or
-                joint == "L_Knee" or
-                joint == "L_Hip_Pitch" or
-                joint == "L_Shoulder_Pitch" ):
+            self.targetAngle[jointID] = angle
 
+            self.syncPositions[jointID] = angle
+            self.syncSpeeds[jointID] = speed
 
-                angleAX.setDegreeValue(300 - angle)
-            else:
-                angleAX.setDegreeValue(angle)
+            #self.actuator.move_actuator(jointID, int(angleAX.getValue()), speed)
+            #time.sleep(0.01)
 
-            #TODO implement method for setting position of all actuators at the same time
-            self.actuator.move_actuator(jointID, int(angleAX.getValue()), speed)
+        time.sleep(0.03)
+        self.actuator.sync_move(self.syncPositions, self.syncSpeeds)
+        time.sleep(0.02)
 
-            self.poseExecuted = self.poseExecuted + 1
+        self.poseExecuted = self.poseExecuted + 1
 
         print "pose executed: ", str(self.poseExecuted)
         end_pose = time.time()
         print "Pose execution time: "
         print (end_pose - start_pose)
-        time.sleep(0.1)
+
+        #self.waitForCompletion(pose, timeout)
+
+        for joint in self.RobotImplementedJoints:
+            jointID = self.robotConfiguration.loadJointId(joint)
+            self.currentAngle[joint] = self.targetAngle[jointID]
 
         '''
         for joint in self.RobotImplementedJoints:
@@ -197,9 +358,10 @@ class PhysicalLucy(Lucy):
             angleAX.setDegreeValue(angle)
             #TODO implement method for setting position of all actuators at the same time
             self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), int(angleAX.getValue()), self.defaultSpeed)
-            self.poseExecuted = self.poseExecuted + 1
+            time.sleep(0.03)
+        self.poseExecuted = self.poseExecuted + 1
         print "pose executed!"
-        time.sleep(0.05)
+        time.sleep(0.04)
         '''
 
     def stopLucy(self):

@@ -49,6 +49,7 @@ geneticPoolDir = os.pardir+conf.getDirectory("Genetic Pool")
 arguments = len(sys.argv)
 
 def createIndividual(filename):
+
     if int(conf.getProperty("Lucy simulated?"))==1:
 
         precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
@@ -79,6 +80,34 @@ def createIndividual(filename):
         walk.setCycleLength(embryoCycleLength)
 
     else:
+
+        precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
+        preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
+
+        preCycleLength = preCycleEmbryo.getLength()
+
+        if int(conf.getProperty("Concatenate walk cycles?")):
+            walkEmbryo = DTIndividualGeneticTimeSerieFileWalk(os.getcwd()+"/"+filename)
+            embryoCycleLength = (walkEmbryo.getLength() - preCycleLength) / int(conf.getProperty("Concatenate walk cycles?"))
+        else:
+            walkEmbryo = DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)
+            embryoCycleLength = walkEmbryo.getLength() - preCycleLength
+
+        if int(conf.getProperty("concatenate external cycle file?")):
+            externalFirstCycleFile = os.getcwd() + conf.getFile("external cycle file")
+            externalFirstCycle = DTIndividualGeneticTimeSerieFile(externalFirstCycleFile)
+            preCycleEmbryo.concatenate(externalFirstCycle)
+            preCycleLength = preCycleEmbryo.getLength()
+            embryoCycleLength = embryoCycleLength - externalFirstCycle.getLength()
+
+        preCycleEmbryo.concatenate(walkEmbryo)
+        walkEmbryo = preCycleEmbryo
+        #walk = Individual(geneticVanillaProp, walkEmbryo)
+        walk = Individual(physicalProp, walkEmbryo)
+        walk.setPrecycleLength(preCycleLength)
+        walk.setCycleLength(embryoCycleLength)
+
+        '''
         #TODO physical stage
         #TODO restructure the precycle for the case of physical and simulated
         walkEmbryo = DTIndividualGeneticTimeSerieFile(os.getcwd()+"/"+filename)
@@ -94,6 +123,8 @@ def createIndividual(filename):
         walkEmbryo = preCycleEmbryo
         walk = Individual(physicalProp, walkEmbryo)
         #TODO add support for walking cycle
+
+        '''
     return walk
 
 '''walk = Individual(geneticVanillaProp, DTIndividualGeneticMatrix()) #dummy individual to initialise the simulator and enable the time step configuration
@@ -125,5 +156,3 @@ else:
         walk.execute()
         print "execution time: ", time.time() - time1
         print "individual executed"
-
-

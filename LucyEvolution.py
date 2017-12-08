@@ -36,7 +36,7 @@ from Individual                                 import Individual
 from configuration.LoadSystemConfiguration      import LoadSystemConfiguration
 from datatypes.DTGenomeFunctions import  DTGenomeFunctions
 from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix, DTIndividualGeneticMatrixWalk
-from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive
+from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive, DTIndividualPropertyPhysicalBioloid
 from genetic_operators import crossovers, mutators
 
 initialPopulationSetted = False
@@ -50,14 +50,14 @@ experimentDir = ""
 def storeExperimentGAparameters():
     conf = LoadSystemConfiguration()
     file = open(os.path.join(experimentDir,"info.txt"),"w")
-    
+
     file.write("initialPopulationSize = " + conf.getProperty("Population size") + "\n")
     file.write("generations = " + conf.getProperty("Number of generations") + "\n")
     file.write("genome.crossover = " + conf.getProperty("Crossover operator") + "\n")
     file.write("genome.mutator = " + conf.getProperty("Mutator operator") + "\n")
-    
+
     file.write("MutationRate = " + conf.getProperty("MutationRate") + "\n")
-    
+
     file.write("selector = " + conf.getProperty("Selection operator") + "\n")
     file.write("CrossoverRate = " + conf.getProperty("CrossoverRate") + "\n")
     file.write("ElitismReplacement percentage = " + conf.getProperty("Elitism replacement percentage") + "\n")
@@ -81,6 +81,7 @@ def setInitialPopulation(ga_engine):
     propCMUDaz = DTIndividualPropertyCMUDaz()
     propVanilla = DTIndividualPropertyVanilla()
     balieroProp = DTIndividualPropertyBaliero()
+    physicalProp = DTIndividualPropertyPhysicalBioloid()
 
     conf = LoadSystemConfiguration()
 
@@ -91,13 +92,13 @@ def setInitialPopulation(ga_engine):
     BalieroDir = os.getcwd()+conf.getDirectory("Baliero transformed walk Files")
     ADHOCDir = os.getcwd()+conf.getDirectory("ADHOC Files")
     geneticPoolDir = os.getcwd()+conf.getDirectory("Genetic Pool")
-    
+
     population = ga_engine.getPopulation()
     popSize = len(population)
 
     individualCounter = 0
-    walk = Individual(propVanilla, DTIndividualGeneticMatrix()) #dummy individual to initialise the simulator and enable the time step configuration
-    walk.execute()
+    #walk = Individual(propVanilla, DTIndividualGeneticMatrix()) #dummy individual to initialise the simulator and enable the time step configuration
+    #walk.execute()
     print "please set the proper time step in vrep"
 
 
@@ -105,6 +106,7 @@ def setInitialPopulation(ga_engine):
 
 
     #the random initia population created is replaced by the imitation motion capture database
+    '''
     if individualCounter < popSize:
         for filename in glob.glob(os.path.join(CMUxmlDir, '*.xml')):
             if individualCounter < popSize:
@@ -127,12 +129,15 @@ def setInitialPopulation(ga_engine):
             else:
                 break
     '''
+
     if individualCounter < popSize:
         for filename in glob.glob(os.path.join(lucyCycles, '*.xml')):
             if individualCounter < popSize:
                 print individualCounter, " individuals processed!"
                 print 'inserting individual: ' + filename + " into the initial population"
-                walk = Individual(propVanilla, DTIndividualGeneticTimeSerieFile(filename))
+                #Modified by avasi
+                #walk = Individual(propVanilla, DTIndividualGeneticTimeSerieFile(filename))
+                walk = Individual(physicalProp, DTIndividualGeneticTimeSerieFile(filename))
                 teacherGeneticMatrix = walk.getGenomeMatrix()
                 adan = population[individualCounter]
                 adanIndividualLength=dtgenoma.getIndividualLength(adan)
@@ -148,14 +153,15 @@ def setInitialPopulation(ga_engine):
                 individualCounter = individualCounter + 1
             else:
                 break
-    '''
 
     global initialPopulationSetted
     initialPopulationSetted = True
 
+
 def chromosomeToLucyGeneticMatrix(chromosome): #TODO encapsulate this in a helper class
     geneticMatrix = [[chromosome[i][j] for j in xrange(chromosome.getWidth())] for i in xrange(chromosome.getHeight())]
     return geneticMatrix
+
 
 def generationCallback(ga_engine):
     # persist best individual at the moment
@@ -186,7 +192,10 @@ def generationCallback(ga_engine):
         storeExperimentGAparameters()
 
     prop = DTIndividualPropertyVanilla()
+    physicalProp = DTIndividualPropertyPhysicalBioloid()
+
     bestIndividual = Individual(prop, DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(best)))
+
     bestIndividual.persist(os.path.join(experimentDir, filename))
     ga_engine.getDBAdapter().commit()
 
@@ -196,22 +205,25 @@ def generationCallback(ga_engine):
 
     return False
 
+
 # This function is the evaluation function
 def eval_func(chromosome):
+
     conf = LoadSystemConfiguration()
     if not initialPopulationSetted:
         setInitialPopulation(gaEngine)
 
     prop = DTIndividualPropertyVanillaEvolutive()
+    physicalProp = DTIndividualPropertyPhysicalBioloid()
 
-    precycleFile = os.getcwd()+"/mocap/cmu_mocap/xml/util/walk_precycle.xml"
+    precycleFile = os.getcwd()+ "/mocap/cmu_mocap/xml/util/walk_precycle.xml"
     preCycleEmbryo = DTIndividualGeneticTimeSerieFile(precycleFile)
+
     preCycleLength = preCycleEmbryo.getLength()
 
     if int(conf.getProperty("Concatenate walk cycles?")):
         embryo = DTIndividualGeneticMatrixWalk(chromosomeToLucyGeneticMatrix(chromosome))
         embryoCycleLength = (embryo.getLength() - preCycleLength) / int(conf.getProperty("Concatenate walk cycles?"))
-
     else:
         embryo = DTIndividualGeneticMatrix(chromosomeToLucyGeneticMatrix(chromosome))
         embryoCycleLength = embryo.getLength() - preCycleLength
@@ -226,16 +238,22 @@ def eval_func(chromosome):
     preCycleEmbryo.concatenate(embryo)
     newEmbryo = preCycleEmbryo
     #embryoLength = newEmbryo.getLength()
+    #Modified by avasi
     individual = Individual(prop, newEmbryo)
+    #individual = Individual(physicalProp, newEmbryo)
     individual.setPrecycleLength(preCycleLength)
-
     individual.setCycleLength(embryoCycleLength)
+
     print "el cycle length seteado es: ", embryoCycleLength
 
     ##print "precyclelength:  ", preCycleLength
     ##print "cyclelength:  ", embryoCycleLength
     #individual.setLength(embryoLength)
     fitness = individual.execute() #return the fitness resulting from the simulator execution
+
+    input_fitness = raw_input("Ingresar fitness")
+    print input_fitness
+    #Vasi cambiar fitness por esperar entrada teclado
 
     if int(conf.getProperty("re-evaluate fittest?"))==True:
         if fitness > max_score: #is really a better fitness ?
@@ -256,6 +274,7 @@ def ConvergenceCriteria(ga_engine):
     return convergenceCriteria
 
 def run_main():
+
     conf = LoadSystemConfiguration()
     initialPopulationSize = int(conf.getProperty("Population size"))
     generations = int(conf.getProperty("Number of generations"))
@@ -274,7 +293,7 @@ def run_main():
 
     #genome.crossover.set(crossovers.G2DListCrossoverSingleNearHPointImprove)
     #genome.crossover.set(crossovers.G2DListCrossoverSingleHPoint)
-    
+
     # Genetic Algorithm Instance
     ga = GSimpleGA.GSimpleGA(genome)
     ga.setGenerations(generations)
@@ -286,9 +305,9 @@ def run_main():
     elif conf.getProperty("Mutator operator") == "Mutators.G2DListMutatorRealGaussianGradient":
         genome.mutator.set(Mutators.G2DListMutatorRealGaussianGradient)
 
-    
+
     ga.setMutationRate(float(conf.getProperty("MutationRate")))
-    
+
     if conf.getProperty("Selection operator") == "Selectors.GRankSelector" :
         ga.selector.set(Selectors.GRankSelector)
     elif conf.getProperty("Selection operator") == "Selectors.GTournamentSelector" :
@@ -298,7 +317,7 @@ def run_main():
     elif conf.getProperty("Selection operator") == "Selectors.GUniformSelector" :
         ga.selector.set(Selectors.GUniformSelector)
 
-    '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation. 
+    '''For crossover probability, maybe it is the ratio of next generation population born by crossover operation.
     While the rest of population...maybe by previous selection or you can define it as best fit survivors'''
     ga.setCrossoverRate(float(conf.getProperty("CrossoverRate")))
 
@@ -315,7 +334,7 @@ def run_main():
     # Create DB Adapter and set as adapter
     sqlite_adapter = DBAdapters.DBSQLite(identify="Lucy walk", resetDB=True)
     ga.setDBAdapter(sqlite_adapter)
-                        
+
     #callback to persist best individual of each generation
     ga.stepCallback.set(generationCallback)
 
@@ -346,12 +365,12 @@ def run_main():
         filename = "final-" + str(pos) + "-" + timestr + ".xml"
         individual.persist(os.path.join(experimentDir, filename))
     #ga.getDBAdapter().commit()
-    
+
     shutil.copy2('pyevolve.db', experimentDir)
     shutil.copy2(conf.getProperty("System Log"), experimentDir)
     os.system("pyevolve_graph.py -i \"Lucy walk\" -3 -o gene_pool/experiment_img/" + timestr + " -e png")
-    
-    #do the stats    
+
+    #do the stats
     print ga.getStatistics()
 
 

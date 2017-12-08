@@ -26,11 +26,16 @@ from datatypes.DTGenomeFunctions import DTGenomeFunctions
 from datatypes.DTModelRepose                    import DTModelVrepReda
 from simulator.LoadRobotConfiguration           import LoadRobotConfiguration
 from simulator.Lucy                             import SimulatedLucy, PhysicalLucy
-
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy as sp
+from scipy.interpolate import interp1d
+import time
 
 class Individual:
 
     def __init__(self, idividualProperty, individualGeneticMaterial, modelReposeValue=DTModelVrepReda()):
+
         self.property = idividualProperty
         self.modelReposeValue = modelReposeValue
         self.fitness = 0
@@ -77,16 +82,32 @@ class Individual:
             self.lucy = SimulatedLucy(int(self.configuration.getProperty("Lucy render enable")))
         else:
             self.lucy = PhysicalLucy()
-   
+
         poseExecute={}
 
+        self.lucy.idlePosition()
+        print('idle')
+        time.sleep(1)
+        fig, ax0 = plt.subplots()
+
         i=0
+        angles = []
+        frames = []
         while (self.lucy.isLucyUp() and i < self.length):
+
             for joint in self.robotConfig.getJointsName():
                 if not(self.property.avoidJoint(joint)):
                     value = self.genomeMatrix[i][self.genomeMatrixJointNameIDMapping[joint]]
                     poseExecute[joint] = value
+
+                    if joint == 'L_Knee' and i >44 and i<86:
+                        angles.append(int(value))
+                        frames.append(i)
+
+
             i = i + self.lucy.getPosesExecutedByStepQty()
+
+
             self.lucy.executePose(Pose(poseExecute))
 
             '''if self.precycleLength > 0 and i == self.precycleLength - 1:
@@ -95,6 +116,23 @@ class Individual:
             if self.precycleLength > 0 and i > self.precycleLength - 1:
                 if (i - self.precycleLength) > 0 and (i - self.precycleLength) % self.cycleLength == 0:
                     self.lucy.moveHelperArm()'''
+
+        x = np.array(frames)
+        y = np.array(angles)
+
+        #tck = sp.interpolate.splrep(x, y)
+        #print sp.interpolate.splev(x, tck)
+        #sp.interpolate.interp1d(x, y, kind='cubic')
+
+        ax0.plot(x, y, "#FF0000" ,label='joint=' + str(joint))
+        ax0.set_title(u'Ángulo en función del tiempo')
+        ax0.set_ylabel('Ángulo')
+        ax0.set_xlabel(u'Frame')
+        ax0.legend(loc='upper right')
+
+        #plt.show()
+
+
 
         startingCyclePose = self.getPrecycleLength()
         executionConcatenationGap = self.individualGeneticMaterial.getConcatenationGap(startingCyclePose)
@@ -189,5 +227,3 @@ class Individual:
 #    print 'executing individual: ' + filename
 #    walk = Individual(filename, propVanilla)
 #    walk.execute()
-
-    
