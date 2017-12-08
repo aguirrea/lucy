@@ -132,8 +132,6 @@ class Individual:
 
         #plt.show()
 
-
-
         startingCyclePose = self.getPrecycleLength()
         executionConcatenationGap = self.individualGeneticMaterial.getConcatenationGap(startingCyclePose)
         self.fitness = self.lucy.getFitness(self.length, executionConcatenationGap)

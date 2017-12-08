@@ -63,8 +63,8 @@ class CommSimulator(Communication):
 
 class CommSerial(Communication):
 
-    #def __init__(self, tty_node = "/dev/tty.usbserial-A7005LBF", baudrate=1000000):
-    def __init__(self, tty_node = "/dev/tty.usbserial-A900fDga", baudrate=1000000):
+    def __init__(self, tty_node = "/dev/tty.usbserial-A7005LBF", baudrate=1000000, rtscts=True):
+    #def __init__(self, tty_node = "/dev/tty.usbserial-A900fDga", baudrate=1000000):
         Communication.__init__(self)
         self.tty_node = tty_node
         self.baudrate = baudrate
@@ -75,10 +75,14 @@ class CommSerial(Communication):
             self.client = serial.Serial()         # create a serial port object
             self.client.baudrate = self.baudrate  # baud rate, in bits/second
             self.client.port = self.tty_node      # this is whatever port your are using
+            self.client.rtscts = True 
             self.client.open()
             print "connected!"
         except:
             print "error stablishing serial connection"
+
+    def close(self):
+        self.client.close()
 
     def send_msg(self, msg):
         #print "mando serial"
@@ -90,6 +94,12 @@ class CommSerial(Communication):
 
     def flushInput (self):
         self.client.flushInput()
+
+    def flushOutput (self):
+        self.client.flushOutput()
+
+    def reset_output_buffer(self):
+        self.reset_output_buffer()
 
     def getByte(self):
         return self.client.read(1)

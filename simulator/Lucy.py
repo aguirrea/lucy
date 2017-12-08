@@ -87,8 +87,10 @@ class PhysicalLucy(Lucy):
     def __init__(self):
 
         Lucy.__init__(self)
+
         self.comm_tty = CommSerial()
         self.comm_tty.connect()
+
         self.actuator = Actuator(self.comm_tty)
         #self.defaultSpeed = 500 #TODO change this, use configuration files
         self.initialPoses = {}
@@ -194,23 +196,26 @@ class PhysicalLucy(Lucy):
 
         #Seteo brazos
         angleAX.setDegreeValue(230)
+        time.sleep(0.01)
         self.actuator.move_actuator(4, int(angleAX.getValue()), DEFAULT_SPEED)
         self.currentAngle[4] = 230
         angleAX.setDegreeValue(70)
+        time.sleep(0.01)
         self.actuator.move_actuator(3, int(angleAX.getValue()), DEFAULT_SPEED)
         self.currentAngle[3] = 70
 
         angleAX.setDegreeValue(150)
+        time.sleep(0.01)
         self.actuator.move_actuator(5, int(angleAX.getValue()), DEFAULT_SPEED)
         self.currentAngle[5] = 150
         angleAX.setDegreeValue(150)
+        time.sleep(0.01)
         self.actuator.move_actuator(6, int(angleAX.getValue()), DEFAULT_SPEED)
         self.currentAngle[6] = 150
 
         #Seteo resto del cuerpo
 
         for joint in self.RobotImplementedJoints:
-
 
             jointID = self.robotConfiguration.loadJointId(joint)
 
@@ -225,10 +230,11 @@ class PhysicalLucy(Lucy):
 
             #real_angle = self.actuator.get_position(jointID).toDegrees()
             self.currentAngle[joint] = 150
-            time.sleep(0.02)
 
+
+        time.sleep(0.01)
         #self.actuator.sync_move(self.syncPositions, self.syncSpeeds)
-
+        time.sleep(0.01)
 
         '''
         jointID = 2
@@ -248,28 +254,28 @@ class PhysicalLucy(Lucy):
 
         #max_speed = 500
         #min_speed = 10
-        timeout = 2000
+        timeout = 200
 
         #start = time.time()
-        self.max_distance_joint, max_distance = self.findMaxDistance(pose)
         #max_distance = 150
+        self.max_distance_joint, max_distance = self.findMaxDistance(pose)
         print "-------------------------"
         print "Max distance: " + str(max_distance)
         print "Max distance jointID: " + str(self.max_distance_joint)
         #end = time.time()
         #print (end-start)
 
+        '''
         jointIDs = []
         for joint in self.RobotImplementedJoints:
             jointID = self.robotConfiguration.loadJointId(joint)
             jointIDs.append(jointID)
             #self.currentAngle[joint] = 150
 
-            '''
             self.currentAngle[joint] = self.actuator.get_position(jointID).toDegrees()
             print self.currentAngle[joint]
             time.sleep(0.01)
-            '''
+        '''
 
         for joint in self.RobotImplementedJoints:
 
@@ -278,7 +284,7 @@ class PhysicalLucy(Lucy):
             print "Joint: ", jointID
 
             target_angle = pose.getValue(joint)
-            print "Target Angle: ", target_angle
+            #print "Target Angle: ", target_angle
 
             '''
             if target_angle > 300:
@@ -305,13 +311,11 @@ class PhysicalLucy(Lucy):
 
             print "Fixed Angle: ", angle
 
-
-            speed = DEFAULT_SPEED
-
             distance = abs(angle - self.currentAngle[joint])
+            speed = DEFAULT_SPEED
             #speed = int((distance * MAX_SPEED) / max_distance)
 
-            print "Distance: ", distance
+            #print "Distance: ", distance
 
             #speed = 300
             if speed > MAX_SPEED:
@@ -319,8 +323,7 @@ class PhysicalLucy(Lucy):
             elif speed < MIN_SPEED:
                 speed = MIN_SPEED
 
-            print "Speed: ", speed
-
+            #print "Speed: ", speed
 
             angleAX = AXAngle()
             angleAX.setDegreeValue(angle)
@@ -333,9 +336,9 @@ class PhysicalLucy(Lucy):
             #self.actuator.move_actuator(jointID, int(angleAX.getValue()), speed)
             #time.sleep(0.01)
 
-        time.sleep(0.03)
         self.actuator.sync_move(self.syncPositions, self.syncSpeeds)
-        time.sleep(0.02)
+        time.sleep(0.04)
+        #time.sleep(0.01)
 
         self.poseExecuted = self.poseExecuted + 1
 
@@ -365,7 +368,8 @@ class PhysicalLucy(Lucy):
         '''
 
     def stopLucy(self):
-        pass
+
+        self.comm_tty.close()
         '''
         for joint in self.joints:
             self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), self.initialPoses[joint], self.defaultSpeed)

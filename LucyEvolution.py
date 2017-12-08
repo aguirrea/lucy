@@ -46,6 +46,7 @@ max_score = 0
 max_score_generation = 0
 convergenceCriteria = False
 experimentDir = ""
+experimentTime = ""
 
 def storeExperimentGAparameters():
     conf = LoadSystemConfiguration()
@@ -188,6 +189,8 @@ def generationCallback(ga_engine):
     if gen == 0:
         global experimentDir
         experimentDir = geneticPoolDir + timestr
+        global experimentTime
+        experimentTime = timestr
         os.mkdir(experimentDir)
         storeExperimentGAparameters()
 
@@ -209,9 +212,12 @@ def generationCallback(ga_engine):
 # This function is the evaluation function
 def eval_func(chromosome):
 
+
     conf = LoadSystemConfiguration()
     if not initialPopulationSetted:
         setInitialPopulation(gaEngine)
+
+    input_fitness = raw_input("Press any key to evaluate candidate.")
 
     prop = DTIndividualPropertyVanillaEvolutive()
     physicalProp = DTIndividualPropertyPhysicalBioloid()
@@ -251,8 +257,8 @@ def eval_func(chromosome):
     #individual.setLength(embryoLength)
     fitness = individual.execute() #return the fitness resulting from the simulator execution
 
-    input_fitness = raw_input("Ingresar fitness")
-    print input_fitness
+    input_fitness = float(raw_input("Write fitness: "))
+    print "Fitness inserted:", str(input_fitness)
     #Vasi cambiar fitness por esperar entrada teclado
 
     if int(conf.getProperty("re-evaluate fittest?"))==True:
@@ -368,7 +374,7 @@ def run_main():
 
     shutil.copy2('pyevolve.db', experimentDir)
     shutil.copy2(conf.getProperty("System Log"), experimentDir)
-    os.system("pyevolve_graph.py -i \"Lucy walk\" -3 -o gene_pool/experiment_img/" + timestr + " -e png")
+    os.system("pyevolve_graph.py -i \"Lucy walk\" -3 -o gene_pool/experiment_img/" + experimentTime + " -e png")
 
     #do the stats
     print ga.getStatistics()

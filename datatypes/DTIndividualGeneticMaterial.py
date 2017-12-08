@@ -266,4 +266,4 @@ class DTIndividualGeneticMatrixWalk(DTIndividualGeneticMaterial):
                               xrange(cycleSize)] * CYCLE_REPETITION
         #for debugging info:
         #self.calculateGapByInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION, True)
-        self.calculateGapByCubicInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION)
+        #self.calculateGapByCubicInterpolation(REFERENCE_WINDOW_RADIUS, INTERPOLATION_WINDOW, SPLINE_SMOOTHING_FACTOR, cycleSize, CYCLE_REPETITION)

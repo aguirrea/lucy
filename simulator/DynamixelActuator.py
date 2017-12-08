@@ -57,6 +57,8 @@ class Actuator:
 
     def sync_write(self, joints):
 
+        #self.communication.flushOutput()
+
         p = []
         for j in joints:
 
@@ -102,7 +104,7 @@ class Actuator:
 
     def get_position(self, id):
         AXposition = AXAngle()
-        self.communication.flushInput()  # to empty the data buffer
+        #self.communication.flushInput()  # to empty the data buffer
         bytesToRead = 0x02
         positionRequestMsg = self.make_msg(id, Instruction.READ_DATA, [Register.CURRENT_POSITION, bytesToRead])
         self.communication.send_msg(positionRequestMsg)
