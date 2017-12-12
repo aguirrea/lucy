@@ -120,6 +120,7 @@ class DTIndividualGeneticMaterial(object):
                 y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
                 interpolationDataIter -= 1
 
+            x = np.sort(x)
             spl = interp1d(x, y)
             #spl.set_smoothing_factor(splineSmoothingFactor/10.0)
 
@@ -158,7 +159,7 @@ class DTIndividualGeneticMaterial(object):
     # |...........[referenceWindowsRadius](interpolationWindow)|[referenceWindowsRadius]........|
     #calculates the set of the last points of the cycle (of size interpolationWindow) using as refence for the spline
     #the set of referenceWindowsRadius size points before the interpolationWindow and the referenceWindowsRadius size
-    #set of the first points of the cycle. It does this for all the cyckeRepetition gaps in the concatenation of the
+    #set of the first points of the cycle. It does this for all the cycleRepetition gaps in the concatenation of the
     #cycle
     def  calculateGapByCubicInterpolation(self, referenceWindowRadius, interpolationWindow, splineSmoothingFactor, cycleSize, cycleRepetition, graphicalRepresentation=False):
 
@@ -186,6 +187,7 @@ class DTIndividualGeneticMaterial(object):
                 x[interpolationDataIter] = referenceFrame
                 y[interpolationDataIter] = self.geneticMatrix[referenceFrame][joint]
                 interpolationDataIter -= 1
+            x = np.sort(x)
             if abs(self.geneticMatrix[cycleSize - interpolationWindow][joint] - self.geneticMatrix[cycleSize][joint]) < 3:
                 spl = interp1d(x, y)
             else:
