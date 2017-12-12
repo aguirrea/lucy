@@ -46,12 +46,17 @@ class Simulator:
         for joint in self.LucyJoints:
             self.jointHandleMapping[joint]=0
         self.clientId = self.connectVREP()
-
+        RETRY_ATTEMPTS = 50
         if simulatorModel:
-            #TODO try to reutilize the same scene for the sake of performance
-            error = self.loadscn(self.clientId, simulatorModel)
+            for i in range(RETRY_ATTEMPTS):
+                #TODO try to reutilize the same scene for the sake of performance
+                error = self.loadscn(self.clientId, simulatorModel)
+                if not error:
+                    break
+                print "retrying connection to vrep"
+
             if error:
-                 raise VrepException("error loading Vrep robot model", -1)
+                raise VrepException("error loading Vrep robot model", -1)
        
         if int(self.sysConf.getProperty("synchronous mode?"))==1:
             self.synchronous = True
