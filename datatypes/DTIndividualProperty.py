@@ -80,7 +80,8 @@ class DTIndividualPropertyPhysicalBioloid(DTIndividualProperty):
         self.avoidJoints = ["L_Elbow_Yaw", "R_Elbow_Yaw", "L_Shoulder_Yaw", "R_Shoulder_Yaw", "R_Ankle_Roll"]
         self.diffAvoidJoints = self.avoidJoints
         self.poseFix["R_Shoulder_Yaw"] = 0
-        self.poseFix["R_Shoulder_Pitch"] = -8
+        #self.poseFix["R_Shoulder_Pitch"] = -8
+        self.poseFix["R_Shoulder_Pitch"] = -30
         self.poseFix["R_Hip_Yaw"] = 0
         self.poseFix["R_Hip_Roll"] = -1
         self.poseFix["R_Hip_Pitch"] = 0
@@ -90,7 +91,8 @@ class DTIndividualPropertyPhysicalBioloid(DTIndividualProperty):
         self.poseFix["R_Ankle_Roll"] = 0
 
         self.poseFix["L_Shoulder_Yaw"] = 0
-        self.poseFix["L_Shoulder_Pitch"] = -12
+        #self.poseFix["L_Shoulder_Pitch"] = -12
+        self.poseFix["L_Shoulder_Pitch"] = -35
         self.poseFix["L_Hip_Yaw"] = 0
         self.poseFix["L_Hip_Roll"] = 1
         self.poseFix["L_Hip_Pitch"] = 0

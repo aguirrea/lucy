@@ -214,29 +214,6 @@ class PhysicalLucy(Lucy):
 
     def idlePosition(self):
 
-        '''
-        for i in range(1,40):
-            angleAX = AXAngle()
-            angleAX.setDegreeValue(230)
-            self.actuator.move_actuator(i, int(angleAX.getValue()), 200)
-        '''
-
-        '''
-        servo_id = 9
-        target_position = 100
-
-        try:
-
-            dynamixel.set_position(self.ser, servo_id, target_position)
-            dynamixel.send_action_packet(self.ser)
-
-            print('Success!')
-
-        except Exception as e:
-            print('Unable to move to desired position.')
-            print(e)
-        '''
-
         angleAX = AXAngle()
 
         #Seteo brazos
@@ -303,16 +280,12 @@ class PhysicalLucy(Lucy):
 
         #start = time.time()
         #max_distance = 150
-        start_time = time.time()
-        end_time = time.time()
         self.max_distance_joint, max_distance = self.findMaxDistance(pose)
-        print (end_time - start_time)
 
         print "-------------------------"
-        '''
         print "Max distance: " + str(max_distance)
         print "Max distance jointID: " + str(self.max_distance_joint)
-        '''
+
 
         #end = time.time()
         #print (end-start)
@@ -328,9 +301,6 @@ class PhysicalLucy(Lucy):
             print self.currentAngle[joint]
             time.sleep(0.01)
         '''
-
-        start_time = time.time()
-        end_time = time.time()
 
         for joint in self.RobotImplementedJoints:
 
@@ -368,7 +338,7 @@ class PhysicalLucy(Lucy):
 
             distance = abs(angle - self.currentAngle[joint])
             speed = DEFAULT_SPEED
-            #speed = int((distance * MAX_SPEED) / max_distance)
+            speed = int((distance * MAX_SPEED) / max_distance)
 
             #print "Distance: ", distance
 
@@ -394,27 +364,16 @@ class PhysicalLucy(Lucy):
 
             #self.actuator.move_actuator(jointID, int(angleAX.getValue()), speed)
             #time.sleep(0.01)
-        print (end_time - start_time)
 
-        start_time = time.time()
         self.actuator.sync_move(self.syncPositions, self.syncSpeeds)
-        end_time = time.time()
-        print (end_time - start_time)
-        #dynamixel.flush_serial(self.ser)
-        #print self.testpos
-        #print self.testservos
-        #print self.testvel
 
-        #vector = chain.make_vector(self.testpos, self.testservos, self.testvel)
-        #chain.move_to_vector(self.ser, vector)
         time.sleep(0.04)
-        #time.sleep(0.01)
 
         self.poseExecuted = self.poseExecuted + 1
 
-        #print "pose executed: ", str(self.poseExecuted)
+        print "pose executed: ", str(self.poseExecuted)
         end_pose = time.time()
-        #print "Pose execution time: "
+        print "Pose execution time: "
         print (end_pose - start_pose)
 
         #self.waitForCompletion(pose, timeout)
@@ -429,7 +388,6 @@ class PhysicalLucy(Lucy):
             angle = pose.getValue(joint)
             angleAX = AXAngle()
             angleAX.setDegreeValue(angle)
-            #TODO implement method for setting position of all actuators at the same time
             self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), int(angleAX.getValue()), self.defaultSpeed)
             time.sleep(0.03)
         self.poseExecuted = self.poseExecuted + 1
