@@ -31,11 +31,12 @@ from AXAngle                        import AXAngle
 from Actuator                       import Actuator
 #from DynamixelActuator              import DynamixelActuator
 from Communication                  import CommSerial
+import Communication
 from FitnessFunctionFactory         import DistanceConcatenationgapFramesexecutedEndcyclebalanceAngle
 from LoadRobotConfiguration         import LoadRobotConfiguration
 from LoadSystemConfiguration        import LoadSystemConfiguration
 from Simulator                      import Simulator
-
+from pydynamixel import dynamixel, chain
 
 MAX_SPEED = 500
 DEFAULT_SPEED = 250
@@ -81,6 +82,9 @@ class Lucy(object):
     def getPosesExecutedByStepQty(self):
         pass
 
+    def setCommunication(self, communication):
+        pass
+
 #Lucy instanciated in a Bioloid Premium robot
 class PhysicalLucy(Lucy):
 
@@ -88,10 +92,16 @@ class PhysicalLucy(Lucy):
 
         Lucy.__init__(self)
 
-        self.comm_tty = CommSerial()
-        self.comm_tty.connect()
+        #self.comm_tty = CommSerial()
+        #self.comm_tty.connect()
 
-        self.actuator = Actuator(self.comm_tty)
+        self.ser = Communication.get_serial_for_url('/dev/tty.usbserial-A900fDga')
+        #self.ser = Communication.get_serial_for_url('/dev/tty.usbserial-A7005LBF')
+
+
+        self.actuator = Actuator(self.ser)
+        #self.actuator = Actuator(self.comm_tty)
+
         #self.defaultSpeed = 500 #TODO change this, use configuration files
         self.initialPoses = {}
 
@@ -105,6 +115,10 @@ class PhysicalLucy(Lucy):
         self.minAngle = {1:0 , 2:0 , 3:45 , 4:55 , 5:46 , 6:50 , 7:140 , 8:110 , 9:110 , 10:140 , 11:35 , 12:125 , 13:55 , 14:145 , 15:125 , 16:50 , 17:110 , 18:100}
         self.maxAngle = {1:300 , 2:300 , 3:245 , 4:255 , 5:250 , 6:254 , 7:190 , 8:160 , 9:160 , 10:190 , 11:175 , 12:265 , 13:155 , 14:245 , 15:250 , 16:175 , 17:200 , 18:190}
 
+        #self.ser = dynamixel.get_serial_for_url('/dev/tty.usbserial-A900fDga')
+        self.testpos = []
+        self.testvel = []
+        self.testservos = []
         '''
         #checking communication with motors
         for joint in self.joints:
@@ -122,6 +136,14 @@ class PhysicalLucy(Lucy):
         for joint in self.joints:
             self.actuator.led_state_change(self.robotConfiguration.loadJointId(joint), 0)
         '''
+
+    '''
+    def setCommunication(self, communication):
+
+        self.comm_tty = communication
+        self.actuator = Actuator(self.comm_tty)
+
+    '''
 
     def getPosesExecutedByStepQty(self):
         return 1
@@ -192,25 +214,48 @@ class PhysicalLucy(Lucy):
 
     def idlePosition(self):
 
+        '''
+        for i in range(1,40):
+            angleAX = AXAngle()
+            angleAX.setDegreeValue(230)
+            self.actuator.move_actuator(i, int(angleAX.getValue()), 200)
+        '''
+
+        '''
+        servo_id = 9
+        target_position = 100
+
+        try:
+
+            dynamixel.set_position(self.ser, servo_id, target_position)
+            dynamixel.send_action_packet(self.ser)
+
+            print('Success!')
+
+        except Exception as e:
+            print('Unable to move to desired position.')
+            print(e)
+        '''
+
         angleAX = AXAngle()
 
         #Seteo brazos
         angleAX.setDegreeValue(230)
         time.sleep(0.01)
-        self.actuator.move_actuator(4, int(angleAX.getValue()), DEFAULT_SPEED)
+        #self.actuator.move_actuator(4, int(angleAX.getValue()), DEFAULT_SPEED)
         self.currentAngle[4] = 230
         angleAX.setDegreeValue(70)
         time.sleep(0.01)
-        self.actuator.move_actuator(3, int(angleAX.getValue()), DEFAULT_SPEED)
+        #self.actuator.move_actuator(3, int(angleAX.getValue()), DEFAULT_SPEED)
         self.currentAngle[3] = 70
 
         angleAX.setDegreeValue(150)
         time.sleep(0.01)
-        self.actuator.move_actuator(5, int(angleAX.getValue()), DEFAULT_SPEED)
+        #self.actuator.move_actuator(5, int(angleAX.getValue()), DEFAULT_SPEED)
         self.currentAngle[5] = 150
         angleAX.setDegreeValue(150)
         time.sleep(0.01)
-        self.actuator.move_actuator(6, int(angleAX.getValue()), DEFAULT_SPEED)
+        #self.actuator.move_actuator(6, int(angleAX.getValue()), DEFAULT_SPEED)
         self.currentAngle[6] = 150
 
         #Seteo resto del cuerpo
@@ -258,10 +303,17 @@ class PhysicalLucy(Lucy):
 
         #start = time.time()
         #max_distance = 150
+        start_time = time.time()
+        end_time = time.time()
         self.max_distance_joint, max_distance = self.findMaxDistance(pose)
+        print (end_time - start_time)
+
         print "-------------------------"
+        '''
         print "Max distance: " + str(max_distance)
         print "Max distance jointID: " + str(self.max_distance_joint)
+        '''
+
         #end = time.time()
         #print (end-start)
 
@@ -277,11 +329,14 @@ class PhysicalLucy(Lucy):
             time.sleep(0.01)
         '''
 
+        start_time = time.time()
+        end_time = time.time()
+
         for joint in self.RobotImplementedJoints:
 
             #start = time.time()
             jointID = self.robotConfiguration.loadJointId(joint)
-            print "Joint: ", jointID
+            #print "Joint: ", jointID
 
             target_angle = pose.getValue(joint)
             #print "Target Angle: ", target_angle
@@ -309,7 +364,7 @@ class PhysicalLucy(Lucy):
                 print (str(jointID) + ': Angle out of max range - ' + str(angle-self.maxAngle[jointID]) )
                 angle = self.maxAngle[jointID]
 
-            print "Fixed Angle: ", angle
+            #print "Fixed Angle: ", angle
 
             distance = abs(angle - self.currentAngle[joint])
             speed = DEFAULT_SPEED
@@ -333,18 +388,33 @@ class PhysicalLucy(Lucy):
             self.syncPositions[jointID] = angle
             self.syncSpeeds[jointID] = speed
 
+            #self.testservos.append(jointID)
+            #self.testpos.append(int(angleAX.getValue()))
+            #self.testvel.append(speed)
+
             #self.actuator.move_actuator(jointID, int(angleAX.getValue()), speed)
             #time.sleep(0.01)
+        print (end_time - start_time)
 
+        start_time = time.time()
         self.actuator.sync_move(self.syncPositions, self.syncSpeeds)
+        end_time = time.time()
+        print (end_time - start_time)
+        #dynamixel.flush_serial(self.ser)
+        #print self.testpos
+        #print self.testservos
+        #print self.testvel
+
+        #vector = chain.make_vector(self.testpos, self.testservos, self.testvel)
+        #chain.move_to_vector(self.ser, vector)
         time.sleep(0.04)
         #time.sleep(0.01)
 
         self.poseExecuted = self.poseExecuted + 1
 
-        print "pose executed: ", str(self.poseExecuted)
+        #print "pose executed: ", str(self.poseExecuted)
         end_pose = time.time()
-        print "Pose execution time: "
+        #print "Pose execution time: "
         print (end_pose - start_pose)
 
         #self.waitForCompletion(pose, timeout)
@@ -368,8 +438,11 @@ class PhysicalLucy(Lucy):
         '''
 
     def stopLucy(self):
-
-        self.comm_tty.close()
+        #pass
+        Communication.close_serial(self.ser)
+        #self.comm_tty.flushInput()
+        #self.comm_tty.flushOutput()
+        #self.comm_tty.close()
         '''
         for joint in self.joints:
             self.actuator.move_actuator(self.robotConfiguration.loadJointId(joint), self.initialPoses[joint], self.defaultSpeed)

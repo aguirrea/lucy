@@ -38,6 +38,7 @@ from datatypes.DTGenomeFunctions import  DTGenomeFunctions
 from datatypes.DTIndividualGeneticMaterial      import DTIndividualGeneticTimeSerieFile, DTIndividualGeneticMatrix, DTIndividualGeneticMatrixWalk
 from datatypes.DTIndividualProperty             import DTIndividualPropertyCMUDaz, DTIndividualPropertyVanilla, DTIndividualPropertyBaliero, DTIndividualPropertyVanillaEvolutive, DTIndividualPropertyPhysicalBioloid
 from genetic_operators import crossovers, mutators
+from simulator.Communication                  import CommSerial
 
 initialPopulationSetted = False
 gaEngine = None
@@ -47,6 +48,7 @@ max_score_generation = 0
 convergenceCriteria = False
 experimentDir = ""
 experimentTime = ""
+#communication =  None
 
 def storeExperimentGAparameters():
     conf = LoadSystemConfiguration()
@@ -255,7 +257,9 @@ def eval_func(chromosome):
     ##print "precyclelength:  ", preCycleLength
     ##print "cyclelength:  ", embryoCycleLength
     #individual.setLength(embryoLength)
+    #fitness = individual.execute(communication) #return the fitness resulting from the simulator execution
     fitness = individual.execute() #return the fitness resulting from the simulator execution
+
 
     input_fitness = float(raw_input("Write fitness: "))
     print "Fitness inserted:", str(input_fitness)
@@ -280,6 +284,12 @@ def ConvergenceCriteria(ga_engine):
     return convergenceCriteria
 
 def run_main():
+
+    '''
+    global communication
+    communication = CommSerial()
+    communication.connect()
+    '''
 
     conf = LoadSystemConfiguration()
     initialPopulationSize = int(conf.getProperty("Population size"))

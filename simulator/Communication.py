@@ -19,9 +19,63 @@
 
 import serial
 import socket
+from serial import SerialException
+from serial import SerialTimeoutException
 
 SIM_HOST = 'localhost'
 SIM_PORT = 7777
+
+BAUDRATE = 1000000
+TIMEOUT = 0.1
+
+
+def get_serial_for_url(url = "/dev/tty.usbserial-A900fDga", baudrate = BAUDRATE, timeout = TIMEOUT):
+    """
+    Open the servo at the specified path with the correct parameters for the Dynamixel.
+
+    :param url: The path to the ``serial`` port.
+    :param baudrate: The baudrate to to which to configure the servo. (Default: ``BAUDRATE``.)
+    :param timeout: The timeout to set for the servo. (Default: ``TIMEOUT``.)
+
+    :returns: A ``serial`` object.
+    """
+
+    ser = serial.serial_for_url(url)
+    ser.baudrate = BAUDRATE
+    ser.timeout = TIMEOUT
+    return ser
+
+
+def flush_serial(ser):
+    """
+    Clear any pending bytes from the ``serial`` buffer.
+
+    :param ser: The ``serial`` object to use.
+
+    :returns: ``None``.
+
+    """
+    while ser.inWaiting() > 0:
+        ser.read()
+
+def close_serial(ser):
+    ser.close()
+
+def write_serial(ser, msg):
+
+    try:
+        '''
+        print msg
+        for val in msg:
+            ser.write(chr(val))
+            print chr(val)
+        '''
+        ser.write(msg)
+    except serial.SerialException as e:
+        print "problems sending package."
+        print e
+    except TypeError as e:
+        print e
 
 class Communication(object):
 
@@ -63,19 +117,29 @@ class CommSimulator(Communication):
 
 class CommSerial(Communication):
 
-    def __init__(self, tty_node = "/dev/tty.usbserial-A7005LBF", baudrate=1000000, rtscts=True):
-    #def __init__(self, tty_node = "/dev/tty.usbserial-A900fDga", baudrate=1000000):
+    #def __init__(self, tty_node = "/dev/tty.usbserial-A7005LBF", baudrate=1000000):
+    def __init__(self, tty_node = "/dev/tty.usbserial-A900fDga", baudrate = BAUDRATE, timeout = TIMEOUT):
+
         Communication.__init__(self)
         self.tty_node = tty_node
         self.baudrate = baudrate
+        self.timeout = timeout
 
     def connect(self):
+
         print "conecting..."
         try:
-            self.client = serial.Serial()         # create a serial port object
+            #self.client = serial.Serial()         # create a serial port object
+            self.client = serial.serial_for_url(self.tty_node)
             self.client.baudrate = self.baudrate  # baud rate, in bits/second
-            self.client.port = self.tty_node      # this is whatever port your are using
-            self.client.rtscts = True 
+            #self.client.port = self.tty_node      # this is whatever port your are using
+            #self.client.rtscts = False
+            #self.client.xonxoff = False
+            self.client.timeout = self.timeout
+            '''
+            self.client.parity = serial.PARITY_NONE
+            self.client.stopbits = serial.STOPBITS_ONE
+            '''
             self.client.open()
             print "connected!"
         except:
@@ -89,8 +153,12 @@ class CommSerial(Communication):
         try:
             for val in msg:
                 self.client.write(chr(val))
-        except:
-            print "problems sending package"
+        except serial.SerialException as e:
+            print "problems sending package."
+            print e
+        except TypeError as e:
+            print e
+
 
     def flushInput (self):
         self.client.flushInput()
@@ -103,6 +171,9 @@ class CommSerial(Communication):
 
     def getByte(self):
         return self.client.read(1)
+
+    def isOpen(self):
+        return self.client.is_open()
 
     def recv_msg(self):
         checksum = 0;

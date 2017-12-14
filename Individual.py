@@ -76,19 +76,25 @@ class Individual:
     def stopLucy(self):
         self.lucy.stopLucy()
 
+    #def execute(self, communication):
     def execute(self):
+
+
         #create the corresponding instance of Lucy, depending if it's real or simulated.
         if int(self.sysConf.getProperty("Lucy simulated?"))==1:
             self.lucy = SimulatedLucy(int(self.configuration.getProperty("Lucy render enable")))
         else:
             self.lucy = PhysicalLucy()
+            #self.lucy.setCommunication(communication)
 
         poseExecute={}
 
+        print('antes idle')
         self.lucy.idlePosition()
         print('idle')
         time.sleep(1)
-        fig, ax0 = plt.subplots()
+
+        #fig, ax0 = plt.subplots()
 
         i=0
         angles = []
@@ -117,19 +123,20 @@ class Individual:
                 if (i - self.precycleLength) > 0 and (i - self.precycleLength) % self.cycleLength == 0:
                     self.lucy.moveHelperArm()'''
 
-        x = np.array(frames)
-        y = np.array(angles)
+        #x = np.array(frames)
+        #y = np.array(angles)
 
         #tck = sp.interpolate.splrep(x, y)
         #print sp.interpolate.splev(x, tck)
         #sp.interpolate.interp1d(x, y, kind='cubic')
 
+        '''
         ax0.plot(x, y, "#FF0000" ,label='joint=' + str(joint))
         ax0.set_title(u'Ángulo en función del tiempo')
         ax0.set_ylabel('Ángulo')
         ax0.set_xlabel(u'Frame')
         ax0.legend(loc='upper right')
-
+        '''
         #plt.show()
 
         startingCyclePose = self.getPrecycleLength()
